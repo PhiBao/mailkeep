@@ -119,16 +119,23 @@ export async function fileLetter(
   } else if (input.route.lane === 'careful') {
     folderId = household.box_careful_folder_id ?? '';
   } else if (input.caseId && input.caseChange) {
-    const month = date.slice(0, 7);
-    const folderName = safeName(
-      `${month} ${input.caseChange.counterparty} — ${input.caseChange.title} (${input.caseId})`,
-    );
-    folderId = await ensureFolder(client, household.box_cases_folder_id ?? '', folderName);
-    db.prepare('UPDATE cases SET box_folder_id = ? WHERE id = ? AND household_id = ?').run(
-      folderId,
-      input.caseId,
-      input.householdId,
-    );
+    const caseRow = db
+      .prepare('SELECT box_folder_id FROM cases WHERE id = ? AND household_id = ?')
+      .get(input.caseId, input.householdId) as { box_folder_id: string | null } | undefined;
+    if (caseRow?.box_folder_id) {
+      folderId = caseRow.box_folder_id;
+    } else {
+      const month = date.slice(0, 7);
+      const folderName = safeName(
+        `${month} ${input.caseChange.counterparty} — ${input.caseChange.title} (${input.caseId})`,
+      );
+      folderId = await ensureFolder(client, household.box_cases_folder_id ?? '', folderName);
+      db.prepare('UPDATE cases SET box_folder_id = ? WHERE id = ? AND household_id = ?').run(
+        folderId,
+        input.caseId,
+        input.householdId,
+      );
+    }
   } else if (input.route.lane === 'handled') {
     folderId = await ensureFolder(client, household.box_other_folder_id ?? '', date.slice(0, 4));
   }
