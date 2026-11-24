@@ -1,0 +1,9 @@
+{
+  "name": "@mailkeep/spike-gateway",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "probe": "tsx probe.ts"
+  }
+}
