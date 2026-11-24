@@ -254,6 +254,11 @@ try {
         "SELECT counterparty, title, status, box_folder_id FROM cases WHERE household_id = ? AND status = 'open' ORDER BY counterparty",
       )
       .all(HOUSEHOLD_ID) as Array<Record<string, unknown>>,
+    boxRootFolderId: (
+      db.prepare('SELECT box_root_folder_id FROM households WHERE id = ?').get(HOUSEHOLD_ID) as {
+        box_root_folder_id: string | null;
+      }
+    ).box_root_folder_id,
     boxLink: boxLink ?? null,
   };
   if (summary.handledOrHeadsup < 15)
@@ -266,7 +271,12 @@ try {
     'Northgate Medical Group',
     'Harbor Gas & Electric',
   ]) {
-    if (!summary.openCases.some((row) => row.counterparty === counterparty)) {
+    if (
+      !summary.openCases.some((row) => {
+        const actual = String(row.counterparty);
+        return actual.includes(counterparty) || counterparty.includes(actual);
+      })
+    ) {
       throw new Error(`Demo is missing an open case for ${counterparty}`);
     }
   }

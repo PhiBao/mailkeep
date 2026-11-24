@@ -1,0 +1,57 @@
+{
+  "generation": 0,
+  "letters": 21,
+  "handledOrHeadsup": 16,
+  "openCases": [
+    {
+      "counterparty": "HC Harbor County Treasurer",
+      "title": "Property Tax Notice",
+      "status": "open",
+      "box_folder_id": "440821948613"
+    },
+    {
+      "counterparty": "Harbor County Library",
+      "title": "Overdue Library Book Notice",
+      "status": "open",
+      "box_folder_id": "440824028640"
+    },
+    {
+      "counterparty": "Harbor County Superior Court",
+      "title": "Jury Summons",
+      "status": "open",
+      "box_folder_id": "440823335125"
+    },
+    {
+      "counterparty": "Harbor Gas & Electric",
+      "title": "November Energy Bill",
+      "status": "open",
+      "box_folder_id": "440823032970"
+    },
+    {
+      "counterparty": "Lakeshore Mutual Insurance",
+      "title": "Auto Insurance Policy Renewal",
+      "status": "open",
+      "box_folder_id": "440821225517"
+    },
+    {
+      "counterparty": "Northgate Medical Group",
+      "title": "Medical Office Visit Bill",
+      "status": "open",
+      "box_folder_id": "440823510209"
+    },
+    {
+      "counterparty": "Riverbend Water Utility",
+      "title": "November Water Bill",
+      "status": "open",
+      "box_folder_id": "440822163605"
+    },
+    {
+      "counterparty": "Westmark State Motor Vehicle Division",
+      "title": "Vehicle Registration Renewal Notice",
+      "status": "open",
+      "box_folder_id": "440823494394"
+    }
+  ],
+  "boxRootFolderId": "440822123671",
+  "boxLink": null
+}
