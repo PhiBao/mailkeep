@@ -1,0 +1,273 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Jev request builder > matches the A9 request snapshot 1`] = `
+{
+  "model": "jev-1.14.0",
+  "questions": {
+    "amount_due": {
+      "criteria": {
+        "a0": "$89.17 — New balance due $89.17",
+        "none": "\`new\` does not ask the recipient to pay any amount",
+      },
+      "instructions": "Which amount in \`amount_candidates\` must the recipient pay because of \`new\`?",
+      "type": "choice",
+    },
+    "completes_0": {
+      "instructions": "\`new\` confirms that the payment or request in \`past[0]\` has been received, paid or completed.",
+      "type": "noul",
+    },
+    "completes_1": {
+      "instructions": "\`new\` confirms that the payment or request in \`past[1]\` has been received, paid or completed.",
+      "type": "noul",
+    },
+    "completes_2": {
+      "instructions": "\`new\` confirms that the payment or request in \`past[2]\` has been received, paid or completed.",
+      "type": "noul",
+    },
+    "completes_3": {
+      "instructions": "\`new\` confirms that the payment or request in \`past[3]\` has been received, paid or completed.",
+      "type": "noul",
+    },
+    "completes_4": {
+      "instructions": "\`new\` confirms that the payment or request in \`past[4]\` has been received, paid or completed.",
+      "type": "noul",
+    },
+    "completes_5": {
+      "instructions": "\`new\` confirms that the payment or request in \`past[5]\` has been received, paid or completed.",
+      "type": "noul",
+    },
+    "due_date": {
+      "criteria": {
+        "d0": "Dec 16, 2026 — Due Dec 16",
+        "none": "\`new\` states no deadline for the recipient",
+      },
+      "instructions": "Which date in \`date_candidates\` is the deadline the recipient must act by because of \`new\`?",
+      "type": "choice",
+    },
+    "follow_up_0": {
+      "instructions": "\`new\` is a reminder, second notice, past-due notice or final notice about the same payment or request as \`past[0]\`.",
+      "type": "noul",
+    },
+    "follow_up_1": {
+      "instructions": "\`new\` is a reminder, second notice, past-due notice or final notice about the same payment or request as \`past[1]\`.",
+      "type": "noul",
+    },
+    "follow_up_2": {
+      "instructions": "\`new\` is a reminder, second notice, past-due notice or final notice about the same payment or request as \`past[2]\`.",
+      "type": "noul",
+    },
+    "follow_up_3": {
+      "instructions": "\`new\` is a reminder, second notice, past-due notice or final notice about the same payment or request as \`past[3]\`.",
+      "type": "noul",
+    },
+    "follow_up_4": {
+      "instructions": "\`new\` is a reminder, second notice, past-due notice or final notice about the same payment or request as \`past[4]\`.",
+      "type": "noul",
+    },
+    "follow_up_5": {
+      "instructions": "\`new\` is a reminder, second notice, past-due notice or final notice about the same payment or request as \`past[5]\`.",
+      "type": "noul",
+    },
+    "kind": {
+      "criteria": {
+        "appointment": "a date the recipient must attend, such as an appointment or jury duty",
+        "bill": "asks the recipient to pay an amount",
+        "collection": "a debt collector or past-due demand",
+        "government": "a tax, benefits or legal notice from a government office",
+        "marketing": "an advert, offer, catalog, prize notice or donation request",
+        "other": "none of these",
+        "payment_confirmation": "confirms a payment was received or an account is paid",
+        "personal": "a personal letter or card",
+        "renewal": "a policy, registration or membership that must be renewed",
+        "statement": "account statement or explanation of benefits that is not a request for payment",
+      },
+      "instructions": "What kind of letter is \`new\`?",
+      "type": "choice",
+    },
+    "needs_action": {
+      "instructions": "The recipient of \`new\` must do something because of it: pay, reply, call, sign, renew or attend.",
+      "type": "noul",
+    },
+    "same_matter_0": {
+      "instructions": "\`new\` and \`past[0]\` concern the same underlying account, member, policy, parcel or case. Answer true when the identifiers or subject match, even if the sender name or letter kind differs; answer false for a different account or matter.",
+      "type": "noul",
+    },
+    "same_matter_1": {
+      "instructions": "\`new\` and \`past[1]\` concern the same underlying account, member, policy, parcel or case. Answer true when the identifiers or subject match, even if the sender name or letter kind differs; answer false for a different account or matter.",
+      "type": "noul",
+    },
+    "same_matter_2": {
+      "instructions": "\`new\` and \`past[2]\` concern the same underlying account, member, policy, parcel or case. Answer true when the identifiers or subject match, even if the sender name or letter kind differs; answer false for a different account or matter.",
+      "type": "noul",
+    },
+    "same_matter_3": {
+      "instructions": "\`new\` and \`past[3]\` concern the same underlying account, member, policy, parcel or case. Answer true when the identifiers or subject match, even if the sender name or letter kind differs; answer false for a different account or matter.",
+      "type": "noul",
+    },
+    "same_matter_4": {
+      "instructions": "\`new\` and \`past[4]\` concern the same underlying account, member, policy, parcel or case. Answer true when the identifiers or subject match, even if the sender name or letter kind differs; answer false for a different account or matter.",
+      "type": "noul",
+    },
+    "same_matter_5": {
+      "instructions": "\`new\` and \`past[5]\` concern the same underlying account, member, policy, parcel or case. Answer true when the identifiers or subject match, even if the sender name or letter kind differs; answer false for a different account or matter.",
+      "type": "noul",
+    },
+    "scam_impersonation": {
+      "instructions": "\`new\` is designed to look like it comes from a government office, but it comes from a private company or says it is not affiliated with the government.",
+      "type": "noul",
+    },
+    "scam_payment": {
+      "instructions": "\`new\` asks to be paid with gift cards, cryptocurrency, a wire transfer or a payment app.",
+      "type": "noul",
+    },
+    "scam_pressure": {
+      "instructions": "\`new\` threatens arrest, loss of benefits or loss of property unless the recipient responds immediately.",
+      "type": "noul",
+    },
+    "scam_prize_fee": {
+      "instructions": "\`new\` says the recipient won a prize or money and must pay a fee to receive it.",
+      "type": "noul",
+    },
+    "scam_secrecy": {
+      "instructions": "\`new\` tells the recipient not to tell their bank, family or anyone else.",
+      "type": "noul",
+    },
+    "sender_consistent_0": {
+      "instructions": "\`new\` and \`past[0]\` come from the same real organisation, with matching return address, phone numbers and account number format.",
+      "type": "noul",
+    },
+    "sender_consistent_1": {
+      "instructions": "\`new\` and \`past[1]\` come from the same real organisation, with matching return address, phone numbers and account number format.",
+      "type": "noul",
+    },
+    "sender_consistent_2": {
+      "instructions": "\`new\` and \`past[2]\` come from the same real organisation, with matching return address, phone numbers and account number format.",
+      "type": "noul",
+    },
+    "sender_consistent_3": {
+      "instructions": "\`new\` and \`past[3]\` come from the same real organisation, with matching return address, phone numbers and account number format.",
+      "type": "noul",
+    },
+    "sender_consistent_4": {
+      "instructions": "\`new\` and \`past[4]\` come from the same real organisation, with matching return address, phone numbers and account number format.",
+      "type": "noul",
+    },
+    "sender_consistent_5": {
+      "instructions": "\`new\` and \`past[5]\` come from the same real organisation, with matching return address, phone numbers and account number format.",
+      "type": "noul",
+    },
+  },
+  "state": {
+    "amount_candidates": [
+      {
+        "context": "New balance due $89.17",
+        "id": "a0",
+        "text": "$89.17",
+      },
+    ],
+    "date_candidates": [
+      {
+        "context": "Due Dec 16",
+        "id": "d0",
+        "iso": "2026-12-16",
+        "text": "Dec 16, 2026",
+      },
+    ],
+    "new": {
+      "claims_government": false,
+      "phones": [
+        "(555) 010-4471",
+      ],
+      "sender": "Riverbend Water Utility",
+      "text": "PAST DUE second notice for $89.17 due December 16.",
+    },
+    "past": [
+      {
+        "amount": "$84.17",
+        "case_status": "open",
+        "due": "2026-12-10",
+        "id": "ltr_0",
+        "kind": "bill",
+        "lane": "headsup",
+        "phones": [
+          "(555) 010-4471",
+        ],
+        "received": "2026-11-10",
+        "sender": "Riverbend Water Utility",
+        "text": "November water bill for $84.17 due December 10.",
+      },
+      {
+        "amount": "$84.17",
+        "case_status": "open",
+        "due": "2026-12-10",
+        "id": "ltr_1",
+        "kind": "bill",
+        "lane": "headsup",
+        "phones": [
+          "(555) 010-4471",
+        ],
+        "received": "2026-11-11",
+        "sender": "Riverbend Water Utility",
+        "text": "November water bill for $84.17 due December 10.",
+      },
+      {
+        "amount": "$84.17",
+        "case_status": "open",
+        "due": "2026-12-10",
+        "id": "ltr_2",
+        "kind": "bill",
+        "lane": "headsup",
+        "phones": [
+          "(555) 010-4471",
+        ],
+        "received": "2026-11-12",
+        "sender": "Riverbend Water Utility",
+        "text": "November water bill for $84.17 due December 10.",
+      },
+      {
+        "amount": "$84.17",
+        "case_status": "open",
+        "due": "2026-12-10",
+        "id": "ltr_3",
+        "kind": "bill",
+        "lane": "headsup",
+        "phones": [
+          "(555) 010-4471",
+        ],
+        "received": "2026-11-13",
+        "sender": "Riverbend Water Utility",
+        "text": "November water bill for $84.17 due December 10.",
+      },
+      {
+        "amount": "$84.17",
+        "case_status": "open",
+        "due": "2026-12-10",
+        "id": "ltr_4",
+        "kind": "bill",
+        "lane": "headsup",
+        "phones": [
+          "(555) 010-4471",
+        ],
+        "received": "2026-11-14",
+        "sender": "Riverbend Water Utility",
+        "text": "November water bill for $84.17 due December 10.",
+      },
+      {
+        "amount": "$84.17",
+        "case_status": "open",
+        "due": "2026-12-10",
+        "id": "ltr_5",
+        "kind": "bill",
+        "lane": "headsup",
+        "phones": [
+          "(555) 010-4471",
+        ],
+        "received": "2026-11-15",
+        "sender": "Riverbend Water Utility",
+        "text": "November water bill for $84.17 due December 10.",
+      },
+    ],
+    "today": "2026-12-09",
+  },
+}
+`;
