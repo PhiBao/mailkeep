@@ -88,6 +88,21 @@ export async function queryVectors(
   return querySchema.parse(response.json);
 }
 
+export async function deleteVectors(
+  client: GatewayClient,
+  input: { index: string; namespace: string; ids: string[] },
+) {
+  const response = await client.request(
+    'pinecone',
+    'POST',
+    `/indexes/${input.index}/vectors/delete`,
+    {
+      json: { namespace: input.namespace, ids: input.ids },
+    },
+  );
+  return deleteSchema.parse(response.json);
+}
+
 export async function deleteNamespace(
   client: GatewayClient,
   input: { index: string; namespace: string },
