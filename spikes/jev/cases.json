@@ -1,0 +1,122 @@
+[
+  {
+    "id": "L01",
+    "received": "2026-11-18",
+    "sender": "Riverbend Water Utility",
+    "kind": "bill",
+    "case_status": "open",
+    "amount": "$84.17",
+    "due": "2026-12-10",
+    "lane": "headsup",
+    "phones": ["(555) 010-4471"],
+    "text": "November water bill for Ruth Alvarez. Account 7720-114471, ending 4471. Amount due $84.17 by December 10, 2026. Riverbend Water Utility, PO Box 310, (555) 010-4471."
+  },
+  {
+    "id": "L02",
+    "received": "2026-12-09",
+    "sender": "Riverbend Water Utility",
+    "kind": "collection",
+    "case_status": "open",
+    "amount": "$89.17",
+    "due": "2026-12-16",
+    "lane": "needs_you",
+    "phones": ["(555) 010-4471"],
+    "text": "PAST DUE — SECOND NOTICE. The $84.17 water bill mailed November 18 has not been received. A $5.00 late fee was added. New balance $89.17 due December 16. Account 7720-114471, ending 4471. Same PO Box 310 and phone (555) 010-4471."
+  },
+  {
+    "id": "L03",
+    "received": "2026-12-14",
+    "sender": "Riverbend Water Utility",
+    "kind": "payment_confirmation",
+    "case_status": "paid",
+    "amount": "$89.17",
+    "due": null,
+    "lane": "handled",
+    "phones": ["(555) 010-4471"],
+    "text": "Payment received. Thank you, Ruth Alvarez. We received your $89.17 payment and posted it to account 7720-114471, ending 4471. Your account balance is $0.00. No further action is needed for the November bill or second notice."
+  },
+  {
+    "id": "L06",
+    "received": "2026-11-16",
+    "sender": "Maple Senior Health Plan",
+    "kind": "statement",
+    "case_status": "open",
+    "amount": null,
+    "due": null,
+    "lane": "handled",
+    "phones": ["(555) 010-2200"],
+    "text": "Explanation of Benefits for Ruth Alvarez, member MSH-55-8830. THIS IS NOT A BILL. Office visit claim CLM-261102-8830. You may owe the provider $35. Maple Senior Health Plan, PO Box 4400, (555) 010-2200."
+  },
+  {
+    "id": "L09",
+    "received": "2026-12-08",
+    "sender": "Maple Senior Health Plan — Benefits Verification Office",
+    "kind": "other",
+    "case_status": "open",
+    "amount": null,
+    "due": null,
+    "lane": "careful",
+    "phones": ["(555) 010-9911"],
+    "text": "ACTION REQUIRED WITHIN 48 HOURS. Verify your Maple member card MSH-55-8830 or benefits will be suspended. Call (555) 010-9911. This office is at PO Box 9911, not the usual PO Box 4400. Fine print says the independent verification service is not affiliated with any government agency."
+  },
+  {
+    "id": "L10",
+    "received": "2026-11-19",
+    "sender": "Lakeshore Mutual Insurance",
+    "kind": "renewal",
+    "case_status": "open",
+    "amount": "$412.00",
+    "due": "2027-01-03",
+    "lane": "headsup",
+    "phones": ["(555) 010-3300"],
+    "text": "Auto policy renewal for Ruth Alvarez, policy LM-AU-205512. Renewal premium $412.00 due January 3, 2027. Lakeshore Mutual Insurance, PO Box 820, (555) 010-3300."
+  },
+  {
+    "id": "L11",
+    "received": "2026-12-08",
+    "sender": "Lakeshore Mutual Insurance",
+    "kind": "statement",
+    "case_status": "open",
+    "amount": null,
+    "due": null,
+    "lane": "handled",
+    "phones": ["(555) 010-3300"],
+    "text": "Renewed auto policy documents for Ruth Alvarez, policy LM-AU-205512. New term January 3 to July 3, 2027. Coverage summary and insurance ID card enclosed. Lakeshore Mutual Insurance, PO Box 820, (555) 010-3300."
+  },
+  {
+    "id": "L15",
+    "received": "2026-11-18",
+    "sender": "Northgate Medical Group",
+    "kind": "bill",
+    "case_status": "open",
+    "amount": "$240.00",
+    "due": "2026-12-02",
+    "lane": "headsup",
+    "phones": ["(555) 010-7700"],
+    "text": "Office visit bill for Ruth Alvarez, patient account 33-0193381. Amount due $240.00 by December 2, 2026. Northgate Medical Group, 240 Northgate Avenue, (555) 010-7700."
+  },
+  {
+    "id": "L16",
+    "received": "2026-11-27",
+    "sender": "Apex Recovery Services",
+    "kind": "collection",
+    "case_status": "open",
+    "amount": "$240.00",
+    "due": "2026-12-27",
+    "lane": "needs_you",
+    "phones": ["(555) 010-8800"],
+    "text": "Collection notice for Ruth Alvarez concerning Northgate Medical Group patient account 33-0193381. Original bill dated November 18 for $240.00 remains unpaid. Apex reference ARS-261127-3381. Requested resolution date December 27, 2026. Apex Recovery Services, PO Box 900, (555) 010-8800."
+  },
+  {
+    "id": "L25",
+    "received": "2026-11-25",
+    "sender": "Riverbend Water Utility",
+    "kind": "statement",
+    "case_status": "open",
+    "amount": null,
+    "due": null,
+    "lane": "handled",
+    "phones": ["(555) 010-4471"],
+    "text": "Notice of water rate changes for account 7720-114471, ending 4471. New rates begin January 1, 2027. This is informational; no payment is due now. Riverbend Water Utility, PO Box 310, (555) 010-4471."
+  }
+]
