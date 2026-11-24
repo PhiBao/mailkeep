@@ -6,6 +6,7 @@ import { openDb } from './db/db.js';
 import { migrate } from './db/migrate.js';
 import { GatewayClient } from './gateway/client.js';
 import { createApp } from './http/app.js';
+import { authRoutes } from './http/routes/auth.js';
 import { hooksRoutes } from './http/routes/hooks.js';
 import { startSenderWorker } from './notify/sender.js';
 import { PipelineQueue, resumePending } from './pipeline/queue.js';
@@ -28,8 +29,10 @@ const db = openDb(path.join(config.MAILKEEP_DATA_DIR, 'mailkeep.db'));
 migrate(db);
 const client = new GatewayClient({ config });
 const queue = new PipelineQueue({ client, config, db });
-const app = createApp(config);
-app.route('/', hooksRoutes({ config, db, client, queue }));
+const app = createApp(config, (instance) => {
+  instance.route('/', authRoutes({ config, db }));
+  instance.route('/', hooksRoutes({ config, db, client, queue }));
+});
 
 const server = serve({ fetch: app.fetch, port: config.PORT }, (info) => {
   log.info({ event: 'started', port: info.port, sha: config.gitSha }, 'Mailkeep agent started');
