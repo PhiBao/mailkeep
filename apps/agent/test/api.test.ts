@@ -647,8 +647,8 @@ describe('Today, case, and letter DTOs', () => {
     expect(today.household.today).toBe('2026-11-24');
     expect(today.asks.map((ask) => ask.id)).toEqual(['ask_new', 'ask_old']);
     expect(today.asks.every((ask) => ask.status === 'open')).toBe(true);
-    expect(today.upcoming).toHaveLength(8);
-    expect(today.upcoming.map((item) => item.dueDate)).toEqual([
+    expect(today.upcoming.length).toBeGreaterThan(8);
+    expect(today.upcoming.slice(0, 8).map((item) => item.dueDate)).toEqual([
       '2026-11-25',
       '2026-11-26',
       '2026-11-27',
@@ -658,7 +658,9 @@ describe('Today, case, and letter DTOs', () => {
       '2026-11-30',
       '2026-12-01',
     ]);
-    expect(today.upcoming.map((item) => item.daysLeft)).toEqual([1, 2, 3, 4, 5, 6, 6, 7]);
+    expect(today.upcoming.slice(0, 8).map((item) => item.daysLeft)).toEqual([
+      1, 2, 3, 4, 5, 6, 6, 7,
+    ]);
     expect(today.handledThisWeek.count).toBe(2);
     expect(today.handledThisWeek.items.map((item) => item.id)).toEqual([
       'ltr_handled_now',

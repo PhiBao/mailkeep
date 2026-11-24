@@ -564,7 +564,7 @@ export function buildTodayDTO(
     .prepare(
       `SELECT * FROM cases
         WHERE household_id = ? AND status IN ('open', 'overdue') AND due_date IS NOT NULL
-        ORDER BY due_date, created_at, id LIMIT 8`,
+        ORDER BY due_date, created_at, id`,
     )
     .all(member.household_id) as CaseRow[];
   const start = weekStart(today);
