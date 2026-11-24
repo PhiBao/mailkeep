@@ -1,7 +1,6 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { T } from '@mailkeep/shared';
 import { loadConfig } from '../apps/agent/src/config.js';
 import { openDb } from '../apps/agent/src/db/db.js';
 import { migrate } from '../apps/agent/src/db/migrate.js';
@@ -11,6 +10,7 @@ import { intakeFile } from '../apps/agent/src/pipeline/intake.js';
 import { runLetter } from '../apps/agent/src/pipeline/run.js';
 import { deleteNamespace } from '../apps/agent/src/providers/pinecone.js';
 import { todayIso } from '../apps/agent/src/util/clock.js';
+import { T } from '../packages/shared/src/thresholds.js';
 import {
   computeMetrics,
   type EvalLetterResult,
