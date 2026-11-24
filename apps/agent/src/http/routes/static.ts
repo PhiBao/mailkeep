@@ -3,7 +3,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { Context, Handler } from 'hono';
 
-const DIST = fileURLToPath(new URL('../../../../web/dist/', import.meta.url));
+const DIST = path.resolve(fileURLToPath(new URL('../../../../web/dist/', import.meta.url)));
 const INDEX = path.join(DIST, 'index.html');
 
 const MIME: Record<string, string> = {

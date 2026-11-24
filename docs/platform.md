@@ -13,3 +13,4 @@ Recorded by `scripts/sprite-setup.sh` on 2026-11-24.
 - Data directory: `/home/sprite/mailkeep-data` (0700)
 - Disk: `overlay          99G   50M   99G   1% /`
 - Routing proof: temporary `hello` service returned HTTP 200, then was deleted.
+- Agent service: `deferred until first deploy`.
