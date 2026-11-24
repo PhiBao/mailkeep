@@ -3,6 +3,7 @@ import { id } from '../util/ids.js';
 import type { DB } from './db.js';
 
 export interface HouseholdInput {
+  id?: string;
   name: string;
   parentDisplay: string;
   timezone: string;
@@ -14,7 +15,7 @@ export function createHousehold(
   db: DB,
   input: HouseholdInput,
 ): { id: string; name: string; pineconeNamespace: string } {
-  const householdId = input.demo ? 'hh_demo' : id('hh');
+  const householdId = input.id ?? (input.demo ? 'hh_demo' : id('hh'));
   const pineconeNamespace = input.pineconeNamespace ?? householdId;
   const createdAt = new Date().toISOString();
   db.prepare(

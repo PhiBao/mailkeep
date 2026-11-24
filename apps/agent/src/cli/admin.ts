@@ -42,7 +42,9 @@ try {
       break;
     case 'household:create': {
       const pineconeNamespace = values.get('pinecone-namespace');
+      const householdId = values.get('id');
       result = createHousehold(db, {
+        ...(householdId ? { id: householdId } : {}),
         name: required(values, 'name'),
         parentDisplay: required(values, 'parent-display'),
         timezone: values.get('tz') ?? 'America/Chicago',
