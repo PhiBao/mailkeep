@@ -1,6 +1,7 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { T } from '@mailkeep/shared';
 import { loadConfig } from '../apps/agent/src/config.js';
 import { openDb } from '../apps/agent/src/db/db.js';
 import { migrate } from '../apps/agent/src/db/migrate.js';
@@ -137,7 +138,7 @@ await writeFile(
     metrics,
     results,
     modelIds: [config.MAILKEEP_JEV_MODEL, config.MAILKEEP_OLLAMA_MODEL],
-    thresholdsVersion: '2026-11-24.1',
+    thresholdsVersion: T.thresholdsVersion,
   }),
 );
 console.log(JSON.stringify(metrics, null, 2));

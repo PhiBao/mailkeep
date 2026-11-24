@@ -364,8 +364,13 @@ describe('A10 routing', () => {
     const result = route(
       input({
         answers: answers({
-          amount_due: { type: 'choice', choice: 'a0', confidence: 0.7, probabilities: { a0: 0.7 } },
-          due_date: { type: 'choice', choice: 'd0', confidence: 0.7, probabilities: { d0: 0.7 } },
+          amount_due: {
+            type: 'choice',
+            choice: 'a0',
+            confidence: 0.69,
+            probabilities: { a0: 0.69 },
+          },
+          due_date: { type: 'choice', choice: 'd0', confidence: 0.69, probabilities: { d0: 0.69 } },
         }),
       }),
     );

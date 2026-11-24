@@ -43,8 +43,9 @@ export interface QuestionInput {
 
 const KIND_CRITERIA: Record<Kind, string> = {
   bill: 'asks the recipient to pay an amount',
-  statement: 'account statement or explanation of benefits that is not a request for payment',
-  renewal: 'a policy, registration or membership that must be renewed',
+  statement:
+    'account statement, explanation of benefits, privacy notice, or policy documents confirming an existing term when no payment or renewal action is requested',
+  renewal: 'a policy, registration or membership that asks the recipient to renew now',
   appointment: 'a date the recipient must attend, such as an appointment or jury duty',
   government: 'a tax, benefits or legal notice from a government office',
   collection: 'a debt collector or past-due demand',
@@ -64,7 +65,7 @@ export function buildRequest(input: QuestionInput, model: string) {
     needs_action: {
       type: 'noul',
       instructions:
-        'The recipient of `new` must do something because of it: pay, reply, call, sign, renew or attend.',
+        'The recipient of `new` is required to do something because of it: pay, reply, call, sign, renew or attend. Optional invitations, donations, offers, and courtesy replies do not count.',
     },
     scam_payment: {
       type: 'noul',
@@ -74,12 +75,12 @@ export function buildRequest(input: QuestionInput, model: string) {
     scam_pressure: {
       type: 'noul',
       instructions:
-        '`new` threatens arrest, loss of benefits or loss of property unless the recipient responds immediately.',
+        '`new` threatens arrest, loss of benefits or loss of property unless the recipient responds immediately. A routine deadline, reminder, or second notice without such a threat does not count.',
     },
     scam_impersonation: {
       type: 'noul',
       instructions:
-        '`new` is designed to look like it comes from a government office, but it comes from a private company or says it is not affiliated with the government.',
+        '`new` is designed to impersonate a government office and asks for money or sensitive personal information, or says it is not affiliated with the government. Merely mentioning government, elections, voting, taxes, or benefits is not enough.',
     },
     scam_secrecy: {
       type: 'noul',
@@ -127,7 +128,7 @@ export function buildRequest(input: QuestionInput, model: string) {
   input.past.forEach((past, index) => {
     questions[`same_matter_${index}`] = {
       type: 'noul',
-      instructions: `\`new\` and \`past[${index}]\` concern the same underlying account, member, policy, parcel or case. Answer true when the identifiers or subject match, even if the sender name or letter kind differs; answer false for a different account or matter.`,
+      instructions: `\`new\` and \`past[${index}]\` concern the same specific account, member, policy, parcel or case. Answer true only when they share a distinctive identifier such as an account, member, policy, parcel or reference number, or clearly concern the same specific obligation with the same organisation. A shared generic subject such as mail, bill, notice, statement, payment or letter is not enough. Answer false for a different account or matter.`,
     };
     questions[`follow_up_${index}`] = {
       type: 'noul',

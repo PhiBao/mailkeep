@@ -78,42 +78,42 @@ exports[`Jev request builder > matches the A9 request snapshot 1`] = `
         "other": "none of these",
         "payment_confirmation": "confirms a payment was received or an account is paid",
         "personal": "a personal letter or card",
-        "renewal": "a policy, registration or membership that must be renewed",
-        "statement": "account statement or explanation of benefits that is not a request for payment",
+        "renewal": "a policy, registration or membership that asks the recipient to renew now",
+        "statement": "account statement, explanation of benefits, privacy notice, or policy documents confirming an existing term when no payment or renewal action is requested",
       },
       "instructions": "What kind of letter is \`new\`?",
       "type": "choice",
     },
     "needs_action": {
-      "instructions": "The recipient of \`new\` must do something because of it: pay, reply, call, sign, renew or attend.",
+      "instructions": "The recipient of \`new\` is required to do something because of it: pay, reply, call, sign, renew or attend. Optional invitations, donations, offers, and courtesy replies do not count.",
       "type": "noul",
     },
     "same_matter_0": {
-      "instructions": "\`new\` and \`past[0]\` concern the same underlying account, member, policy, parcel or case. Answer true when the identifiers or subject match, even if the sender name or letter kind differs; answer false for a different account or matter.",
+      "instructions": "\`new\` and \`past[0]\` concern the same specific account, member, policy, parcel or case. Answer true only when they share a distinctive identifier such as an account, member, policy, parcel or reference number, or clearly concern the same specific obligation with the same organisation. A shared generic subject such as mail, bill, notice, statement, payment or letter is not enough. Answer false for a different account or matter.",
       "type": "noul",
     },
     "same_matter_1": {
-      "instructions": "\`new\` and \`past[1]\` concern the same underlying account, member, policy, parcel or case. Answer true when the identifiers or subject match, even if the sender name or letter kind differs; answer false for a different account or matter.",
+      "instructions": "\`new\` and \`past[1]\` concern the same specific account, member, policy, parcel or case. Answer true only when they share a distinctive identifier such as an account, member, policy, parcel or reference number, or clearly concern the same specific obligation with the same organisation. A shared generic subject such as mail, bill, notice, statement, payment or letter is not enough. Answer false for a different account or matter.",
       "type": "noul",
     },
     "same_matter_2": {
-      "instructions": "\`new\` and \`past[2]\` concern the same underlying account, member, policy, parcel or case. Answer true when the identifiers or subject match, even if the sender name or letter kind differs; answer false for a different account or matter.",
+      "instructions": "\`new\` and \`past[2]\` concern the same specific account, member, policy, parcel or case. Answer true only when they share a distinctive identifier such as an account, member, policy, parcel or reference number, or clearly concern the same specific obligation with the same organisation. A shared generic subject such as mail, bill, notice, statement, payment or letter is not enough. Answer false for a different account or matter.",
       "type": "noul",
     },
     "same_matter_3": {
-      "instructions": "\`new\` and \`past[3]\` concern the same underlying account, member, policy, parcel or case. Answer true when the identifiers or subject match, even if the sender name or letter kind differs; answer false for a different account or matter.",
+      "instructions": "\`new\` and \`past[3]\` concern the same specific account, member, policy, parcel or case. Answer true only when they share a distinctive identifier such as an account, member, policy, parcel or reference number, or clearly concern the same specific obligation with the same organisation. A shared generic subject such as mail, bill, notice, statement, payment or letter is not enough. Answer false for a different account or matter.",
       "type": "noul",
     },
     "same_matter_4": {
-      "instructions": "\`new\` and \`past[4]\` concern the same underlying account, member, policy, parcel or case. Answer true when the identifiers or subject match, even if the sender name or letter kind differs; answer false for a different account or matter.",
+      "instructions": "\`new\` and \`past[4]\` concern the same specific account, member, policy, parcel or case. Answer true only when they share a distinctive identifier such as an account, member, policy, parcel or reference number, or clearly concern the same specific obligation with the same organisation. A shared generic subject such as mail, bill, notice, statement, payment or letter is not enough. Answer false for a different account or matter.",
       "type": "noul",
     },
     "same_matter_5": {
-      "instructions": "\`new\` and \`past[5]\` concern the same underlying account, member, policy, parcel or case. Answer true when the identifiers or subject match, even if the sender name or letter kind differs; answer false for a different account or matter.",
+      "instructions": "\`new\` and \`past[5]\` concern the same specific account, member, policy, parcel or case. Answer true only when they share a distinctive identifier such as an account, member, policy, parcel or reference number, or clearly concern the same specific obligation with the same organisation. A shared generic subject such as mail, bill, notice, statement, payment or letter is not enough. Answer false for a different account or matter.",
       "type": "noul",
     },
     "scam_impersonation": {
-      "instructions": "\`new\` is designed to look like it comes from a government office, but it comes from a private company or says it is not affiliated with the government.",
+      "instructions": "\`new\` is designed to impersonate a government office and asks for money or sensitive personal information, or says it is not affiliated with the government. Merely mentioning government, elections, voting, taxes, or benefits is not enough.",
       "type": "noul",
     },
     "scam_payment": {
@@ -121,7 +121,7 @@ exports[`Jev request builder > matches the A9 request snapshot 1`] = `
       "type": "noul",
     },
     "scam_pressure": {
-      "instructions": "\`new\` threatens arrest, loss of benefits or loss of property unless the recipient responds immediately.",
+      "instructions": "\`new\` threatens arrest, loss of benefits or loss of property unless the recipient responds immediately. A routine deadline, reminder, or second notice without such a threat does not count.",
       "type": "noul",
     },
     "scam_prize_fee": {
