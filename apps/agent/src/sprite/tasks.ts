@@ -30,13 +30,14 @@ function taskRequest(method: 'PUT' | 'DELETE', name: string): Promise<number> {
 }
 
 export async function withTaskHold<T>(name: string, work: () => Promise<T>): Promise<T> {
-  const acquired = await taskRequest('PUT', name);
+  const taskName = name.toLowerCase().replace(/[^a-z0-9-]/g, '-');
+  const acquired = await taskRequest('PUT', taskName);
   if (acquired !== 200 && acquired !== 201)
     throw new Error(`Task hold failed with HTTP ${acquired}`);
   const heartbeat = setInterval(() => {
-    void taskRequest('PUT', name).catch((error: unknown) => {
+    void taskRequest('PUT', taskName).catch((error: unknown) => {
       log.warn(
-        { event: 'task_heartbeat_failed', name },
+        { event: 'task_heartbeat_failed', name: taskName },
         error instanceof Error ? error.message : String(error),
       );
     });
@@ -47,10 +48,10 @@ export async function withTaskHold<T>(name: string, work: () => Promise<T>): Pro
   } finally {
     clearInterval(heartbeat);
     try {
-      await taskRequest('DELETE', name);
+      await taskRequest('DELETE', taskName);
     } catch (error) {
       log.warn(
-        { event: 'task_release_failed', name },
+        { event: 'task_release_failed', name: taskName },
         error instanceof Error ? error.message : String(error),
       );
     }
