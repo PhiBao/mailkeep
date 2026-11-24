@@ -12,6 +12,7 @@ import { demoRoutes } from './http/routes/demo.js';
 import { hooksRoutes } from './http/routes/hooks.js';
 import { momRoutes } from './http/routes/mom.js';
 import { proofRoutes } from './http/routes/proof.js';
+import { tickRoutes } from './http/routes/tick.js';
 import { startSenderWorker } from './notify/sender.js';
 import { PipelineQueue, resumePending } from './pipeline/queue.js';
 import { scanKeys } from './sprite/keyscan.js';
@@ -41,6 +42,7 @@ const app = createApp(config, (instance) => {
   instance.route('/', demoRoutes({ config, db, queue }));
   instance.route('/', momRoutes({ db }));
   instance.route('/', proofRoutes({ proof }));
+  instance.route('/', tickRoutes({ config, db, client, queue }));
   instance.route('/', hooksRoutes({ config, db, client, queue }));
 });
 
