@@ -1,0 +1,153 @@
+{
+  "L01": {
+    "id": "L01",
+    "received": "2026-11-18",
+    "thread": "A",
+    "photo": "normal",
+    "demo": "seed",
+    "heldout": false,
+    "truth": {
+      "kind_ok": [
+        "bill"
+      ],
+      "lanes_ok": [
+        "headsup"
+      ],
+      "needs_action": true,
+      "amount_cents": 8417,
+      "due_date": "2026-12-10",
+      "scam": false,
+      "links": [],
+      "closes": null
+    }
+  },
+  "L02": {
+    "id": "L02",
+    "received": "2026-12-09",
+    "thread": "A",
+    "photo": "normal",
+    "demo": "sample",
+    "heldout": false,
+    "truth": {
+      "kind_ok": [
+        "collection",
+        "bill"
+      ],
+      "lanes_ok": [
+        "needs_you"
+      ],
+      "needs_action": true,
+      "amount_cents": 8917,
+      "due_date": "2026-12-16",
+      "scam": false,
+      "links": [
+        {
+          "to": "L01",
+          "relation": "follow_up"
+        }
+      ],
+      "closes": null
+    }
+  },
+  "L03": {
+    "id": "L03",
+    "received": "2026-12-14",
+    "thread": "A",
+    "photo": "normal",
+    "demo": "none",
+    "heldout": false,
+    "truth": {
+      "kind_ok": [
+        "payment_confirmation"
+      ],
+      "lanes_ok": [
+        "handled"
+      ],
+      "needs_action": false,
+      "amount_cents": null,
+      "due_date": null,
+      "scam": false,
+      "links": [
+        {
+          "to": "L02",
+          "relation": "completes"
+        }
+      ],
+      "closes": "L01"
+    }
+  },
+  "L06": {
+    "id": "L06",
+    "received": "2026-11-16",
+    "thread": "C",
+    "photo": "normal",
+    "demo": "seed",
+    "heldout": false,
+    "truth": {
+      "kind_ok": [
+        "statement"
+      ],
+      "lanes_ok": [
+        "handled"
+      ],
+      "needs_action": false,
+      "amount_cents": null,
+      "due_date": null,
+      "scam": false,
+      "links": [],
+      "closes": null
+    }
+  },
+  "L09": {
+    "id": "L09",
+    "received": "2026-12-08",
+    "thread": "C",
+    "photo": "normal",
+    "demo": "sample",
+    "heldout": false,
+    "truth": {
+      "kind_ok": [
+        "other",
+        "government",
+        "marketing"
+      ],
+      "lanes_ok": [
+        "careful"
+      ],
+      "needs_action": true,
+      "amount_cents": null,
+      "due_date": null,
+      "scam": true,
+      "links": [
+        {
+          "to": "L06",
+          "relation": "sender_mismatch"
+        }
+      ],
+      "closes": null
+    }
+  },
+  "L30": {
+    "id": "L30",
+    "received": "2026-11-20",
+    "thread": "J",
+    "photo": "dark",
+    "demo": "seed",
+    "heldout": false,
+    "truth": {
+      "kind_ok": [
+        "bill"
+      ],
+      "lanes_ok": [
+        "headsup",
+        "needs_you"
+      ],
+      "needs_action": true,
+      "amount_cents": 13240,
+      "due_date": "2026-12-12",
+      "scam": false,
+      "links": [],
+      "closes": null
+    }
+  }
+}

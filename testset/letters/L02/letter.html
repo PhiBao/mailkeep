@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Riverbend Water Utility — Past due notice</title>
+    <style>
+      * { box-sizing: border-box; }
+      html, body { margin: 0; width: 816px; height: 1056px; }
+      body { padding: 50px 64px 42px; color: #172432; background: #fff; font-family: Georgia, serif; }
+      header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 3px solid #1d5b78; padding-bottom: 20px; }
+      .brand { display: flex; gap: 14px; align-items: center; }
+      .mark { width: 46px; height: 46px; border: 3px solid #1d5b78; border-radius: 50%; position: relative; }
+      .mark::after { content: ""; position: absolute; left: 8px; right: 8px; bottom: 12px; height: 8px; border-radius: 50% 50% 0 0; background: #1d5b78; }
+      h1 { margin: 0; font-size: 27px; color: #1d5b78; }
+      .small { font-family: Arial, sans-serif; font-size: 12px; line-height: 1.45; color: #4d5964; }
+      address { text-align: right; font-style: normal; }
+      .date { margin: 24px 0 16px; font-family: Arial, sans-serif; font-size: 14px; }
+      .notice { border: 3px solid #a52a2a; color: #8f2020; padding: 12px; text-align: center; font-family: Arial, sans-serif; font-weight: bold; font-size: 25px; letter-spacing: .1em; }
+      .account { margin-top: 18px; display: flex; justify-content: space-between; background: #eef4f6; border: 1px solid #b8cdd5; padding: 13px 18px; font-family: Arial, sans-serif; font-size: 14px; }
+      h2 { margin: 24px 0 8px; font-size: 24px; }
+      p { margin: 10px 0; font-size: 16px; line-height: 1.5; }
+      .amount { margin: 20px 0; padding: 16px 18px; border: 2px solid #a52a2a; display: flex; justify-content: space-between; align-items: baseline; }
+      .amount span { font-family: Arial, sans-serif; font-size: 14px; font-weight: bold; text-transform: uppercase; }
+      .amount strong { font-size: 33px; color: #8f2020; }
+      table { width: 100%; border-collapse: collapse; font-size: 14px; }
+      td { padding: 8px 10px; border-bottom: 1px solid #cad4d9; }
+      td:last-child { text-align: right; }
+      .warning { margin-top: 18px; padding: 13px 16px; background: #fbefee; border-left: 4px solid #a52a2a; font-family: Arial, sans-serif; font-size: 13px; line-height: 1.45; }
+      .stub { margin-top: 24px; border-top: 2px dashed #8c9aa2; padding-top: 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; font-family: Arial, sans-serif; font-size: 13px; line-height: 1.5; }
+      .stub strong { display: block; margin-bottom: 5px; }
+      footer { position: absolute; left: 64px; right: 64px; bottom: 28px; border-top: 1px solid #cad4d9; padding-top: 10px; font-family: Arial, sans-serif; font-size: 10px; color: #5c6870; display: flex; justify-content: space-between; }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="brand">
+        <div class="mark" aria-hidden="true"></div>
+        <div><h1>Riverbend Water Utility</h1><div class="small">Safe water. Dependable service.</div></div>
+      </div>
+      <address class="small">PO Box 310<br />Riverbend, WM 60104<br />(555) 010-4471</address>
+    </header>
+    <div class="date">December 9, 2026</div>
+    <div class="notice">PAST DUE — SECOND NOTICE</div>
+    <div class="account"><span>Account: <strong>7720-114471</strong></span><span>Original due date: December 10</span></div>
+    <h2>Your water bill remains unpaid</h2>
+    <p>Dear Ruth Alvarez,</p>
+    <p>Our records show that the $84.17 bill mailed on November 18 has not been received. A $5.00 late fee has been added.</p>
+    <div class="amount"><span>New balance due</span><strong>$89.17</strong></div>
+    <table>
+      <tbody>
+        <tr><td>November water bill</td><td>$84.17</td></tr>
+        <tr><td>Late fee after December 10</td><td>$5.00</td></tr>
+        <tr><td><strong>Total due by December 16, 2026</strong></td><td><strong>$89.17</strong></td></tr>
+      </tbody>
+    </table>
+    <div class="warning"><strong>Please pay promptly.</strong> If the balance is not paid by December 16, water service may be scheduled for disconnection. If you have already paid, call (555) 010-4471 so we can locate your payment.</div>
+    <div class="stub">
+      <div><strong>Riverbend Water Utility</strong>PO Box 310<br />Riverbend, WM 60104</div>
+      <div><strong>Account 7720-114471</strong>Amount enclosed: $________<br />Check number: __________</div>
+    </div>
+    <footer><span>This is a second notice for the same account.</span><span>Please keep both notices together.</span></footer>
+  </body>
+</html>

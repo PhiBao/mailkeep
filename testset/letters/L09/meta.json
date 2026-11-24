@@ -1,0 +1,18 @@
+{
+  "id": "L09",
+  "received": "2026-12-08",
+  "thread": "C",
+  "photo": "normal",
+  "demo": "sample",
+  "heldout": false,
+  "truth": {
+    "kind_ok": ["other", "government", "marketing"],
+    "lanes_ok": ["careful"],
+    "needs_action": true,
+    "amount_cents": null,
+    "due_date": null,
+    "scam": true,
+    "links": [{ "to": "L06", "relation": "sender_mismatch" }],
+    "closes": null
+  }
+}

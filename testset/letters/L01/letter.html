@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Riverbend Water Utility — November bill</title>
+    <style>
+      * { box-sizing: border-box; }
+      html, body { margin: 0; width: 816px; height: 1056px; }
+      body { padding: 54px 64px 42px; color: #172432; background: #fff; font-family: Georgia, serif; }
+      header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 3px solid #1d5b78; padding-bottom: 22px; }
+      .brand { display: flex; gap: 14px; align-items: center; }
+      .mark { width: 46px; height: 46px; border: 3px solid #1d5b78; border-radius: 50%; position: relative; }
+      .mark::after { content: ""; position: absolute; left: 8px; right: 8px; bottom: 12px; height: 8px; border-radius: 50% 50% 0 0; background: #1d5b78; }
+      h1 { margin: 0; font-size: 27px; color: #1d5b78; }
+      .small { font-family: Arial, sans-serif; font-size: 12px; line-height: 1.45; color: #4d5964; }
+      address { text-align: right; font-style: normal; }
+      .date { margin: 26px 0 20px; font-family: Arial, sans-serif; font-size: 14px; }
+      .account { display: flex; justify-content: space-between; background: #eef4f6; border: 1px solid #b8cdd5; padding: 14px 18px; font-family: Arial, sans-serif; font-size: 14px; }
+      h2 { margin: 28px 0 8px; font-size: 25px; }
+      p { margin: 10px 0; font-size: 16px; line-height: 1.5; }
+      .amount { margin: 22px 0; padding: 18px; border: 2px solid #1d5b78; display: flex; justify-content: space-between; align-items: baseline; }
+      .amount span { font-family: Arial, sans-serif; font-size: 15px; font-weight: bold; text-transform: uppercase; letter-spacing: .06em; }
+      .amount strong { font-size: 34px; }
+      table { width: 100%; border-collapse: collapse; margin-top: 18px; font-size: 14px; }
+      th, td { text-align: left; padding: 9px 10px; border-bottom: 1px solid #cad4d9; }
+      th { background: #f1f5f6; font-family: Arial, sans-serif; font-size: 12px; text-transform: uppercase; }
+      td:last-child, th:last-child { text-align: right; }
+      .stub { margin-top: 30px; border-top: 2px dashed #8c9aa2; padding-top: 18px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; font-family: Arial, sans-serif; font-size: 13px; line-height: 1.5; }
+      .stub strong { display: block; margin-bottom: 5px; }
+      footer { position: absolute; left: 64px; right: 64px; bottom: 30px; border-top: 1px solid #cad4d9; padding-top: 10px; font-family: Arial, sans-serif; font-size: 10px; color: #5c6870; display: flex; justify-content: space-between; }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="brand">
+        <div class="mark" aria-hidden="true"></div>
+        <div><h1>Riverbend Water Utility</h1><div class="small">Safe water. Dependable service.</div></div>
+      </div>
+      <address class="small">PO Box 310<br />Riverbend, WM 60104<br />(555) 010-4471</address>
+    </header>
+    <div class="date">November 18, 2026</div>
+    <div class="account"><span>Account: <strong>7720-114471</strong></span><span>Service: 41 Linden Court</span></div>
+    <h2>Your November water bill</h2>
+    <p>Dear Ruth Alvarez,</p>
+    <p>Your water service was delivered from October 8 through November 7. Please pay the amount below by the due date.</p>
+    <div class="amount"><span>Amount due</span><strong>$84.17</strong></div>
+    <table>
+      <thead><tr><th>Service period</th><th>Usage</th><th>Charge</th></tr></thead>
+      <tbody>
+        <tr><td>Oct 8 – Nov 7, 2026</td><td>4,200 gallons</td><td>$61.20</td></tr>
+        <tr><td>Water service and treatment</td><td>Fixed charge</td><td>$22.97</td></tr>
+        <tr><td><strong>Total current charges</strong></td><td></td><td><strong>$84.17</strong></td></tr>
+      </tbody>
+    </table>
+    <p><strong>Payment due: December 10, 2026.</strong> You can pay online, by phone, or by mailing a check with the stub below.</p>
+    <div class="stub">
+      <div><strong>Riverbend Water Utility</strong>PO Box 310<br />Riverbend, WM 60104</div>
+      <div><strong>Account 7720-114471</strong>Amount enclosed: $________<br />Check number: __________</div>
+    </div>
+    <footer><span>Questions? (555) 010-4471 · Weekdays 8 a.m.–5 p.m.</span><span>Please keep this bill for your records.</span></footer>
+  </body>
+</html>
