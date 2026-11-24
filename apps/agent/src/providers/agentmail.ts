@@ -11,6 +11,7 @@ const messageSchema = z.object({
   message_id: z.string(),
   thread_id: z.string(),
   subject: z.string().optional(),
+  timestamp: z.string().optional(),
   from: z.unknown().optional(),
   to: z.unknown().optional(),
   text: z.string().optional(),

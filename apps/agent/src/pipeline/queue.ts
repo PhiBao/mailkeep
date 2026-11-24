@@ -42,13 +42,15 @@ export class PipelineQueue {
   }
 }
 
-export async function resumePending(deps: PipelineDeps): Promise<void> {
+export async function resumePending(
+  deps: PipelineDeps,
+  queue: PipelineQueue = new PipelineQueue(deps),
+): Promise<void> {
   const rows = deps.db
     .prepare(
       "SELECT id FROM letters WHERE status IN ('queued','reading','recalling','deciding','acting') ORDER BY created_at",
     )
     .all() as Array<{ id: string }>;
   if (rows.length === 0) return;
-  const queue = new PipelineQueue(deps);
   await Promise.all(rows.map((row) => queue.enqueue(row.id)));
 }

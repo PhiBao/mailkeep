@@ -6,7 +6,9 @@ import { openDb } from './db/db.js';
 import { migrate } from './db/migrate.js';
 import { GatewayClient } from './gateway/client.js';
 import { createApp } from './http/app.js';
-import { resumePending } from './pipeline/queue.js';
+import { hooksRoutes } from './http/routes/hooks.js';
+import { startSenderWorker } from './notify/sender.js';
+import { PipelineQueue, resumePending } from './pipeline/queue.js';
 import { scanKeys } from './sprite/keyscan.js';
 import { log } from './util/log.js';
 
@@ -24,7 +26,10 @@ if (keyscan.found > 0) {
 await mkdir(config.MAILKEEP_DATA_DIR, { recursive: true, mode: 0o700 });
 const db = openDb(path.join(config.MAILKEEP_DATA_DIR, 'mailkeep.db'));
 migrate(db);
+const client = new GatewayClient({ config });
+const queue = new PipelineQueue({ client, config, db });
 const app = createApp(config);
+app.route('/', hooksRoutes({ config, db, client, queue }));
 
 const server = serve({ fetch: app.fetch, port: config.PORT }, (info) => {
   log.info({ event: 'started', port: info.port, sha: config.gitSha }, 'Mailkeep agent started');
@@ -37,8 +42,7 @@ function shutdown(): void {
 process.on('SIGTERM', shutdown);
 process.on('SIGINT', shutdown);
 
-void resumePending({ client: new GatewayClient({ config }), config, db }).catch(
-  (error: unknown) => {
-    log.error({ event: 'resume_failed' }, error instanceof Error ? error.message : String(error));
-  },
-);
+void resumePending({ client, config, db }, queue).catch((error: unknown) => {
+  log.error({ event: 'resume_failed' }, error instanceof Error ? error.message : String(error));
+});
+startSenderWorker({ db, client, inboxId: config.MAILKEEP_AGENTMAIL_INBOX_ID });

@@ -1,0 +1,76 @@
+import type { DB } from '../db/db.js';
+import type { GatewayClient } from '../gateway/client.js';
+import { listInboxes, replyToMessage, sendMessage } from '../providers/agentmail.js';
+import { log } from '../util/log.js';
+
+export interface SenderDeps {
+  db: DB;
+  client: GatewayClient;
+  inboxId: string;
+}
+
+interface OutboxRow {
+  id: string;
+  to_email: string;
+  subject: string;
+  body_text: string;
+  agentmail_message_id: string | null;
+  agentmail_thread_id: string | null;
+  attempts: number;
+}
+
+export async function sendPending(deps: SenderDeps): Promise<void> {
+  const rows = deps.db
+    .prepare(
+      "SELECT * FROM outbox WHERE status = 'pending' AND attempts < 3 ORDER BY created_at LIMIT 20",
+    )
+    .all() as OutboxRow[];
+  if (rows.length === 0) return;
+  const inboxId = deps.inboxId || (await listInboxes(deps.client)).inboxes[0]?.inbox_id;
+  if (!inboxId) throw new Error('No AgentMail inbox configured');
+  for (const row of rows) {
+    try {
+      const replyTarget = row.agentmail_message_id ?? row.agentmail_thread_id;
+      const sent = replyTarget
+        ? await replyToMessage(deps.client, {
+            inboxId,
+            messageId: replyTarget,
+            text: row.body_text,
+            subject: row.subject,
+          })
+        : await sendMessage(deps.client, {
+            inboxId,
+            to: row.to_email,
+            subject: row.subject,
+            text: row.body_text,
+          });
+      deps.db
+        .prepare(
+          "UPDATE outbox SET status = 'sent', agentmail_message_id = ?, agentmail_thread_id = ?, sent_at = ?, attempts = attempts + 1 WHERE id = ?",
+        )
+        .run(sent.message_id, sent.thread_id, new Date().toISOString(), row.id);
+    } catch (error) {
+      const attempts = row.attempts + 1;
+      deps.db
+        .prepare('UPDATE outbox SET attempts = ?, status = ? WHERE id = ?')
+        .run(attempts, attempts >= 3 ? 'failed' : 'pending', row.id);
+      log.warn(
+        { event: 'outbox_send_failed', outboxId: row.id, attempts },
+        error instanceof Error ? error.message : String(error),
+      );
+    }
+  }
+}
+
+export function startSenderWorker(deps: SenderDeps): void {
+  const timer = setInterval(() => {
+    void sendPending(deps).catch((error: unknown) => {
+      log.error(
+        { event: 'outbox_worker_failed' },
+        error instanceof Error ? error.message : String(error),
+      );
+    });
+  }, 5000);
+  timer.unref();
+  void sendPending(deps);
+}

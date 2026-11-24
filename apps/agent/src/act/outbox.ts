@@ -1,19 +1,7 @@
-import {
-  askSubject,
-  familyCarefulSubject,
-  familyContradictionSubject,
-  familySecondNoticeSubject,
-  formatParentDate,
-  formatUsd,
-  parentCarefulSubject,
-  parentHandledSubject,
-  parentHeadsupSubject,
-  parentNeedsYouSubject,
-  retakeSubject,
-} from '@mailkeep/shared';
 import { nanoid } from 'nanoid';
 import type { DB } from '../db/db.js';
-import type { RouteOutput } from '../pipeline/route.js';
+import { askEmail, familyAlert, parentNote, retakeEmail } from '../notify/templates.js';
+import type { RouteCheck, RouteOutput } from '../pipeline/route.js';
 
 interface Member {
   email: string;
@@ -99,6 +87,7 @@ export function queueLetterOutbox(
     trial: boolean;
     letter: Letter;
     route: RouteOutput;
+    checks: RouteCheck[];
     asks: AskRow[];
     members: Member[];
   },
@@ -116,53 +105,41 @@ export function queueLetterOutbox(
   const link = `${input.publicUrl.replace(/\/$/, '')}/letters/${input.letter.id}`;
 
   if (parent) {
-    let subject = parentNeedsYouSubject({ title: input.letter.title });
-    let body = `Hi ${input.parentDisplay}, ${input.letter.summary_parent ?? 'Mailkeep read this letter.'} Keep it for now. Sarah will look at it. — Mailkeep`;
-    if (input.route.lane === 'handled') {
-      subject = parentHandledSubject({ title: input.letter.title });
-      body = `Hi ${input.parentDisplay}, ${input.letter.summary_parent ?? 'Mailkeep read this letter.'} Nothing to do. You can put it away. — Mailkeep`;
-    } else if (input.route.lane === 'headsup') {
-      subject =
-        amount !== null
-          ? parentHeadsupSubject({ title: input.letter.title, amountCents: amount, dueDate: due })
-          : parentNeedsYouSubject({ title: input.letter.title });
-      body =
-        amount !== null
-          ? `Hi ${input.parentDisplay}, this is your ${input.letter.sender_org ?? 'letter'}. Pay ${formatUsd(amount)}${due ? ` by ${formatParentDate(due)}` : ''}. Sarah knows about it too. — Mailkeep`
-          : body;
-    } else if (input.route.lane === 'careful') {
-      subject = parentCarefulSubject();
-      body = `Hi ${input.parentDisplay}, the letter from "${input.letter.sender_org ?? 'unknown sender'}" looks like a scam. Don't pay it. Don't call the number on it. Don't give any card or account numbers. Sarah has been told. — Mailkeep`;
-    }
+    const note = parentNote({
+      parentDisplay: input.parentDisplay,
+      title: input.letter.title,
+      senderOrg: input.letter.sender_org,
+      summaryParent: input.letter.summary_parent ?? 'Mailkeep read this letter.',
+      amountCents: amount,
+      dueDate: due,
+      route: input.route,
+    });
     insert(db, {
       householdId: input.householdId,
       to: parent.email,
       kind: 'parent_note',
-      subject,
-      body,
+      subject: note.subject,
+      body: note.body,
       relatedId: input.letter.id,
       suppressedReason: suppressed,
     });
   }
 
   if (input.route.familyAlert || input.route.lane === 'careful') {
-    const subject = input.route.caseChange?.contradiction
-      ? familyContradictionSubject({ counterparty: input.route.caseChange.counterparty })
-      : input.route.caseChange?.secondNotice
-        ? familySecondNoticeSubject({
-            counterparty: input.route.caseChange.counterparty,
-            kind: input.route.caseChange.kind,
-          })
-        : input.route.lane === 'careful'
-          ? familyCarefulSubject({ parentDisplay: input.parentDisplay })
-          : `Mailkeep needs you: ${input.letter.title}`;
+    const alert = familyAlert({
+      parentDisplay: input.parentDisplay,
+      title: input.letter.title,
+      route: input.route,
+      checks: input.checks,
+      link,
+    });
     for (const member of family) {
       insert(db, {
         householdId: input.householdId,
         to: member.email,
         kind: 'family_alert',
-        subject,
-        body: `${input.route.notes.join(' ')}\n${link}`,
+        subject: alert.subject,
+        body: alert.body,
         relatedId: input.letter.id,
         suppressedReason: suppressed,
       });
@@ -170,14 +147,19 @@ export function queueLetterOutbox(
   }
 
   for (const ask of input.asks) {
-    const options = ask.options.map((option) => option.value.toUpperCase()).join(' · ');
+    const email = askEmail({
+      question: ask.question,
+      evidence: ask.evidence,
+      options: ask.options,
+      link,
+    });
     for (const member of family) {
       insert(db, {
         householdId: input.householdId,
         to: member.email,
         kind: 'ask',
-        subject: askSubject({ question: ask.question }),
-        body: `${ask.question}\n${ask.evidence}\nReply with one word: ${options}, or open ${link}`,
+        subject: email.subject,
+        body: email.body,
         relatedId: ask.id,
         suppressedReason: suppressed,
       });
@@ -189,12 +171,13 @@ export function queueRetake(
   db: DB,
   input: { householdId: string; letterId: string; to: string; suppressedReason: string | null },
 ): void {
+  const email = retakeEmail();
   insert(db, {
     householdId: input.householdId,
     to: input.to,
     kind: 'retake',
-    subject: retakeSubject(),
-    body: 'The photo was too dark or blurry to read. Please take another one in good light.',
+    subject: email.subject,
+    body: email.body,
     relatedId: input.letterId,
     suppressedReason: input.suppressedReason,
   });

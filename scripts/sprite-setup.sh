@@ -52,7 +52,7 @@ trap - EXIT
 SERVICE_STATE="deferred until first deploy"
 if sprite exec -o "$ORG" -s "$SPRITE" -- test -f /home/sprite/mailkeep/apps/agent/dist/main.js; then
   if ! sprite exec -o "$ORG" -s "$SPRITE" -- sprite-env services get mailkeep >/dev/null 2>&1; then
-    ENV_VALUES="PORT=8080,MAILKEEP_PUBLIC_URL=$URL,MAILKEEP_DATA_DIR=/home/sprite/mailkeep-data,MAILKEEP_PINECONE_INDEX=mailkeep-letters,MAILKEEP_JEV_MODEL=jev-1.14.0,MAILKEEP_OLLAMA_MODEL=gemma4:31b,MAILKEEP_DEMO_HOUSEHOLD_ID=hh_demo,MAILKEEP_TICK_MIN_INTERVAL_S=300,LOG_LEVEL=info"
+    ENV_VALUES="PORT=8080,MAILKEEP_PUBLIC_URL=$URL,MAILKEEP_DATA_DIR=/home/sprite/mailkeep-data,MAILKEEP_AGENTMAIL_INBOX_ID=kiter@agentmail.to,MAILKEEP_PINECONE_INDEX=mailkeep-letters,MAILKEEP_JEV_MODEL=jev-1.14.0,MAILKEEP_OLLAMA_MODEL=gemma4:31b,MAILKEEP_DEMO_HOUSEHOLD_ID=hh_demo,MAILKEEP_TICK_MIN_INTERVAL_S=300,LOG_LEVEL=info"
     sprite exec -o "$ORG" -s "$SPRITE" -- sprite-env services create mailkeep \
       --cmd node --args "apps/agent/dist/main.js" --dir /home/sprite/mailkeep \
       --http-port 8080 --env "$ENV_VALUES" --no-stream

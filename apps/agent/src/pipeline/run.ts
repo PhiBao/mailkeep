@@ -269,6 +269,7 @@ async function actLetter(deps: PipelineDeps, row: LetterRow, output: RouteOutput
           due_date: output.dueDate,
         },
         route: output,
+        checks: output.checks,
         asks,
         members,
       });

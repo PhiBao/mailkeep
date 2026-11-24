@@ -53,6 +53,32 @@ export interface IntakeResult {
   localPath: string;
 }
 
+export async function intakeEmailAttachment(
+  input: IntakeInput & { memberId: string; receivedAt: string },
+): Promise<IntakeResult & { created: boolean }> {
+  const intake = await intakeFile(input);
+  if (intake.duplicate) return { ...intake, created: false };
+  const now = new Date().toISOString();
+  input.db
+    .prepare(
+      `INSERT INTO letters
+        (id, household_id, source, trial, submitted_by, received_at, status, mime, sha256, local_path, created_at, updated_at)
+       VALUES (?, ?, 'email', 0, ?, ?, 'queued', ?, ?, ?, ?, ?)`,
+    )
+    .run(
+      intake.letterId,
+      input.householdId,
+      input.memberId,
+      input.receivedAt,
+      intake.mime,
+      intake.sha256,
+      intake.localPath,
+      now,
+      now,
+    );
+  return { ...intake, created: true };
+}
+
 export async function intakeFile(input: IntakeInput): Promise<IntakeResult> {
   if (input.bytes.length === 0) throw new IntakeError('invalid', 'The file is empty.');
   if (input.bytes.length > MAX_FILE_BYTES) {
