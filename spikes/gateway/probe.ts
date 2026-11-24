@@ -81,6 +81,12 @@ try {
     const item = object(connection);
     if (typeof item.provider === 'string' && typeof item.gateway_base_url === 'string') {
       bases.set(item.provider, item.gateway_base_url);
+      if (
+        item.provider === 'custom_api' &&
+        object(item.provider_info).base_api_url === 'https://api.agentmail.to'
+      ) {
+        bases.set('agentmail', item.gateway_base_url);
+      }
     }
   }
   section('Gateway discovery', [
@@ -260,7 +266,10 @@ async function pineconeSpike(base: string): Promise<void> {
     '/embed',
     jsonBody({
       model: 'llama-text-embed-v2',
-      inputs: ['Riverbend Water Utility November bill', 'Past due second notice for water bill'],
+      inputs: [
+        { text: 'Riverbend Water Utility November bill' },
+        { text: 'Past due second notice for water bill' },
+      ],
       parameters: { input_type: 'passage', truncate: 'END' },
     }),
   );
@@ -283,6 +292,11 @@ async function pineconeSpike(base: string): Promise<void> {
       ],
     }),
   );
+  if (!upsert.ok && upsert.status === 400 && upsert.text.includes('document schema')) {
+    throw new Error(
+      'Index is a document schema. Recreate mailkeep-letters as a vector/dense index without schema fields; the dedicated connector blocks the Documents API.',
+    );
+  }
   const query = await call(
     base,
     `/indexes/${indexName}/vectors/query`,
@@ -490,6 +504,12 @@ for (const connection of (object(gatewayList.json).connections as unknown[] | un
   const item = object(connection);
   if (typeof item.provider === 'string' && typeof item.gateway_base_url === 'string') {
     bases.set(item.provider, item.gateway_base_url);
+    if (
+      item.provider === 'custom_api' &&
+      object(item.provider_info).base_api_url === 'https://api.agentmail.to'
+    ) {
+      bases.set('agentmail', item.gateway_base_url);
+    }
   }
 }
 

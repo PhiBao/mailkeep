@@ -1,20 +1,21 @@
 # T02 RESULT — every connector through the gateway
 
-Run: 2026-11-24T10:22:34.296Z on Sprite `mailkeep`.
+Run: 2026-11-24T10:55:05.656Z on Sprite `mailkeep`.
 
 ## Gateway discovery
 
 - Path: `GET /v1/gateway/list`
 
-- Latency: 1922 ms
+- Latency: 241 ms
 
 - Top-level keys: `available`, `connections`
 
-- Connections: 5
+- Connections: 6
 
 - Base URLs:
-  - agentmail: `https://api.sprites.dev/v1/gateway/agentmail/Fpbhxqw64ryueJ5CafEIeA`
+  - agentmail: `https://api.sprites.dev/v1/gateway/custom_api/oFVcFZMwhdqmA-6RU-mG1A`
   - box: `https://api.sprites.dev/v1/gateway/box/D6Q3d2I6yAJQq5AoK6X1Jg`
+  - custom_api: `https://api.sprites.dev/v1/gateway/custom_api/oFVcFZMwhdqmA-6RU-mG1A`
   - ollama: `https://api.sprites.dev/v1/gateway/ollama/Xuv-D-igLp6l-Lg_xYH4nA`
   - pinecone: `https://api.sprites.dev/v1/gateway/pinecone/anVdybVeX3EAI11QdTiVhA`
   - typesafe: `https://api.sprites.dev/v1/gateway/typesafe/nzOp5iVCbA5OBl_eRQvEwQ`
@@ -439,6 +440,38 @@ Run: 2026-11-24T10:22:34.296Z on Sprite `mailkeep`.
       "request_scopes_url": "https://sprites.dev/account/kiter/connect/box?scopes="
     },
     {
+      "id": "oFVcFZMwhdqmA-6RU-mG1A",
+      "description": "Connect any API with a token",
+      "provider": "custom_api",
+      "access_policy": {
+        "name_prefix": "mailkeep"
+      },
+      "inserted_at": "2026-11-24T10:38:35.861379Z",
+      "updated_at": "2026-11-24T10:38:45.286471Z",
+      "connection_type": "oauth",
+      "username": null,
+      "auth_method": "header",
+      "base_api_url": "https://api.agentmail.to",
+      "display_name": "mailkeep",
+      "user_id": null,
+      "provider_info": {
+        "auth_header_prefix": "Bearer",
+        "auth_method": "header",
+        "base_api_url": "https://api.agentmail.to",
+        "test_url": "https://api.agentmail.to/v0/inboxes"
+      },
+      "provider_account_name": "mailkeep",
+      "provider_account_id": "mailkeep",
+      "scopes": null,
+      "token_expires_at": null,
+      "usage_snippet": "# Responses stream unchanged, including compressed content. Use --compressed\n# to let curl negotiate and decode compression. The gateway still filters\n# credentials, cookies, gateway identity and hop-by-hop headers, and manages\n# HTTP framing. Requests are limited to 8 MB; redirects are not followed by\n# the gateway. Custom API responses are not inspected for inference usage.\n# Query-parameter auth protects echoed keys instead of passing bytes through:\n# only identity/gzip responses are supported, and HTTP 206 is rejected.\n\n# Make a GET request through the gateway\ncurl \"https://api.sprites.dev/v1/gateway/custom_api/oFVcFZMwhdqmA-6RU-mG1A/your/endpoint\"\n\n# POST with JSON body\ncurl -X POST \"https://api.sprites.dev/v1/gateway/custom_api/oFVcFZMwhdqmA-6RU-mG1A/your/endpoint\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\"key\": \"value\"}'",
+      "notes": [],
+      "gateway_base_url": "https://api.sprites.dev/v1/gateway/custom_api/oFVcFZMwhdqmA-6RU-mG1A",
+      "workspace_url": null,
+      "manage_url": "https://sprites.dev/account/kiter/connectors/oFVcFZMwhdqmA-6RU-mG1A",
+      "request_scopes_url": "https://sprites.dev/account/kiter/connect/custom_api?scopes="
+    },
+    {
       "id": "Xuv-D-igLp6l-Lg_xYH4nA",
       "description": "Cloud-hosted open models via Ollama",
       "provider": "ollama",
@@ -522,9 +555,9 @@ Run: 2026-11-24T10:22:34.296Z on Sprite `mailkeep`.
 
 - Path: `POST /v1/systemone`
 
-- Quickstart: HTTP 200, 207 ms
+- Quickstart: HTTP 200, 465 ms
 
-- Image header call: HTTP 200, 185 ms; `TypeSafe-Danger-Zone-Images: true` passed
+- Image header call: HTTP 200, 772 ms; `TypeSafe-Danger-Zone-Images: true` passed
 
 - Quickstart response shape:
 
@@ -564,9 +597,9 @@ Run: 2026-11-24T10:22:34.296Z on Sprite `mailkeep`.
 
 ## Ollama
 
-- Text path: `POST /api/chat` — HTTP 200, 645 ms
+- Text path: `POST /api/chat` — HTTP 200, 588 ms
 
-- Vision path: `POST /api/chat` — HTTP 200, 2258 ms
+- Vision path: `POST /api/chat` — HTTP 200, 2506 ms
 
 - Text token fields: `prompt_eval_count=18`, `eval_count=2`
 
@@ -577,14 +610,14 @@ Run: 2026-11-24T10:22:34.296Z on Sprite `mailkeep`.
 ```json
 {
   "model": "gemma4:31b",
-  "created_at": "2026-11-24T10:22:20.843844396Z",
+  "created_at": "2026-11-24T10:54:55.243716705Z",
   "message": {
     "role": "assistant",
     "content": "OK"
   },
   "done": true,
   "done_reason": "stop",
-  "total_duration": 197372129,
+  "total_duration": 317540886,
   "prompt_eval_count": 18,
   "prompt_eval_cached_count": 0,
   "eval_count": 2
@@ -678,12 +711,12 @@ FAIL: Error: Create index failed: {"error":"endpoint is not supported by the Pin
   "id": "2611842280600",
   "file_version": {
     "type": "file_version",
-    "id": "2899725494200",
-    "sha1": "463dd10966bb54d1923ac4f2260c6dedc5d94bfe"
+    "id": "2899727202196",
+    "sha1": "f06aec41f0d218b1e355de2424842a70e26d069e"
   },
-  "sequence_id": "0",
-  "etag": "0",
-  "sha1": "463dd10966bb54d1923ac4f2260c6dedc5d94bfe",
+  "sequence_id": "1",
+  "etag": "1",
+  "sha1": "f06aec41f0d218b1e355de2424842a70e26d069e",
   "name": "tiny.jpg"
 }
 ```
@@ -699,11 +732,11 @@ FAIL: Error: Create index failed: {"error":"endpoint is not supported by the Pin
       "id": "2611842280600",
       "file_version": {
         "type": "file_version",
-        "id": "2899727202196",
+        "id": "2899792130258",
         "sha1": "f06aec41f0d218b1e355de2424842a70e26d069e"
       },
-      "sequence_id": "1",
-      "etag": "1",
+      "sequence_id": "2",
+      "etag": "2",
       "sha1": "f06aec41f0d218b1e355de2424842a70e26d069e",
       "name": "tiny.jpg",
       "description": "",
@@ -728,11 +761,11 @@ FAIL: Error: Create index failed: {"error":"endpoint is not supported by the Pin
         ]
       },
       "created_at": "2026-11-24T02:16:48-08:00",
-      "modified_at": "2026-11-24T02:22:28-08:00",
+      "modified_at": "2026-11-24T02:55:00-08:00",
       "trashed_at": null,
       "purged_at": null,
       "content_created_at": "2026-11-24T02:16:48-08:00",
-      "content_modified_at": "2026-11-24T02:22:28-08:00",
+      "content_modified_at": "2026-11-24T02:55:00-08:00",
       "created_by": {
         "type": "user",
         "id": "53551722311",
@@ -762,13 +795,13 @@ FAIL: Error: Create index failed: {"error":"endpoint is not supported by the Pin
 
 - Paths: `GET /v0/inboxes`, `POST /v0/inboxes/:inbox/messages/send`, `GET /v0/inboxes/:inbox/messages`, `GET /v0/inboxes/:inbox/messages/:id/attachments/:att`
 
-- Test email to kiter7396@gmail.com: HTTP 200, message `<010001a20d14173e-fe1e19af-dcd7-4ec9-a47f-273c01591f5d-000000@email.amazonses.com>`
+- Test email to kiter7396@gmail.com: HTTP 200, message `<010001a20d31ddef-767ccc1e-2e64-4ef3-bd0d-1aab732d51e4-000000@email.amazonses.com>`
 
-- Self attachment message: HTTP 200, message `<010001a20d141b5c-66500ab5-c69c-40f4-ba63-d5f89472281b-000000@email.amazonses.com>`
+- Self attachment message: HTTP 200, message `<010001a20d31e0b0-6d4944a5-fa06-4123-b539-e3e0fee369ba-000000@email.amazonses.com>`
 
-- Attachment metadata: HTTP 403
+- Attachment metadata: HTTP 200
 
-- Direct CDN download: not attempted; no download_url in response
+- Direct CDN download: HTTP 200, 7337 bytes, host `cdn.agentmail.to`
 
 - Inbox response:
 
@@ -794,8 +827,8 @@ FAIL: Error: Create index failed: {"error":"endpoint is not supported by the Pin
 
 ```json
 {
-  "message_id": "<010001a20d14173e-fe1e19af-dcd7-4ec9-a47f-273c01591f5d-000000@email.amazonses.com>",
-  "thread_id": "c53a5a91-2839-44ba-be3e-2e358bea4acb"
+  "message_id": "<010001a20d31ddef-767ccc1e-2e64-4ef3-bd0d-1aab732d51e4-000000@email.amazonses.com>",
+  "thread_id": "5ac4a155-5ace-4aed-bc6d-764626fd6e69"
 }
 ```
 
@@ -803,13 +836,18 @@ FAIL: Error: Create index failed: {"error":"endpoint is not supported by the Pin
 
 ```json
 {
-  "error": "endpoint is not supported by the AgentMail connector",
-  "download_url": "[signed URL omitted]"
+  "attachment_id": "b44f4779-4423-4e86-82e4-d4240805c657",
+  "filename": "tiny.jpg",
+  "size": 7337,
+  "content_type": "image/jpeg",
+  "content_disposition": "attachment",
+  "download_url": "[signed URL omitted]",
+  "expires_at": "2026-11-24T11:55:05.305Z"
 }
 ```
 ## Quirks and notes
 
-- Pinecone index create: HTTP 403, 1535 ms.
+- Pinecone index create: HTTP 403, 180 ms.
 
 ## Outcome
 
@@ -818,4 +856,4 @@ FAIL: Error: Create index failed: {"error":"endpoint is not supported by the Pin
 - PASS ollama
 - FAIL pinecone
 - PASS box
-- FAIL agentmail
+- PASS agentmail
