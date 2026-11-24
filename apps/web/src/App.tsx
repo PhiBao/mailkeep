@@ -1,5 +1,6 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router';
 import { Wordmark } from './components/Wordmark.js';
+import { Case } from './routes/Case.js';
 import { Today } from './routes/Today.js';
 
 function Home() {
@@ -24,6 +25,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/today" element={<Today />} />
+        <Route path="/cases/:id" element={<Case />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
