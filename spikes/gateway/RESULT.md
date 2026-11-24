@@ -1,21 +1,22 @@
 # T02 RESULT — every connector through the gateway
 
-Run: 2026-11-24T10:55:05.656Z on Sprite `mailkeep`.
+Run: 2026-11-24T11:53:29.672Z on Sprite `mailkeep`.
 
 ## Gateway discovery
 
 - Path: `GET /v1/gateway/list`
 
-- Latency: 241 ms
+- Latency: 1056 ms
 
 - Top-level keys: `available`, `connections`
 
-- Connections: 6
+- Connections: 7
 
 - Base URLs:
   - agentmail: `https://api.sprites.dev/v1/gateway/custom_api/oFVcFZMwhdqmA-6RU-mG1A`
   - box: `https://api.sprites.dev/v1/gateway/box/D6Q3d2I6yAJQq5AoK6X1Jg`
-  - custom_api: `https://api.sprites.dev/v1/gateway/custom_api/oFVcFZMwhdqmA-6RU-mG1A`
+  - custom_api: `https://api.sprites.dev/v1/gateway/custom_api/i98ggUCAgLaQL3TuC6o5dA`
+  - pinecone_control: `https://api.sprites.dev/v1/gateway/custom_api/i98ggUCAgLaQL3TuC6o5dA`
   - ollama: `https://api.sprites.dev/v1/gateway/ollama/Xuv-D-igLp6l-Lg_xYH4nA`
   - pinecone: `https://api.sprites.dev/v1/gateway/pinecone/anVdybVeX3EAI11QdTiVhA`
   - typesafe: `https://api.sprites.dev/v1/gateway/typesafe/nzOp5iVCbA5OBl_eRQvEwQ`
@@ -422,7 +423,7 @@ Run: 2026-11-24T10:55:05.656Z on Sprite `mailkeep`.
         "name_prefix": "mailkeep"
       },
       "inserted_at": "2026-11-24T10:01:00.058422Z",
-      "updated_at": "2026-11-24T10:01:08.293884Z",
+      "updated_at": "2026-11-24T11:50:11.251852Z",
       "connection_type": "oauth",
       "username": null,
       "display_name": "Box (kiter)",
@@ -431,7 +432,7 @@ Run: 2026-11-24T10:55:05.656Z on Sprite `mailkeep`.
       "provider_account_name": "Box (kiter)",
       "provider_account_id": "box_53551722311",
       "scopes": "root_readwrite",
-      "token_expires_at": "2026-11-24T11:12:26.058189Z",
+      "token_expires_at": "2026-11-24T12:54:30.251777Z",
       "usage_snippet": "export BOX_GATEWAY=\"https://api.sprites.dev/v1/gateway/box/D6Q3d2I6yAJQq5AoK6X1Jg\"\ncurl \"$BOX_GATEWAY/2.0/folders/0/items\"\ncurl --fail \"$BOX_GATEWAY/2.0/files/FILE_ID/content\" -o document.pdf\n# Attributes must precede file; total request limit is 50 MiB.\ncurl --fail \"$BOX_GATEWAY/upload/files/content\" \\\n  -F 'attributes={\"name\":\"document.pdf\",\"parent\":{\"id\":\"0\"}}' \\\n  -F 'file=@document.pdf'\n# Replace content: POST the multipart file to /upload/files/FILE_ID/content.",
       "notes": [],
       "gateway_base_url": "https://api.sprites.dev/v1/gateway/box/D6Q3d2I6yAJQq5AoK6X1Jg",
@@ -469,6 +470,39 @@ Run: 2026-11-24T10:55:05.656Z on Sprite `mailkeep`.
       "gateway_base_url": "https://api.sprites.dev/v1/gateway/custom_api/oFVcFZMwhdqmA-6RU-mG1A",
       "workspace_url": null,
       "manage_url": "https://sprites.dev/account/kiter/connectors/oFVcFZMwhdqmA-6RU-mG1A",
+      "request_scopes_url": "https://sprites.dev/account/kiter/connect/custom_api?scopes="
+    },
+    {
+      "id": "i98ggUCAgLaQL3TuC6o5dA",
+      "description": "Connect any API with a token",
+      "provider": "custom_api",
+      "access_policy": {
+        "name_prefix": "mailkeep"
+      },
+      "inserted_at": "2026-11-24T11:45:52.398409Z",
+      "updated_at": "2026-11-24T11:46:00.469401Z",
+      "connection_type": "oauth",
+      "username": null,
+      "auth_method": "custom_header",
+      "base_api_url": "https://api.pinecone.io",
+      "display_name": "mailkeep-pinecone",
+      "user_id": null,
+      "provider_info": {
+        "auth_custom_header_name": "Api-Key",
+        "auth_header_prefix": "Bearer",
+        "auth_method": "custom_header",
+        "base_api_url": "https://api.pinecone.io",
+        "test_url": "https://api.pinecone.io/indexes"
+      },
+      "provider_account_name": "mailkeep-pinecone",
+      "provider_account_id": "mailkeep-pinecone",
+      "scopes": null,
+      "token_expires_at": null,
+      "usage_snippet": "# Responses stream unchanged, including compressed content. Use --compressed\n# to let curl negotiate and decode compression. The gateway still filters\n# credentials, cookies, gateway identity and hop-by-hop headers, and manages\n# HTTP framing. Requests are limited to 8 MB; redirects are not followed by\n# the gateway. Custom API responses are not inspected for inference usage.\n# Query-parameter auth protects echoed keys instead of passing bytes through:\n# only identity/gzip responses are supported, and HTTP 206 is rejected.\n\n# Make a GET request through the gateway\ncurl \"https://api.sprites.dev/v1/gateway/custom_api/i98ggUCAgLaQL3TuC6o5dA/your/endpoint\"\n\n# POST with JSON body\ncurl -X POST \"https://api.sprites.dev/v1/gateway/custom_api/i98ggUCAgLaQL3TuC6o5dA/your/endpoint\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\"key\": \"value\"}'",
+      "notes": [],
+      "gateway_base_url": "https://api.sprites.dev/v1/gateway/custom_api/i98ggUCAgLaQL3TuC6o5dA",
+      "workspace_url": null,
+      "manage_url": "https://sprites.dev/account/kiter/connectors/i98ggUCAgLaQL3TuC6o5dA",
       "request_scopes_url": "https://sprites.dev/account/kiter/connect/custom_api?scopes="
     },
     {
@@ -555,9 +589,9 @@ Run: 2026-11-24T10:55:05.656Z on Sprite `mailkeep`.
 
 - Path: `POST /v1/systemone`
 
-- Quickstart: HTTP 200, 465 ms
+- Quickstart: HTTP 200, 735 ms
 
-- Image header call: HTTP 200, 772 ms; `TypeSafe-Danger-Zone-Images: true` passed
+- Image header call: HTTP 200, 840 ms; `TypeSafe-Danger-Zone-Images: true` passed
 
 - Quickstart response shape:
 
@@ -597,27 +631,27 @@ Run: 2026-11-24T10:55:05.656Z on Sprite `mailkeep`.
 
 ## Ollama
 
-- Text path: `POST /api/chat` — HTTP 200, 588 ms
+- Text path: `POST /api/chat` — HTTP 200, 528 ms
 
-- Vision path: `POST /api/chat` — HTTP 200, 2506 ms
+- Vision path: `POST /api/chat` — HTTP 200, 2037 ms
 
 - Text token fields: `prompt_eval_count=18`, `eval_count=2`
 
-- Vision token fields: `prompt_eval_count=304`, `eval_count=301`
+- Vision token fields: `prompt_eval_count=304`, `eval_count=304`
 
 - Text response shape:
 
 ```json
 {
   "model": "gemma4:31b",
-  "created_at": "2026-11-24T10:54:55.243716705Z",
+  "created_at": "2026-11-24T11:53:12.200231432Z",
   "message": {
     "role": "assistant",
     "content": "OK"
   },
   "done": true,
   "done_reason": "stop",
-  "total_duration": 317540886,
+  "total_duration": 173690984,
   "prompt_eval_count": 18,
   "prompt_eval_cached_count": 0,
   "eval_count": 2
@@ -655,9 +689,13 @@ Total current charges $84.17
 Payment due: December 10, 2026. You can pay online, by phone, or by mailing a
 check with the stub below.
 
-Riverbend Water Utility Account 7720-114471
-PO Box 310 Amount enclosed: $ ________
-Riverbend, WM 60104 Check number: ________
+Riverbend Water Utility
+PO Box 310
+Riverbend, WM 60104
+
+Account 7720-114471
+Amount enclosed: $ ________
+Check number: ________
 
 Questions? (555) 010-4471 · Weekdays 8 a.m.-5 p.m.
 Please keep this bill for your records.
@@ -665,7 +703,64 @@ Please keep this bill for your records.
 
 ## Pinecone
 
-FAIL: Error: Create index failed: {"error":"endpoint is not supported by the Pinecone connector"}
+- Index: `mailkeep-letters` (dense, 1024, cosine, serverless aws us-east-1)
+
+- Control connector: `https://api.sprites.dev/v1/gateway/custom_api/i98ggUCAgLaQL3TuC6o5dA`
+
+- Paths: `POST /embed`, `POST /indexes/mailkeep-letters/vectors/upsert`, `POST /indexes/mailkeep-letters/query`, `POST /indexes/mailkeep-letters/vectors/delete`
+
+- Embed: HTTP 200, 485 ms, 2 vectors × 1024 dimensions
+
+- Upsert: HTTP 200, 1344 ms
+
+- Query: HTTP 200, 668 ms, 2 matches
+
+- Delete namespace: HTTP 200, 985 ms
+
+- Upsert response:
+
+```json
+{
+  "upsertedCount": 2
+}
+```
+
+- Query response:
+
+```json
+{
+  "results": [],
+  "matches": [
+    {
+      "id": "spike-1",
+      "score": 0.999861479,
+      "values": [],
+      "metadata": {
+        "label": "bill"
+      }
+    },
+    {
+      "id": "spike-2",
+      "score": 0.69270885,
+      "values": [],
+      "metadata": {
+        "label": "second_notice"
+      }
+    }
+  ],
+  "namespace": "spike",
+  "usage": {
+    "readUnits": 1,
+    "egressBytes": 90
+  }
+}
+```
+
+- Delete response:
+
+```json
+{}
+```
 
 ## Box
 
@@ -688,11 +783,11 @@ FAIL: Error: Create index failed: {"error":"endpoint is not supported by the Pin
   "name": "kiter",
   "login": "kiter0211@gmail.com",
   "created_at": "2026-11-24T02:00:07-08:00",
-  "modified_at": "2026-11-24T02:00:58-08:00",
+  "modified_at": "2026-11-24T03:38:47-08:00",
   "language": "en",
   "timezone": "America/Los_Angeles",
   "space_amount": 10737418240,
-  "space_used": 0,
+  "space_used": 7337,
   "max_upload_size": 262144000,
   "status": "active",
   "job_title": "",
@@ -711,11 +806,11 @@ FAIL: Error: Create index failed: {"error":"endpoint is not supported by the Pin
   "id": "2611842280600",
   "file_version": {
     "type": "file_version",
-    "id": "2899727202196",
+    "id": "2899921794082",
     "sha1": "f06aec41f0d218b1e355de2424842a70e26d069e"
   },
-  "sequence_id": "1",
-  "etag": "1",
+  "sequence_id": "3",
+  "etag": "3",
   "sha1": "f06aec41f0d218b1e355de2424842a70e26d069e",
   "name": "tiny.jpg"
 }
@@ -732,11 +827,11 @@ FAIL: Error: Create index failed: {"error":"endpoint is not supported by the Pin
       "id": "2611842280600",
       "file_version": {
         "type": "file_version",
-        "id": "2899792130258",
+        "id": "2899946499891",
         "sha1": "f06aec41f0d218b1e355de2424842a70e26d069e"
       },
-      "sequence_id": "2",
-      "etag": "2",
+      "sequence_id": "4",
+      "etag": "4",
       "sha1": "f06aec41f0d218b1e355de2424842a70e26d069e",
       "name": "tiny.jpg",
       "description": "",
@@ -761,11 +856,11 @@ FAIL: Error: Create index failed: {"error":"endpoint is not supported by the Pin
         ]
       },
       "created_at": "2026-11-24T02:16:48-08:00",
-      "modified_at": "2026-11-24T02:55:00-08:00",
+      "modified_at": "2026-11-24T03:53:21-08:00",
       "trashed_at": null,
       "purged_at": null,
       "content_created_at": "2026-11-24T02:16:48-08:00",
-      "content_modified_at": "2026-11-24T02:55:00-08:00",
+      "content_modified_at": "2026-11-24T03:53:21-08:00",
       "created_by": {
         "type": "user",
         "id": "53551722311",
@@ -795,9 +890,9 @@ FAIL: Error: Create index failed: {"error":"endpoint is not supported by the Pin
 
 - Paths: `GET /v0/inboxes`, `POST /v0/inboxes/:inbox/messages/send`, `GET /v0/inboxes/:inbox/messages`, `GET /v0/inboxes/:inbox/messages/:id/attachments/:att`
 
-- Test email to kiter7396@gmail.com: HTTP 200, message `<010001a20d31ddef-767ccc1e-2e64-4ef3-bd0d-1aab732d51e4-000000@email.amazonses.com>`
+- Test email to kiter7396@gmail.com: HTTP 200, message `<010001a20d6750f5-564cf018-7c43-4c11-bce4-dd605b90aec4-000000@email.amazonses.com>`
 
-- Self attachment message: HTTP 200, message `<010001a20d31e0b0-6d4944a5-fa06-4123-b539-e3e0fee369ba-000000@email.amazonses.com>`
+- Self attachment message: HTTP 200, message `<010001a20d6755cc-d15451f0-74b6-4cf2-81ec-eb4c2265b65b-000000@email.amazonses.com>`
 
 - Attachment metadata: HTTP 200
 
@@ -815,8 +910,8 @@ FAIL: Error: Create index failed: {"error":"endpoint is not supported by the Pin
       "inbox_id": "kiter@agentmail.to",
       "email": "kiter@agentmail.to",
       "display_name": "AgentMail",
-      "status_until": "2026-12-24T10:16:52.570Z",
-      "updated_at": "2026-11-24T10:16:52.843Z",
+      "status_until": "2026-12-24T11:50:14.195Z",
+      "updated_at": "2026-11-24T11:50:14.527Z",
       "created_at": "2026-11-24T10:05:15.535Z"
     }
   ]
@@ -827,8 +922,8 @@ FAIL: Error: Create index failed: {"error":"endpoint is not supported by the Pin
 
 ```json
 {
-  "message_id": "<010001a20d31ddef-767ccc1e-2e64-4ef3-bd0d-1aab732d51e4-000000@email.amazonses.com>",
-  "thread_id": "5ac4a155-5ace-4aed-bc6d-764626fd6e69"
+  "message_id": "<010001a20d6750f5-564cf018-7c43-4c11-bce4-dd605b90aec4-000000@email.amazonses.com>",
+  "thread_id": "dd3925d3-2fa2-43d8-951b-e6f3cc641372"
 }
 ```
 
@@ -836,24 +931,27 @@ FAIL: Error: Create index failed: {"error":"endpoint is not supported by the Pin
 
 ```json
 {
-  "attachment_id": "b44f4779-4423-4e86-82e4-d4240805c657",
+  "attachment_id": "cad4ba96-2cc3-461e-9139-658ef46f96d8",
   "filename": "tiny.jpg",
   "size": 7337,
   "content_type": "image/jpeg",
   "content_disposition": "attachment",
   "download_url": "[signed URL omitted]",
-  "expires_at": "2026-11-24T11:55:05.305Z"
+  "expires_at": "2026-11-24T12:53:29.226Z"
 }
 ```
 ## Quirks and notes
 
-- Pinecone index create: HTTP 403, 180 ms.
+- Pinecone vector index `mailkeep-letters` was created through Custom API connector `mailkeep-pinecone` with `POST /indexes` and `X-Pinecone-Api-Version: 2025-10`; the dashboard only creates document/schema indexes.
+- Pinecone query uses `POST /indexes/mailkeep-letters/query`; `/vectors/query` is blocked by the dedicated connector.
+- AgentMail uses Custom API connector `mailkeep` for the full API, including attachment metadata; the dedicated connector is limited to polling/sending.
+- Box upload uses `POST /upload/files/content`; new versions use `POST /upload/files/:id/content`.
 
 ## Outcome
 
 - PASS gateway
 - PASS typesafe
 - PASS ollama
-- FAIL pinecone
+- PASS pinecone
 - PASS box
 - PASS agentmail

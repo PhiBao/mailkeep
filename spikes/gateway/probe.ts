@@ -87,6 +87,12 @@ try {
       ) {
         bases.set('agentmail', item.gateway_base_url);
       }
+      if (
+        item.provider === 'custom_api' &&
+        object(item.provider_info).base_api_url === 'https://api.pinecone.io'
+      ) {
+        bases.set('pinecone_control', item.gateway_base_url);
+      }
     }
   }
   section('Gateway discovery', [
@@ -97,7 +103,7 @@ try {
     `- Base URLs:\n${[...bases].map(([provider, base]) => `  - ${provider}: \`${base}\``).join('\n')}`,
     `- Full response:\n\n\`\`\`json\n${sample(list.json, 30_000)}\n\`\`\``,
   ]);
-  const required = ['typesafe', 'ollama', 'pinecone', 'box', 'agentmail'];
+  const required = ['typesafe', 'ollama', 'pinecone', 'pinecone_control', 'box', 'agentmail'];
   const missing = required.filter((provider) => !bases.has(provider));
   finish('gateway', missing.length === 0, `missing ${missing.join(', ')}`);
 } catch (error) {
@@ -233,24 +239,31 @@ async function ollamaSpike(base: string): Promise<void> {
   finish('ollama', pass, `text ${text.status}, vision ${vision.status}`);
 }
 
-async function pineconeSpike(base: string): Promise<void> {
+async function pineconeSpike(base: string, controlBase?: string): Promise<void> {
   const indexName = 'mailkeep-letters';
   let indexes = await call(base, '/indexes');
   let index = (object(indexes.json).indexes as unknown[] | undefined)?.find(
     (item) => object(item).name === indexName,
   );
   if (!index) {
-    const created = await call(
-      base,
-      '/indexes',
-      jsonBody({
+    if (!controlBase) throw new Error('Missing Pinecone Custom API control connector');
+    const created = await call(controlBase, '/indexes', {
+      ...jsonBody({
         name: indexName,
+        vector_type: 'dense',
         dimension: 1024,
         metric: 'cosine',
         spec: { serverless: { cloud: 'aws', region: 'us-east-1' } },
+        deletion_protection: 'disabled',
       }),
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Pinecone-Api-Version': '2025-10',
+      },
+    });
+    notes.push(
+      `Pinecone vector index create via Custom API \`POST /indexes\` with \`X-Pinecone-Api-Version: 2025-10\`: HTTP ${created.status}, ${created.ms} ms.`,
     );
-    notes.push(`Pinecone index create: HTTP ${created.status}, ${created.ms} ms.`);
     if (!created.ok) throw new Error(`Create index failed: ${created.text.slice(0, 500)}`);
     for (let attempt = 0; attempt < 30; attempt += 1) {
       await new Promise((resolve) => setTimeout(resolve, 2000));
@@ -299,7 +312,7 @@ async function pineconeSpike(base: string): Promise<void> {
   }
   const query = await call(
     base,
-    `/indexes/${indexName}/vectors/query`,
+    `/indexes/${indexName}/query`,
     jsonBody({
       namespace: 'spike',
       vector: values,
@@ -316,7 +329,8 @@ async function pineconeSpike(base: string): Promise<void> {
   const pass = upsert.ok && query.ok && deleted.ok && (matches?.length ?? 0) > 0;
   section('Pinecone', [
     `- Index: \`${indexName}\` (dense, 1024, cosine, serverless aws us-east-1)`,
-    `- Paths: \`POST /embed\`, \`POST /indexes/${indexName}/vectors/upsert\`, \`POST /indexes/${indexName}/vectors/query\`, \`POST /indexes/${indexName}/vectors/delete\``,
+    `- Control connector: \`${controlBase ?? 'not needed; index already existed'}\``,
+    `- Paths: \`POST /embed\`, \`POST /indexes/${indexName}/vectors/upsert\`, \`POST /indexes/${indexName}/query\`, \`POST /indexes/${indexName}/vectors/delete\``,
     `- Embed: HTTP ${embedded.status}, ${embedded.ms} ms, ${vectors?.length} vectors × ${values.length} dimensions`,
     `- Upsert: HTTP ${upsert.status}, ${upsert.ms} ms`,
     `- Query: HTTP ${query.status}, ${query.ms} ms, ${matches?.length ?? 0} matches`,
@@ -510,10 +524,16 @@ for (const connection of (object(gatewayList.json).connections as unknown[] | un
     ) {
       bases.set('agentmail', item.gateway_base_url);
     }
+    if (
+      item.provider === 'custom_api' &&
+      object(item.provider_info).base_api_url === 'https://api.pinecone.io'
+    ) {
+      bases.set('pinecone_control', item.gateway_base_url);
+    }
   }
 }
 
-const spikes: Array<[string, string, (base: string) => Promise<void>]> = [
+const spikes: Array<[string, string, (base: string, control?: string) => Promise<void>]> = [
   ['typesafe', 'TypeSafe', typesafeSpike],
   ['ollama', 'Ollama', ollamaSpike],
   ['pinecone', 'Pinecone', pineconeSpike],
@@ -528,7 +548,7 @@ for (const [provider, label, run] of spikes) {
     continue;
   }
   try {
-    await run(base);
+    await run(base, bases.get('pinecone_control'));
   } catch (error) {
     section(label, [`FAIL: ${String(error)}`]);
     finish(provider, false, String(error));
