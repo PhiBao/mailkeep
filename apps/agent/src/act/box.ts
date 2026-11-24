@@ -142,19 +142,17 @@ export async function fileLetter(
 
   const extension = input.letter.mime === 'application/pdf' ? 'pdf' : 'jpg';
   const originalName = `${date} ${title}.${extension}`;
-  if (!input.letter.box_file_id) {
-    const fileId = await putFile(client, {
-      folderId,
-      name: originalName,
-      bytes: await readFile(input.letter.local_path),
-      contentType: input.letter.mime,
-    });
-    db.prepare('UPDATE letters SET box_file_id = ? WHERE id = ? AND household_id = ?').run(
-      fileId,
-      input.letter.id,
-      input.householdId,
-    );
-  }
+  const originalFileId = await putFile(client, {
+    folderId,
+    name: originalName,
+    bytes: await readFile(input.letter.local_path),
+    contentType: input.letter.mime,
+  });
+  db.prepare('UPDATE letters SET box_file_id = ? WHERE id = ? AND household_id = ?').run(
+    originalFileId,
+    input.letter.id,
+    input.householdId,
+  );
 
   const letterMarkdown = renderLetterFile({
     title: input.letter.title ?? 'Letter',
