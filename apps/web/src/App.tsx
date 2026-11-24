@@ -6,6 +6,7 @@ import { Letter } from './routes/Letter.js';
 import { Login } from './routes/Login.js';
 import { Mom } from './routes/Mom.js';
 import { Proof } from './routes/Proof.js';
+import { Shoebox } from './routes/Shoebox.js';
 import { Today } from './routes/Today.js';
 
 function Home() {
@@ -35,6 +36,7 @@ export default function App() {
         <Route path="/demo" element={<Demo />} />
         <Route path="/demo/cases/:id" element={<Case demo />} />
         <Route path="/demo/letters/:id" element={<Letter demo />} />
+        <Route path="/shoebox" element={<Shoebox />} />
         <Route path="/today" element={<Today />} />
         <Route path="/cases/:id" element={<Case />} />
         <Route path="/letters/:id" element={<Letter />} />
