@@ -10,9 +10,11 @@ import { apiRoutes } from './http/routes/api.js';
 import { authRoutes } from './http/routes/auth.js';
 import { hooksRoutes } from './http/routes/hooks.js';
 import { momRoutes } from './http/routes/mom.js';
+import { proofRoutes } from './http/routes/proof.js';
 import { startSenderWorker } from './notify/sender.js';
 import { PipelineQueue, resumePending } from './pipeline/queue.js';
 import { scanKeys } from './sprite/keyscan.js';
+import { collectProof } from './sprite/proof.js';
 import { log } from './util/log.js';
 
 const config = loadConfig();
@@ -30,11 +32,13 @@ await mkdir(config.MAILKEEP_DATA_DIR, { recursive: true, mode: 0o700 });
 const db = openDb(path.join(config.MAILKEEP_DATA_DIR, 'mailkeep.db'));
 migrate(db);
 const client = new GatewayClient({ config });
+const proof = await collectProof({ config, db, client, keyscan, env: process.env });
 const queue = new PipelineQueue({ client, config, db });
 const app = createApp(config, (instance) => {
   instance.route('/', authRoutes({ config, db }));
   instance.route('/', apiRoutes({ config, db, queue }));
   instance.route('/', momRoutes({ db }));
+  instance.route('/', proofRoutes({ proof }));
   instance.route('/', hooksRoutes({ config, db, client, queue }));
 });
 

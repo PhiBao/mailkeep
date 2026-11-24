@@ -4,6 +4,7 @@ import { Case } from './routes/Case.js';
 import { Letter } from './routes/Letter.js';
 import { Login } from './routes/Login.js';
 import { Mom } from './routes/Mom.js';
+import { Proof } from './routes/Proof.js';
 import { Today } from './routes/Today.js';
 
 function Home() {
@@ -29,6 +30,7 @@ export default function App() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/mom" element={<Mom />} />
+        <Route path="/proof" element={<Proof />} />
         <Route path="/today" element={<Today />} />
         <Route path="/cases/:id" element={<Case />} />
         <Route path="/letters/:id" element={<Letter />} />
