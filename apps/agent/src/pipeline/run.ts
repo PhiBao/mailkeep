@@ -166,6 +166,16 @@ function saveAsks(
       JSON.stringify(ask.options),
       new Date().toISOString(),
     );
+    if (input.caseId) {
+      addCaseEvent(db, {
+        householdId: input.householdId,
+        caseId: input.caseId,
+        letterId: input.letterId,
+        type: 'asked',
+        actor: 'agent',
+        detail: { askId, qtype: ask.qtype },
+      });
+    }
     return { ...ask, id: askId };
   });
 }
@@ -362,7 +372,11 @@ export async function runLetter(
             read.accountTail,
             JSON.stringify(read.phones.map((phone) => phone.text)),
             JSON.stringify(read.scamRuleHits),
-            JSON.stringify({ needsRetake: read.needsRetake, r2Failed: read.r2Failed }),
+            JSON.stringify({
+              qualityFlagged: read.qualityFlagged,
+              needsRetake: read.needsRetake,
+              r2Failed: read.r2Failed,
+            }),
             read.promptTokens,
             read.outputTokens,
             new Date().toISOString(),

@@ -11,11 +11,14 @@ export interface SenderDeps {
 
 interface OutboxRow {
   id: string;
+  household_id: string;
   to_email: string;
   subject: string;
   body_text: string;
   agentmail_message_id: string | null;
   agentmail_thread_id: string | null;
+  kind: string;
+  related_id: string | null;
   attempts: number;
 }
 
@@ -49,6 +52,11 @@ export async function sendPending(deps: SenderDeps): Promise<void> {
           "UPDATE outbox SET status = 'sent', agentmail_message_id = ?, agentmail_thread_id = ?, sent_at = ?, attempts = attempts + 1 WHERE id = ?",
         )
         .run(sent.message_id, sent.thread_id, new Date().toISOString(), row.id);
+      if (row.kind === 'ask' && row.related_id) {
+        deps.db
+          .prepare('UPDATE asks SET agentmail_thread_id = ? WHERE id = ? AND household_id = ?')
+          .run(sent.thread_id, row.related_id, row.household_id);
+      }
     } catch (error) {
       const attempts = row.attempts + 1;
       deps.db

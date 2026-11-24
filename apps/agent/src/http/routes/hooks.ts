@@ -3,6 +3,7 @@ import type { Config } from '../../config.js';
 import type { DB } from '../../db/db.js';
 import { getMemberByEmail } from '../../db/repo.js';
 import type { GatewayClient } from '../../gateway/client.js';
+import { handleAskReply } from '../../notify/replies.js';
 import { intakeEmailAttachment } from '../../pipeline/intake.js';
 import type { PipelineQueue } from '../../pipeline/queue.js';
 import {
@@ -18,12 +19,14 @@ export interface HookDeps {
   db: DB;
   client: GatewayClient;
   queue: PipelineQueue;
+  replyHandler?: typeof handleAskReply;
 }
 
 export interface InboundMessage {
   message_id: string;
   thread_id: string;
   subject?: string | undefined;
+  text?: string | undefined;
   timestamp?: string | undefined;
   from?: unknown;
   attachments?: unknown;
@@ -107,15 +110,28 @@ export async function pollAgentMail(deps: HookDeps, adapter?: MailAdapter): Prom
     const memberId = String(member.id);
     const openAsk = deps.db
       .prepare(
-        "SELECT id FROM asks WHERE household_id = ? AND agentmail_thread_id = ? AND status = 'open'",
+        "SELECT * FROM asks WHERE household_id = ? AND agentmail_thread_id = ? AND status = 'open' ORDER BY created_at LIMIT 1",
       )
-      .get(householdId, message.thread_id);
+      .get(householdId, message.thread_id) as { id: string } | undefined;
     if (openAsk) {
-      deps.db
-        .prepare(
-          'INSERT INTO inbound_seen (agentmail_message_id, outcome, created_at) VALUES (?, ?, ?)',
-        )
-        .run(message.message_id, 'reply_pending', new Date().toISOString());
+      try {
+        const outcome = await (deps.replyHandler ?? handleAskReply)(deps, {
+          askId: openAsk.id,
+          memberId: memberId,
+          text: message.text ?? '',
+          via: 'email',
+        });
+        deps.db
+          .prepare(
+            'INSERT INTO inbound_seen (agentmail_message_id, outcome, created_at) VALUES (?, ?, ?)',
+          )
+          .run(message.message_id, outcome, new Date().toISOString());
+      } catch (error) {
+        log.warn(
+          { event: 'inbound_reply_failed', messageId: message.message_id, askId: openAsk.id },
+          error instanceof Error ? error.message : String(error),
+        );
+      }
       continue;
     }
 

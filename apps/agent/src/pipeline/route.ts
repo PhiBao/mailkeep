@@ -31,7 +31,7 @@ export interface RouteInput {
   past: RoutePast[];
   amountCandidates: Array<{ id: string; amountCents: number }>;
   dateCandidates: Array<{ id: string; iso: string }>;
-  forced?: { kind?: Kind; linkLetterId?: string; scam?: boolean };
+  forced?: { kind?: Kind; linkLetterId?: string; rejectLinkLetterId?: string; scam?: boolean };
 }
 
 export interface RouteCheck {
@@ -236,10 +236,23 @@ export function route(input: RouteInput): RouteOutput {
       probability: noul(input.answers, `same_matter_${index}`),
     }))
     .sort((left, right) => right.probability - left.probability);
-  const accepted = candidates.find((candidate) => candidate.probability >= T.linkAccept);
+  const forcedCandidate = input.forced?.linkLetterId
+    ? candidates.find((candidate) => candidate.past.letterId === input.forced?.linkLetterId)
+    : undefined;
+  const accepted =
+    forcedCandidate ??
+    candidates.find(
+      (candidate) =>
+        candidate.past.letterId !== input.forced?.rejectLinkLetterId &&
+        candidate.probability >= T.linkAccept,
+    );
   const askCandidate = accepted
     ? undefined
-    : candidates.find((candidate) => candidate.probability >= T.linkAsk);
+    : candidates.find(
+        (candidate) =>
+          candidate.past.letterId !== input.forced?.rejectLinkLetterId &&
+          candidate.probability >= T.linkAsk,
+      );
   const linked = accepted?.past;
   const linkedIndex = accepted?.index;
 
@@ -248,10 +261,7 @@ export function route(input: RouteInput): RouteOutput {
       otherLetterId: linked.letterId,
       relation: 'same_matter',
       probability: accepted.probability,
-      status:
-        input.forced?.linkLetterId && input.forced.linkLetterId !== linked.letterId
-          ? 'rejected'
-          : 'accepted',
+      status: 'accepted',
     });
     if (noul(input.answers, `follow_up_${accepted.index}`) >= T.followUp) {
       relations.push({
@@ -329,13 +339,13 @@ export function route(input: RouteInput): RouteOutput {
       linked.lane !== 'careful'
     : false;
   const scam =
-    input.forced?.scam === true ||
-    Object.entries(input.answers).some(
+    input.forced?.scam ??
+    (Object.entries(input.answers).some(
       ([key, answer]) =>
         key.startsWith('scam_') && answer.type === 'noul' && (answer.noul ?? 0) >= T.scamAny,
     ) ||
-    input.scamRuleHits.length > 0 ||
-    senderMismatch;
+      input.scamRuleHits.length > 0 ||
+      senderMismatch);
 
   let lane: Lane = 'needs_you';
   let amountCents: number | null = selectedAmount;

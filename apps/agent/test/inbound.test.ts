@@ -2,7 +2,7 @@ import { mkdtemp, readFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { loadConfig } from '../src/config.js';
 import { type DB, openDb } from '../src/db/db.js';
 import { migrate } from '../src/db/migrate.js';
@@ -94,6 +94,39 @@ describe('AgentMail intake', () => {
     await pollAgentMail(deps(), mail);
     expect((db.prepare('SELECT count(*) AS n FROM letters').get() as { n: number }).n).toBe(1);
     expect((db.prepare('SELECT count(*) AS n FROM inbound_seen').get() as { n: number }).n).toBe(1);
+  });
+
+  it('routes a family reply to the matching open ask instead of intake', async () => {
+    const family = addMember(db, {
+      householdId: 'hh_test',
+      email: 'kiter7396@gmail.com',
+      displayName: 'Sarah',
+      role: 'family',
+    });
+    db.prepare(
+      `INSERT INTO asks
+        (id, household_id, letter_id, qtype, question, evidence, options_json, status,
+         agentmail_thread_id, created_at)
+       VALUES ('ask_1', 'hh_test', NULL, 'check', 'Check this', 'Evidence', '[]', 'open', 'thread_1', ?)`,
+    ).run(new Date().toISOString());
+    const replyHandler = vi.fn().mockResolvedValue('answered');
+    await pollAgentMail(
+      { ...deps(), replyHandler },
+      adapter(
+        [message({ from: 'Sarah <kiter7396@gmail.com>', text: 'HANDLED IT', attachments: [] })],
+        Buffer.from('x'),
+      ),
+    );
+    expect(replyHandler).toHaveBeenCalledWith(expect.objectContaining({ db }), {
+      askId: 'ask_1',
+      memberId: family.id,
+      text: 'HANDLED IT',
+      via: 'email',
+    });
+    expect((db.prepare('SELECT count(*) AS n FROM letters').get() as { n: number }).n).toBe(0);
+    expect(
+      (db.prepare('SELECT outcome FROM inbound_seen').get() as { outcome: string }).outcome,
+    ).toBe('answered');
   });
 
   it('caps a message at ten attachments', async () => {

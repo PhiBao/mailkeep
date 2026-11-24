@@ -88,6 +88,17 @@ export function addCaseEvent(
   );
 }
 
+export function replaceRelations(
+  db: DB,
+  input: { householdId: string; letterId: string; relations: RouteRelation[] },
+): void {
+  db.prepare('DELETE FROM relations WHERE household_id = ? AND letter_id = ?').run(
+    input.householdId,
+    input.letterId,
+  );
+  saveRelations(db, input);
+}
+
 export function saveRelations(
   db: DB,
   input: { householdId: string; letterId: string; relations: RouteRelation[] },

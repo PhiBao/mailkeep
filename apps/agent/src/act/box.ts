@@ -97,6 +97,77 @@ async function putFile(
   return (await uploadFile(client, input)).entries[0]?.id ?? '';
 }
 
+export async function updateCaseFile(
+  client: GatewayClient,
+  db: DB,
+  input: { householdId: string; caseId: string; modelIds: string[] },
+): Promise<void> {
+  const household = await ensureHouseholdFolders(client, db, input.householdId);
+  const caseRow = db
+    .prepare('SELECT * FROM cases WHERE id = ? AND household_id = ?')
+    .get(input.caseId, input.householdId) as Record<string, unknown> | undefined;
+  if (!caseRow) throw new Error(`Case ${input.caseId} not found`);
+  let folderId = caseRow.box_folder_id ? String(caseRow.box_folder_id) : '';
+  if (!folderId) {
+    const firstLetter = db
+      .prepare(
+        'SELECT received_at FROM letters WHERE case_id = ? AND household_id = ? ORDER BY received_at LIMIT 1',
+      )
+      .get(input.caseId, input.householdId) as { received_at: string } | undefined;
+    const date = (firstLetter?.received_at ?? new Date().toISOString()).slice(0, 10);
+    const folderName = safeName(
+      `${date.slice(0, 7)} ${String(caseRow.counterparty)} — ${String(caseRow.title)} (${input.caseId})`,
+    );
+    folderId = await ensureFolder(client, household.box_cases_folder_id ?? '', folderName);
+    db.prepare('UPDATE cases SET box_folder_id = ? WHERE id = ? AND household_id = ?').run(
+      folderId,
+      input.caseId,
+      input.householdId,
+    );
+  }
+  const events = db
+    .prepare(
+      'SELECT created_at, type, actor FROM case_events WHERE case_id = ? AND household_id = ? ORDER BY created_at',
+    )
+    .all(input.caseId, input.householdId) as Array<{
+    created_at: string;
+    type: string;
+    actor: string;
+  }>;
+  const letters = db
+    .prepare('SELECT id FROM letters WHERE case_id = ? AND household_id = ? ORDER BY received_at')
+    .all(input.caseId, input.householdId) as Array<{ id: string }>;
+  const markdown = renderCaseFile({
+    title: String(caseRow.title),
+    counterparty: String(caseRow.counterparty),
+    kind: String(caseRow.kind),
+    status: String(caseRow.status),
+    amountCents: caseRow.amount_cents === null ? null : Number(caseRow.amount_cents),
+    dueDate: caseRow.due_date === null ? null : String(caseRow.due_date),
+    secondNotice: Boolean(caseRow.second_notice),
+    contradiction: Boolean(caseRow.contradiction),
+    events: events.map((event) => ({
+      createdAt: event.created_at,
+      type: event.type,
+      actor: event.actor,
+    })),
+    letterIds: letters.map((letter) => letter.id),
+    modelIds: input.modelIds,
+    updatedAt: new Date().toISOString(),
+  });
+  const caseFileId = await putFile(client, {
+    folderId,
+    name: 'case.md',
+    bytes: Buffer.from(markdown),
+    contentType: 'text/markdown',
+  });
+  db.prepare('UPDATE cases SET box_casefile_id = ? WHERE id = ? AND household_id = ?').run(
+    caseFileId,
+    input.caseId,
+    input.householdId,
+  );
+}
+
 export async function fileLetter(
   client: GatewayClient,
   db: DB,
