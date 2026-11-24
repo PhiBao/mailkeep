@@ -373,5 +373,7 @@ export async function runTick(deps: TickDeps): Promise<TickResult> {
   const purged = deps.purge
     ? await deps.purge()
     : await purgeExpiredTrials(deps.db, deps.client, now);
-  return { ran: true, asks, overdue, digests, purged };
+  const result = { ran: true, asks, overdue, digests, purged };
+  log.info({ event: 'tick_complete', ...result }, 'Chase tick complete');
+  return result;
 }
