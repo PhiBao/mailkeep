@@ -1,0 +1,18 @@
+{
+  "id": "L35",
+  "received": "2026-11-27",
+  "thread": null,
+  "photo": "normal",
+  "demo": "none",
+  "heldout": true,
+  "truth": {
+    "kind_ok": ["other", "government", "marketing"],
+    "lanes_ok": ["careful"],
+    "needs_action": true,
+    "amount_cents": null,
+    "due_date": null,
+    "scam": true,
+    "links": [],
+    "closes": null
+  }
+}

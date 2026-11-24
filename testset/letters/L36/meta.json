@@ -1,0 +1,18 @@
+{
+  "id": "L36",
+  "received": "2026-11-26",
+  "thread": null,
+  "photo": "normal",
+  "demo": "none",
+  "heldout": true,
+  "truth": {
+    "kind_ok": ["statement"],
+    "lanes_ok": ["handled"],
+    "needs_action": false,
+    "amount_cents": null,
+    "due_date": null,
+    "scam": false,
+    "links": [],
+    "closes": null
+  }
+}
