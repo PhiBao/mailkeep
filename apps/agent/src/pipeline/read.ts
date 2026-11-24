@@ -64,8 +64,12 @@ async function requestSummary(
     promptTokens += result.promptTokens;
     outputTokens += result.outputTokens;
     try {
+      const content = result.content
+        .trim()
+        .replace(/^```(?:json)?\s*/i, '')
+        .replace(/\s*```$/, '');
       return {
-        value: summarySchema.parse(JSON.parse(result.content)),
+        value: summarySchema.parse(JSON.parse(content)),
         failed: false,
         promptTokens,
         outputTokens,

@@ -23,12 +23,12 @@ export async function remember(
     id: input.letter.id,
     values: input.letter.vector,
     metadata: {
-      case_id: input.letter.caseId,
-      sender_org: input.letter.senderOrg,
-      account_tail: input.letter.accountTail,
+      ...(input.letter.caseId ? { case_id: input.letter.caseId } : {}),
+      ...(input.letter.senderOrg ? { sender_org: input.letter.senderOrg } : {}),
+      ...(input.letter.accountTail ? { account_tail: input.letter.accountTail } : {}),
       received_at: input.letter.receivedAt,
-      kind: input.letter.kind,
-      lane: input.letter.lane,
+      ...(input.letter.kind ? { kind: input.letter.kind } : {}),
+      ...(input.letter.lane ? { lane: input.letter.lane } : {}),
       trial: input.letter.trial,
     },
   });
