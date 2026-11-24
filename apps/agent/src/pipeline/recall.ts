@@ -13,6 +13,10 @@ export interface RecallLetter {
   account_tail: string | null;
   kind: string | null;
   lane: 'handled' | 'headsup' | 'needs_you' | 'careful' | null;
+  case_id: string | null;
+  amount_cents: number | null;
+  due_date: string | null;
+  phones_json: string | null;
 }
 
 export interface RecallCandidate {

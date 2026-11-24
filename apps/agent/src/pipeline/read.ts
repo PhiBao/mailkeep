@@ -3,6 +3,7 @@ import type { GatewayClient } from '../gateway/client.js';
 import { chat } from '../providers/ollama.js';
 import { firstLines } from '../util/text.js';
 import { amountCandidates, dateCandidates, phoneCandidates } from './candidates.js';
+import { measureQuality } from './quality.js';
 import { redact } from './redact.js';
 import { type ScamRule, scamRuleHits } from './scamrules.js';
 
@@ -30,6 +31,7 @@ export interface ReadResult {
   phones: ReturnType<typeof phoneCandidates>;
   scamRuleHits: ScamRule[];
   needsRetake: boolean;
+  qualityFlagged: boolean;
   r2Failed: boolean;
   promptTokens: number;
   outputTokens: number;
@@ -44,16 +46,30 @@ async function requestSummary(
   model: string,
   transcript: string,
   today: string,
-): Promise<{ value: z.infer<typeof summarySchema>; failed: boolean }> {
+): Promise<{
+  value: z.infer<typeof summarySchema>;
+  failed: boolean;
+  promptTokens: number;
+  outputTokens: number;
+}> {
   let lastError = '';
+  let promptTokens = 0;
+  let outputTokens = 0;
   for (let attempt = 0; attempt < 2; attempt += 1) {
     const prompt =
       attempt === 0
         ? summaryPrompt(transcript, today)
         : `${summaryPrompt(transcript, today)}\n\nThe previous response failed validation: ${lastError}. Return corrected JSON only.`;
     const result = await chat(client, { model, messages: [{ role: 'user', content: prompt }] });
+    promptTokens += result.promptTokens;
+    outputTokens += result.outputTokens;
     try {
-      return { value: summarySchema.parse(JSON.parse(result.content)), failed: false };
+      return {
+        value: summarySchema.parse(JSON.parse(result.content)),
+        failed: false,
+        promptTokens,
+        outputTokens,
+      };
     } catch (error) {
       lastError = error instanceof Error ? error.message : String(error);
     }
@@ -67,18 +83,23 @@ async function requestSummary(
       todo_parent: null,
     },
     failed: true,
+    promptTokens,
+    outputTokens,
   };
 }
 
-export async function readLetterImage(
+async function readTranscript(
   client: GatewayClient,
-  input: { bytes: Buffer; model: string; today: string },
+  input: {
+    rawTranscript: string;
+    model: string;
+    today: string;
+    promptTokens?: number;
+    outputTokens?: number;
+    qualityFlagged?: boolean;
+  },
 ): Promise<ReadResult> {
-  const transcription = await chat(client, {
-    model: input.model,
-    messages: [{ role: 'user', content: R1_PROMPT, images: [input.bytes.toString('base64')] }],
-  });
-  const redacted = redact(transcription.content);
+  const redacted = redact(input.rawTranscript);
   const summary = await requestSummary(client, input.model, redacted.text, input.today);
   const words = redacted.text.trim().split(/\s+/).filter(Boolean);
   const unreadable = redacted.text.match(/\[unreadable\]/gi)?.length ?? 0;
@@ -95,8 +116,35 @@ export async function readLetterImage(
     phones: phoneCandidates(redacted.text),
     scamRuleHits: scamRuleHits(redacted.text),
     needsRetake: unreadable >= 3 || words.length < 15,
+    qualityFlagged: input.qualityFlagged ?? false,
     r2Failed: summary.failed,
+    promptTokens: (input.promptTokens ?? 0) + summary.promptTokens,
+    outputTokens: (input.outputTokens ?? 0) + summary.outputTokens,
+  };
+}
+
+export async function readLetterText(
+  client: GatewayClient,
+  input: { text: string; model: string; today: string },
+): Promise<ReadResult> {
+  return readTranscript(client, { ...input, rawTranscript: input.text });
+}
+
+export async function readLetterImage(
+  client: GatewayClient,
+  input: { bytes: Buffer; model: string; today: string },
+): Promise<ReadResult> {
+  const transcription = await chat(client, {
+    model: input.model,
+    messages: [{ role: 'user', content: R1_PROMPT, images: [input.bytes.toString('base64')] }],
+  });
+  const quality = await measureQuality(input.bytes);
+  return readTranscript(client, {
+    rawTranscript: transcription.content,
+    model: input.model,
+    today: input.today,
     promptTokens: transcription.promptTokens,
     outputTokens: transcription.outputTokens,
-  };
+    qualityFlagged: quality.flagged,
+  });
 }

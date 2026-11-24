@@ -4,7 +4,9 @@ import { serve } from '@hono/node-server';
 import { loadConfig } from './config.js';
 import { openDb } from './db/db.js';
 import { migrate } from './db/migrate.js';
+import { GatewayClient } from './gateway/client.js';
 import { createApp } from './http/app.js';
+import { resumePending } from './pipeline/queue.js';
 import { scanKeys } from './sprite/keyscan.js';
 import { log } from './util/log.js';
 
@@ -34,3 +36,9 @@ function shutdown(): void {
 
 process.on('SIGTERM', shutdown);
 process.on('SIGINT', shutdown);
+
+void resumePending({ client: new GatewayClient({ config }), config, db }).catch(
+  (error: unknown) => {
+    log.error({ event: 'resume_failed' }, error instanceof Error ? error.message : String(error));
+  },
+);

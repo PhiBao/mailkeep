@@ -13,6 +13,10 @@ function letter(id: string, received: string, overrides: Partial<RecallLetter> =
     account_tail: '4471',
     kind: 'bill',
     lane: 'headsup',
+    case_id: null,
+    amount_cents: null,
+    due_date: null,
+    phones_json: null,
     ...overrides,
   };
 }
