@@ -11,5 +11,5 @@ export default defineConfig({
   plugins: [react()],
   server: { proxy },
   preview: { proxy },
-  build: { outDir: 'dist', emptyOutDir: true },
+  build: { outDir: 'dist', emptyOutDir: true, assetsInlineLimit: 0 },
 });
