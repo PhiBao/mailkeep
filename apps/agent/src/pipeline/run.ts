@@ -194,7 +194,12 @@ function queueFailure(deps: PipelineDeps, row: LetterRow, message: string): void
   }
 }
 
-async function actLetter(deps: PipelineDeps, row: LetterRow, output: RouteOutput): Promise<void> {
+async function actLetter(
+  deps: PipelineDeps,
+  row: LetterRow,
+  output: RouteOutput,
+  options: { box?: boolean; email?: boolean } = {},
+): Promise<void> {
   const persisted = deps.db.prepare('SELECT v FROM kv WHERE k = ?').get(`acted:${row.id}`);
   if (!persisted) {
     deps.db.transaction(() => {
@@ -253,26 +258,28 @@ async function actLetter(deps: PipelineDeps, row: LetterRow, output: RouteOutput
       const household = deps.db
         .prepare('SELECT parent_display FROM households WHERE id = ?')
         .get(row.household_id) as { parent_display: string };
-      queueLetterOutbox(deps.db, {
-        householdId: row.household_id,
-        parentDisplay: household.parent_display,
-        publicUrl: deps.config.MAILKEEP_PUBLIC_URL,
-        source: row.source,
-        trial: Boolean(row.trial),
-        letter: {
-          id: row.id,
-          title: row.title ?? 'Letter',
-          summary_parent: row.summary_parent,
-          todo_parent: row.todo_parent,
-          sender_org: row.sender_org,
-          amount_cents: output.amountCents,
-          due_date: output.dueDate,
-        },
-        route: output,
-        checks: output.checks,
-        asks,
-        members,
-      });
+      if (options.email !== false) {
+        queueLetterOutbox(deps.db, {
+          householdId: row.household_id,
+          parentDisplay: household.parent_display,
+          publicUrl: deps.config.MAILKEEP_PUBLIC_URL,
+          source: row.source,
+          trial: Boolean(row.trial),
+          letter: {
+            id: row.id,
+            title: row.title ?? 'Letter',
+            summary_parent: row.summary_parent,
+            todo_parent: row.todo_parent,
+            sender_org: row.sender_org,
+            amount_cents: output.amountCents,
+            due_date: output.dueDate,
+          },
+          route: output,
+          checks: output.checks,
+          asks,
+          members,
+        });
+      }
       deps.db
         .prepare("INSERT INTO kv (k, v) VALUES (?, '1') ON CONFLICT(k) DO UPDATE SET v = '1'")
         .run(`acted:${row.id}`);
@@ -305,18 +312,24 @@ async function actLetter(deps: PipelineDeps, row: LetterRow, output: RouteOutput
   const modelRows = deps.db
     .prepare('SELECT model_id FROM decisions WHERE letter_id = ?')
     .all(row.id) as Array<{ model_id: string }>;
-  await fileLetter(deps.client, deps.db, {
-    householdId: row.household_id,
-    letter: current,
-    route: output,
-    caseId: current.case_id,
-    caseChange: output.caseChange,
-    checks: output.checks,
-    modelIds: [deps.config.MAILKEEP_OLLAMA_MODEL, ...modelRows.map((model) => model.model_id)],
-  });
+  if (options.box !== false) {
+    await fileLetter(deps.client, deps.db, {
+      householdId: row.household_id,
+      letter: current,
+      route: output,
+      caseId: current.case_id,
+      caseChange: output.caseChange,
+      checks: output.checks,
+      modelIds: [deps.config.MAILKEEP_OLLAMA_MODEL, ...modelRows.map((model) => model.model_id)],
+    });
+  }
 }
 
-export async function runLetter(deps: PipelineDeps, letterId: string): Promise<void> {
+export async function runLetter(
+  deps: PipelineDeps,
+  letterId: string,
+  options: { box?: boolean; email?: boolean } = {},
+): Promise<void> {
   const initial = letterRow(deps.db, letterId);
   if (initial.status === 'done') return;
   await withTaskHold(`letter-${letterId}`, async () => {
@@ -491,7 +504,7 @@ export async function runLetter(deps: PipelineDeps, letterId: string): Promise<v
         | { v: string }
         | undefined;
       if (!routeValue) throw new Error('Missing stored route for acting letter');
-      await actLetter(deps, row, JSON.parse(routeValue.v) as RouteOutput);
+      await actLetter(deps, row, JSON.parse(routeValue.v) as RouteOutput, options);
       setStatus(deps.db, row.id, 'done');
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
