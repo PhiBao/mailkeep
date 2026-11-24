@@ -1,0 +1,18 @@
+{
+  "id": "L24",
+  "received": "2026-11-24",
+  "thread": null,
+  "photo": "normal",
+  "demo": "seed",
+  "heldout": false,
+  "truth": {
+    "kind_ok": ["marketing"],
+    "lanes_ok": ["handled"],
+    "needs_action": false,
+    "amount_cents": null,
+    "due_date": null,
+    "scam": false,
+    "links": [],
+    "closes": null
+  }
+}

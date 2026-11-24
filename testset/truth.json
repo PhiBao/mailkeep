@@ -7,12 +7,8 @@
     "demo": "seed",
     "heldout": false,
     "truth": {
-      "kind_ok": [
-        "bill"
-      ],
-      "lanes_ok": [
-        "headsup"
-      ],
+      "kind_ok": ["bill"],
+      "lanes_ok": ["headsup"],
       "needs_action": true,
       "amount_cents": 8417,
       "due_date": "2026-12-10",
@@ -29,13 +25,8 @@
     "demo": "sample",
     "heldout": false,
     "truth": {
-      "kind_ok": [
-        "collection",
-        "bill"
-      ],
-      "lanes_ok": [
-        "needs_you"
-      ],
+      "kind_ok": ["collection", "bill"],
+      "lanes_ok": ["needs_you"],
       "needs_action": true,
       "amount_cents": 8917,
       "due_date": "2026-12-16",
@@ -57,12 +48,8 @@
     "demo": "none",
     "heldout": false,
     "truth": {
-      "kind_ok": [
-        "payment_confirmation"
-      ],
-      "lanes_ok": [
-        "handled"
-      ],
+      "kind_ok": ["payment_confirmation"],
+      "lanes_ok": ["handled"],
       "needs_action": false,
       "amount_cents": null,
       "due_date": null,
@@ -76,6 +63,47 @@
       "closes": "L01"
     }
   },
+  "L04": {
+    "id": "L04",
+    "received": "2026-11-17",
+    "thread": "B",
+    "photo": "normal",
+    "demo": "seed",
+    "heldout": false,
+    "truth": {
+      "kind_ok": ["government", "bill"],
+      "lanes_ok": ["needs_you"],
+      "needs_action": true,
+      "amount_cents": 128400,
+      "due_date": "2026-12-15",
+      "scam": false,
+      "links": [],
+      "closes": null
+    }
+  },
+  "L05": {
+    "id": "L05",
+    "received": "2026-12-08",
+    "thread": "B",
+    "photo": "normal",
+    "demo": "sample",
+    "heldout": false,
+    "truth": {
+      "kind_ok": ["payment_confirmation"],
+      "lanes_ok": ["handled"],
+      "needs_action": false,
+      "amount_cents": null,
+      "due_date": null,
+      "scam": false,
+      "links": [
+        {
+          "to": "L04",
+          "relation": "completes"
+        }
+      ],
+      "closes": "L04"
+    }
+  },
   "L06": {
     "id": "L06",
     "received": "2026-11-16",
@@ -84,17 +112,59 @@
     "demo": "seed",
     "heldout": false,
     "truth": {
-      "kind_ok": [
-        "statement"
-      ],
-      "lanes_ok": [
-        "handled"
-      ],
+      "kind_ok": ["statement"],
+      "lanes_ok": ["handled"],
       "needs_action": false,
       "amount_cents": null,
       "due_date": null,
       "scam": false,
       "links": [],
+      "closes": null
+    }
+  },
+  "L07": {
+    "id": "L07",
+    "received": "2026-11-24",
+    "thread": "C",
+    "photo": "normal",
+    "demo": "seed",
+    "heldout": false,
+    "truth": {
+      "kind_ok": ["statement"],
+      "lanes_ok": ["handled"],
+      "needs_action": false,
+      "amount_cents": null,
+      "due_date": null,
+      "scam": false,
+      "links": [
+        {
+          "to": "L06",
+          "relation": "same_matter"
+        }
+      ],
+      "closes": null
+    }
+  },
+  "L08": {
+    "id": "L08",
+    "received": "2026-11-25",
+    "thread": "C",
+    "photo": "normal",
+    "demo": "seed",
+    "heldout": false,
+    "truth": {
+      "kind_ok": ["statement"],
+      "lanes_ok": ["handled"],
+      "needs_action": false,
+      "amount_cents": null,
+      "due_date": null,
+      "scam": false,
+      "links": [
+        {
+          "to": "L06",
+          "relation": "same_matter"
+        }
+      ],
       "closes": null
     }
   },
@@ -106,14 +176,8 @@
     "demo": "sample",
     "heldout": false,
     "truth": {
-      "kind_ok": [
-        "other",
-        "government",
-        "marketing"
-      ],
-      "lanes_ok": [
-        "careful"
-      ],
+      "kind_ok": ["other", "government", "marketing"],
+      "lanes_ok": ["careful"],
       "needs_action": true,
       "amount_cents": null,
       "due_date": null,
@@ -127,6 +191,345 @@
       "closes": null
     }
   },
+  "L10": {
+    "id": "L10",
+    "received": "2026-11-19",
+    "thread": "D",
+    "photo": "normal",
+    "demo": "seed",
+    "heldout": false,
+    "truth": {
+      "kind_ok": ["renewal", "bill"],
+      "lanes_ok": ["headsup"],
+      "needs_action": true,
+      "amount_cents": 41200,
+      "due_date": "2027-01-03",
+      "scam": false,
+      "links": [],
+      "closes": null
+    }
+  },
+  "L11": {
+    "id": "L11",
+    "received": "2026-12-08",
+    "thread": "D",
+    "photo": "normal",
+    "demo": "sample",
+    "heldout": false,
+    "truth": {
+      "kind_ok": ["statement"],
+      "lanes_ok": ["handled"],
+      "needs_action": false,
+      "amount_cents": null,
+      "due_date": null,
+      "scam": false,
+      "links": [
+        {
+          "to": "L10",
+          "relation": "same_matter"
+        }
+      ],
+      "closes": null
+    }
+  },
+  "L12": {
+    "id": "L12",
+    "received": "2026-11-20",
+    "thread": "E",
+    "photo": "normal",
+    "demo": "seed",
+    "heldout": false,
+    "truth": {
+      "kind_ok": ["renewal", "government"],
+      "lanes_ok": ["headsup", "needs_you"],
+      "needs_action": true,
+      "amount_cents": 9600,
+      "due_date": "2026-12-31",
+      "scam": false,
+      "links": [],
+      "closes": null
+    }
+  },
+  "L13": {
+    "id": "L13",
+    "received": "2026-11-16",
+    "thread": "F",
+    "photo": "normal",
+    "demo": "seed",
+    "heldout": false,
+    "truth": {
+      "kind_ok": ["statement"],
+      "lanes_ok": ["handled"],
+      "needs_action": false,
+      "amount_cents": null,
+      "due_date": null,
+      "scam": false,
+      "links": [],
+      "closes": null
+    }
+  },
+  "L15": {
+    "id": "L15",
+    "received": "2026-11-18",
+    "thread": "G",
+    "photo": "normal",
+    "demo": "seed",
+    "heldout": false,
+    "truth": {
+      "kind_ok": ["bill"],
+      "lanes_ok": ["headsup"],
+      "needs_action": true,
+      "amount_cents": 24000,
+      "due_date": "2026-12-02",
+      "scam": false,
+      "links": [],
+      "closes": null
+    }
+  },
+  "L16": {
+    "id": "L16",
+    "received": "2026-11-27",
+    "thread": "G",
+    "photo": "normal",
+    "demo": "none",
+    "heldout": false,
+    "truth": {
+      "kind_ok": ["collection"],
+      "lanes_ok": ["needs_you"],
+      "needs_action": true,
+      "amount_cents": 24000,
+      "due_date": "2026-12-27",
+      "scam": false,
+      "links": [
+        {
+          "to": "L15",
+          "relation": "follow_up"
+        }
+      ],
+      "closes": null
+    }
+  },
+  "L17": {
+    "id": "L17",
+    "received": "2026-11-23",
+    "thread": null,
+    "photo": "normal",
+    "demo": "seed",
+    "heldout": false,
+    "truth": {
+      "kind_ok": ["marketing", "other"],
+      "lanes_ok": ["careful"],
+      "needs_action": true,
+      "amount_cents": null,
+      "due_date": null,
+      "scam": true,
+      "links": [],
+      "closes": null
+    }
+  },
+  "L18": {
+    "id": "L18",
+    "received": "2026-11-24",
+    "thread": null,
+    "photo": "normal",
+    "demo": "seed",
+    "heldout": false,
+    "truth": {
+      "kind_ok": ["marketing", "other"],
+      "lanes_ok": ["careful"],
+      "needs_action": true,
+      "amount_cents": null,
+      "due_date": null,
+      "scam": true,
+      "links": [],
+      "closes": null
+    }
+  },
+  "L19": {
+    "id": "L19",
+    "received": "2026-11-21",
+    "thread": null,
+    "photo": "normal",
+    "demo": "seed",
+    "heldout": false,
+    "truth": {
+      "kind_ok": ["appointment", "other", "personal"],
+      "lanes_ok": ["handled", "headsup", "needs_you"],
+      "needs_action": true,
+      "amount_cents": null,
+      "due_date": null,
+      "scam": false,
+      "links": [],
+      "closes": null
+    }
+  },
+  "L20": {
+    "id": "L20",
+    "received": "2026-11-17",
+    "thread": null,
+    "photo": "normal",
+    "demo": "seed",
+    "heldout": false,
+    "truth": {
+      "kind_ok": ["marketing"],
+      "lanes_ok": ["handled"],
+      "needs_action": false,
+      "amount_cents": null,
+      "due_date": null,
+      "scam": false,
+      "links": [],
+      "closes": null
+    }
+  },
+  "L21": {
+    "id": "L21",
+    "received": "2026-11-19",
+    "thread": null,
+    "photo": "normal",
+    "demo": "seed",
+    "heldout": false,
+    "truth": {
+      "kind_ok": ["marketing"],
+      "lanes_ok": ["handled"],
+      "needs_action": false,
+      "amount_cents": null,
+      "due_date": null,
+      "scam": false,
+      "links": [],
+      "closes": null
+    }
+  },
+  "L22": {
+    "id": "L22",
+    "received": "2026-11-22",
+    "thread": null,
+    "photo": "normal",
+    "demo": "seed",
+    "heldout": false,
+    "truth": {
+      "kind_ok": ["personal"],
+      "lanes_ok": ["handled"],
+      "needs_action": false,
+      "amount_cents": null,
+      "due_date": null,
+      "scam": false,
+      "links": [],
+      "closes": null
+    }
+  },
+  "L23": {
+    "id": "L23",
+    "received": "2026-11-20",
+    "thread": null,
+    "photo": "normal",
+    "demo": "seed",
+    "heldout": false,
+    "truth": {
+      "kind_ok": ["appointment", "government"],
+      "lanes_ok": ["needs_you", "headsup"],
+      "needs_action": true,
+      "amount_cents": null,
+      "due_date": "2026-12-14",
+      "scam": false,
+      "links": [],
+      "closes": null
+    }
+  },
+  "L24": {
+    "id": "L24",
+    "received": "2026-11-24",
+    "thread": null,
+    "photo": "normal",
+    "demo": "seed",
+    "heldout": false,
+    "truth": {
+      "kind_ok": ["marketing"],
+      "lanes_ok": ["handled"],
+      "needs_action": false,
+      "amount_cents": null,
+      "due_date": null,
+      "scam": false,
+      "links": [],
+      "closes": null
+    }
+  },
+  "L25": {
+    "id": "L25",
+    "received": "2026-11-25",
+    "thread": "A",
+    "photo": "normal",
+    "demo": "none",
+    "heldout": false,
+    "truth": {
+      "kind_ok": ["statement"],
+      "lanes_ok": ["handled"],
+      "needs_action": false,
+      "amount_cents": null,
+      "due_date": null,
+      "scam": false,
+      "links": [
+        {
+          "to": "L01",
+          "relation": "same_matter"
+        }
+      ],
+      "closes": null
+    }
+  },
+  "L26": {
+    "id": "L26",
+    "received": "2026-12-08",
+    "thread": null,
+    "photo": "normal",
+    "demo": "sample",
+    "heldout": false,
+    "truth": {
+      "kind_ok": ["marketing"],
+      "lanes_ok": ["handled", "needs_you"],
+      "needs_action": false,
+      "amount_cents": null,
+      "due_date": null,
+      "scam": false,
+      "links": [],
+      "closes": null
+    }
+  },
+  "L28": {
+    "id": "L28",
+    "received": "2026-12-09",
+    "thread": null,
+    "photo": "normal",
+    "demo": "sample",
+    "heldout": false,
+    "truth": {
+      "kind_ok": ["personal"],
+      "lanes_ok": ["handled"],
+      "needs_action": false,
+      "amount_cents": null,
+      "due_date": null,
+      "scam": false,
+      "links": [],
+      "closes": null
+    }
+  },
+  "L29": {
+    "id": "L29",
+    "received": "2026-11-23",
+    "thread": null,
+    "photo": "normal",
+    "demo": "seed",
+    "heldout": false,
+    "truth": {
+      "kind_ok": ["bill", "other"],
+      "lanes_ok": ["headsup", "handled", "needs_you"],
+      "needs_action": true,
+      "amount_cents": 250,
+      "due_date": null,
+      "scam": false,
+      "links": [],
+      "closes": null
+    }
+  },
   "L30": {
     "id": "L30",
     "received": "2026-11-20",
@@ -135,18 +538,61 @@
     "demo": "seed",
     "heldout": false,
     "truth": {
-      "kind_ok": [
-        "bill"
-      ],
-      "lanes_ok": [
-        "headsup",
-        "needs_you"
-      ],
+      "kind_ok": ["bill"],
+      "lanes_ok": ["headsup", "needs_you"],
       "needs_action": true,
       "amount_cents": 13240,
       "due_date": "2026-12-12",
       "scam": false,
       "links": [],
+      "closes": null
+    }
+  },
+  "L32": {
+    "id": "L32",
+    "received": "2026-11-24",
+    "thread": null,
+    "photo": "sideways",
+    "demo": "seed",
+    "heldout": false,
+    "truth": {
+      "kind_ok": ["marketing"],
+      "lanes_ok": ["handled", "needs_you"],
+      "needs_action": false,
+      "amount_cents": null,
+      "due_date": null,
+      "scam": false,
+      "links": [
+        {
+          "to": "L20",
+          "relation": "same_matter",
+          "optional": true
+        }
+      ],
+      "closes": null
+    }
+  },
+  "L34": {
+    "id": "L34",
+    "received": "2026-11-16",
+    "thread": "F",
+    "photo": "pdf",
+    "demo": "seed",
+    "heldout": false,
+    "truth": {
+      "kind_ok": ["statement"],
+      "lanes_ok": ["handled"],
+      "needs_action": false,
+      "amount_cents": null,
+      "due_date": null,
+      "scam": false,
+      "links": [
+        {
+          "to": "L13",
+          "relation": "same_matter",
+          "optional": true
+        }
+      ],
       "closes": null
     }
   }

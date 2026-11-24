@@ -1,0 +1,18 @@
+{
+  "id": "L23",
+  "received": "2026-11-20",
+  "thread": null,
+  "photo": "normal",
+  "demo": "seed",
+  "heldout": false,
+  "truth": {
+    "kind_ok": ["appointment", "government"],
+    "lanes_ok": ["needs_you", "headsup"],
+    "needs_action": true,
+    "amount_cents": null,
+    "due_date": "2026-12-14",
+    "scam": false,
+    "links": [],
+    "closes": null
+  }
+}

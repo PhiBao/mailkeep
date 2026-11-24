@@ -1,0 +1,18 @@
+{
+  "id": "L28",
+  "received": "2026-12-09",
+  "thread": null,
+  "photo": "normal",
+  "demo": "sample",
+  "heldout": false,
+  "truth": {
+    "kind_ok": ["personal"],
+    "lanes_ok": ["handled"],
+    "needs_action": false,
+    "amount_cents": null,
+    "due_date": null,
+    "scam": false,
+    "links": [],
+    "closes": null
+  }
+}

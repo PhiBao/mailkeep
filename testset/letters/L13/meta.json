@@ -1,0 +1,18 @@
+{
+  "id": "L13",
+  "received": "2026-11-16",
+  "thread": "F",
+  "photo": "normal",
+  "demo": "seed",
+  "heldout": false,
+  "truth": {
+    "kind_ok": ["statement"],
+    "lanes_ok": ["handled"],
+    "needs_action": false,
+    "amount_cents": null,
+    "due_date": null,
+    "scam": false,
+    "links": [],
+    "closes": null
+  }
+}

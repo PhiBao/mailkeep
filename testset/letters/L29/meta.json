@@ -1,0 +1,18 @@
+{
+  "id": "L29",
+  "received": "2026-11-23",
+  "thread": null,
+  "photo": "normal",
+  "demo": "seed",
+  "heldout": false,
+  "truth": {
+    "kind_ok": ["bill", "other"],
+    "lanes_ok": ["headsup", "handled", "needs_you"],
+    "needs_action": true,
+    "amount_cents": 250,
+    "due_date": null,
+    "scam": false,
+    "links": [],
+    "closes": null
+  }
+}

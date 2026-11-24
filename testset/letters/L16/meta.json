@@ -1,0 +1,18 @@
+{
+  "id": "L16",
+  "received": "2026-11-27",
+  "thread": "G",
+  "photo": "normal",
+  "demo": "none",
+  "heldout": false,
+  "truth": {
+    "kind_ok": ["collection"],
+    "lanes_ok": ["needs_you"],
+    "needs_action": true,
+    "amount_cents": 24000,
+    "due_date": "2026-12-27",
+    "scam": false,
+    "links": [{ "to": "L15", "relation": "follow_up" }],
+    "closes": null
+  }
+}

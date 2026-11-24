@@ -1,0 +1,18 @@
+{
+  "id": "L10",
+  "received": "2026-11-19",
+  "thread": "D",
+  "photo": "normal",
+  "demo": "seed",
+  "heldout": false,
+  "truth": {
+    "kind_ok": ["renewal", "bill"],
+    "lanes_ok": ["headsup"],
+    "needs_action": true,
+    "amount_cents": 41200,
+    "due_date": "2027-01-03",
+    "scam": false,
+    "links": [],
+    "closes": null
+  }
+}

@@ -7,7 +7,7 @@
   "scripts": {
     "biome": "biome",
     "test": "pnpm -r test",
-    "testset:build": "tsx testset/scripts/build.ts"
+    "testset:build": "tsx testset/scripts/build.ts && pnpm biome format --write testset/truth.json"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.0.0",

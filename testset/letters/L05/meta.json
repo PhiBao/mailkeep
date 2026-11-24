@@ -1,0 +1,18 @@
+{
+  "id": "L05",
+  "received": "2026-12-08",
+  "thread": "B",
+  "photo": "normal",
+  "demo": "sample",
+  "heldout": false,
+  "truth": {
+    "kind_ok": ["payment_confirmation"],
+    "lanes_ok": ["handled"],
+    "needs_action": false,
+    "amount_cents": null,
+    "due_date": null,
+    "scam": false,
+    "links": [{ "to": "L04", "relation": "completes" }],
+    "closes": "L04"
+  }
+}
