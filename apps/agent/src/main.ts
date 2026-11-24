@@ -6,8 +6,10 @@ import { openDb } from './db/db.js';
 import { migrate } from './db/migrate.js';
 import { GatewayClient } from './gateway/client.js';
 import { createApp } from './http/app.js';
+import { apiRoutes } from './http/routes/api.js';
 import { authRoutes } from './http/routes/auth.js';
 import { hooksRoutes } from './http/routes/hooks.js';
+import { momRoutes } from './http/routes/mom.js';
 import { startSenderWorker } from './notify/sender.js';
 import { PipelineQueue, resumePending } from './pipeline/queue.js';
 import { scanKeys } from './sprite/keyscan.js';
@@ -31,6 +33,8 @@ const client = new GatewayClient({ config });
 const queue = new PipelineQueue({ client, config, db });
 const app = createApp(config, (instance) => {
   instance.route('/', authRoutes({ config, db }));
+  instance.route('/', apiRoutes({ config, db, queue }));
+  instance.route('/', momRoutes({ db }));
   instance.route('/', hooksRoutes({ config, db, client, queue }));
 });
 
