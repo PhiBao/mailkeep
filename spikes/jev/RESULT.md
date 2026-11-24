@@ -1,60 +1,58 @@
 # T03 RESULT — does Jev link letters well?
 
-Run: 2026-11-24T12:22:25.748Z on Sprite `mailkeep`.
+Run: 2026-11-24T20:52:11.220Z on Sprite `mailkeep`.
 
 - Model: `jev-1.14.0`
 - Method: exact A§9 request shape; ten typed transcripts from TESTSET; no held-out letters.
-- Wording: variant 1 for `same_matter_i` — explicit underlying account/member/policy/parcel/case matching; all other questions use baseline A§9 wording.
+- Wording: variant 2 for `same_matter_i` — distinctive identifier or same specific obligation with the same organisation; generic subjects do not count. T17 narrows action/field wording and retires the unreliable government-impersonation question; explicit scam rules and sender mismatch remain.
 
 ## Rewording trials
 
-- **Baseline A§9:** 4/6 true links. L09 `same_matter=0.780`; L25 `same_matter=0.780`. Other gate checks passed.
-- **Variant 1 (winner):** 6/6 true links. L09 `same_matter=0.940`; L25 `same_matter=0.990`. L25 `follow_up=0.020`; L09 `sender_consistent=0.060`; L03 `completes=0.960`.
-- **Winning instruction:** “`new` and `past[i]` concern the same underlying account, member, policy, parcel or case. Answer true when the identifiers or subject match, even if the sender name or letter kind differs; answer false for a different account or matter.”
-- No second rewording was needed. The build uses variant 1.
+- **Baseline A§9:** 4/6 true links; L09 and L25 `same_matter=0.780`.
+- **Variant 1:** 6/6 true links, but the first full eval showed false links between unrelated generic letters.
+- **Variant 2 (current):** 6/6 true links; no third same-matter rewording was used.
 
 ## Gate summary
 
 | Check                              | Result | Evidence                                                                                |
 | ---------------------------------- | ------ | --------------------------------------------------------------------------------------- |
 | True links `same_matter ≥ 0.85`    | PASS   | 6/6: L02 vs L01 + L25, L03 vs L02 + L01, L09 vs L06, L11 vs L10, L16 vs L15, L25 vs L01 |
-| L25 is not a follow-up             | PASS   | p=0.020 < 0.80                                                                          |
-| L09 sender mismatch or scam signal | PASS   | sender_consistent=0.060, max scam=0.850                                                 |
-| L03 completes payment              | PASS   | p=0.960 ≥ 0.90                                                                          |
+| L25 is not a follow-up             | PASS   | p=0.030 < 0.80                                                                          |
+| L09 sender mismatch or scam signal | PASS   | sender_consistent=0.050, max scam=0.910                                                 |
+| L03 completes payment              | PASS   | p=0.970 ≥ 0.90                                                                          |
 
 ## L02 vs L01 + L25
 
 - Model: `jev-1.14.0`
-- Latency: 517 ms
-- Tokens: 1984 in / 424 out
-- Questions: 17
+- Latency: 376 ms
+- Tokens: 2185 in / 403 out
+- Questions: 16
 
 | Question              |     Answer |     p |  conf | Bar                     | Outcome       |
 | --------------------- | ---------: | ----: | ----: | ----------------------- | ------------- |
-| `kind`                | collection | 0.880 | 0.870 | max p ≥ 0.60            | kind accepted |
-| `needs_action`        |      0.950 | 0.950 |     — | ≥ 0.60                  | action        |
-| `scam_payment`        |      0.020 | 0.020 |     — | ≥ 0.50                  | no hit        |
+| `kind`                | collection | 0.830 | 0.810 | max p ≥ 0.60            | kind accepted |
+| `needs_action`        |      0.990 | 0.990 |     — | ≥ 0.60                  | action        |
+| `scam_payment`        |      0.010 | 0.010 |     — | ≥ 0.50                  | no hit        |
 | `scam_pressure`       |      0.020 | 0.020 |     — | ≥ 0.50                  | no hit        |
-| `scam_impersonation`  |      0.530 | 0.530 |     — | ≥ 0.50                  | careful       |
 | `scam_secrecy`        |      0.010 | 0.010 |     — | ≥ 0.50                  | no hit        |
 | `scam_prize_fee`      |      0.010 | 0.010 |     — | ≥ 0.50                  | no hit        |
-| `amount_due`          |         a0 | 1.000 | 1.000 | confidence ≥ 0.80       | use field     |
-| `due_date`            |         d0 | 1.000 | 1.000 | confidence ≥ 0.80       | use field     |
+| `amount_due`          |         a0 | 1.000 | 1.000 | confidence ≥ 0.70       | use field     |
+| `due_date`            |         d0 | 1.000 | 1.000 | confidence ≥ 0.70       | use field     |
 | `same_matter_0`       |      1.000 | 1.000 |     — | ≥ 0.85 link; ≥ 0.50 ask | linked        |
-| `follow_up_0`         |      0.980 | 0.980 |     — | ≥ 0.80                  | reminder      |
+| `follow_up_0`         |      0.990 | 0.990 |     — | ≥ 0.80                  | reminder      |
 | `completes_0`         |      0.010 | 0.010 |     — | ≥ 0.90 paid; ≥ 0.60 ask | no            |
 | `sender_consistent_0` |      0.970 | 0.970 |     — | < 0.30 mismatch         | consistent    |
 | `same_matter_1`       |      0.990 | 0.990 |     — | ≥ 0.85 link; ≥ 0.50 ask | linked        |
-| `follow_up_1`         |      0.070 | 0.070 |     — | ≥ 0.80                  | not reminder  |
+| `follow_up_1`         |      0.040 | 0.040 |     — | ≥ 0.80                  | not reminder  |
 | `completes_1`         |      0.030 | 0.030 |     — | ≥ 0.90 paid; ≥ 0.60 ask | no            |
-| `sender_consistent_1` |      0.970 | 0.970 |     — | < 0.30 mismatch         | consistent    |
+| `sender_consistent_1` |      0.980 | 0.980 |     — | < 0.30 mismatch         | consistent    |
 
 ## L03 vs L02 + L01
 
 - Model: `jev-1.14.0`
-- Latency: 711 ms
-- Tokens: 1763 in / 393 out
-- Questions: 16
+- Latency: 294 ms
+- Tokens: 1934 in / 372 out
+- Questions: 15
 
 | Question              |               Answer |     p |  conf | Bar                     | Outcome       |
 | --------------------- | -------------------: | ----: | ----: | ----------------------- | ------------- |
@@ -62,79 +60,75 @@ Run: 2026-11-24T12:22:25.748Z on Sprite `mailkeep`.
 | `needs_action`        |                0.020 | 0.020 |     — | ≥ 0.60                  | quiet         |
 | `scam_payment`        |                0.010 | 0.010 |     — | ≥ 0.50                  | no hit        |
 | `scam_pressure`       |                0.010 | 0.010 |     — | ≥ 0.50                  | no hit        |
-| `scam_impersonation`  |                0.410 | 0.410 |     — | ≥ 0.50                  | no hit        |
 | `scam_secrecy`        |                0.020 | 0.020 |     — | ≥ 0.50                  | no hit        |
 | `scam_prize_fee`      |                0.010 | 0.010 |     — | ≥ 0.50                  | no hit        |
-| `amount_due`          |                 none | 1.000 | 1.000 | confidence ≥ 0.80       | use field     |
+| `amount_due`          |                 none | 1.000 | 1.000 | confidence ≥ 0.70       | use field     |
 | `same_matter_0`       |                0.990 | 0.990 |     — | ≥ 0.85 link; ≥ 0.50 ask | linked        |
-| `follow_up_0`         |                0.110 | 0.110 |     — | ≥ 0.80                  | not reminder  |
-| `completes_0`         |                0.960 | 0.960 |     — | ≥ 0.90 paid; ≥ 0.60 ask | paid signal   |
+| `follow_up_0`         |                0.100 | 0.100 |     — | ≥ 0.80                  | not reminder  |
+| `completes_0`         |                0.970 | 0.970 |     — | ≥ 0.90 paid; ≥ 0.60 ask | paid signal   |
 | `sender_consistent_0` |                0.940 | 0.940 |     — | < 0.30 mismatch         | consistent    |
 | `same_matter_1`       |                0.990 | 0.990 |     — | ≥ 0.85 link; ≥ 0.50 ask | linked        |
 | `follow_up_1`         |                0.090 | 0.090 |     — | ≥ 0.80                  | not reminder  |
-| `completes_1`         |                0.780 | 0.780 |     — | ≥ 0.90 paid; ≥ 0.60 ask | ask paid      |
-| `sender_consistent_1` |                0.940 | 0.940 |     — | < 0.30 mismatch         | consistent    |
+| `completes_1`         |                0.790 | 0.790 |     — | ≥ 0.90 paid; ≥ 0.60 ask | ask paid      |
+| `sender_consistent_1` |                0.950 | 0.950 |     — | < 0.30 mismatch         | consistent    |
 
 ## L09 vs L06
 
 - Model: `jev-1.14.0`
-- Latency: 656 ms
-- Tokens: 1203 in / 283 out
-- Questions: 11
+- Latency: 204 ms
+- Tokens: 1291 in / 262 out
+- Questions: 10
 
-| Question              | Answer |     p |  conf | Bar                     | Outcome      |
-| --------------------- | -----: | ----: | ----: | ----------------------- | ------------ |
-| `kind`                |  other | 0.580 | 0.530 | max p ≥ 0.60            | ask kind     |
-| `needs_action`        |  0.790 | 0.790 |     — | ≥ 0.60                  | action       |
-| `scam_payment`        |  0.020 | 0.020 |     — | ≥ 0.50                  | no hit       |
-| `scam_pressure`       |  0.850 | 0.850 |     — | ≥ 0.50                  | careful      |
-| `scam_impersonation`  |  0.630 | 0.630 |     — | ≥ 0.50                  | careful      |
-| `scam_secrecy`        |  0.020 | 0.020 |     — | ≥ 0.50                  | no hit       |
-| `scam_prize_fee`      |  0.010 | 0.010 |     — | ≥ 0.50                  | no hit       |
-| `same_matter_0`       |  0.990 | 0.990 |     — | ≥ 0.85 link; ≥ 0.50 ask | linked       |
-| `follow_up_0`         |  0.040 | 0.040 |     — | ≥ 0.80                  | not reminder |
-| `completes_0`         |  0.010 | 0.010 |     — | ≥ 0.90 paid; ≥ 0.60 ask | no           |
-| `sender_consistent_0` |  0.060 | 0.060 |     — | < 0.30 mismatch         | mismatch     |
+| Question              | Answer |     p |  conf | Bar                     | Outcome       |
+| --------------------- | -----: | ----: | ----: | ----------------------- | ------------- |
+| `kind`                |  other | 0.650 | 0.610 | max p ≥ 0.60            | kind accepted |
+| `needs_action`        |  0.940 | 0.940 |     — | ≥ 0.60                  | action        |
+| `scam_payment`        |  0.020 | 0.020 |     — | ≥ 0.50                  | no hit        |
+| `scam_pressure`       |  0.910 | 0.910 |     — | ≥ 0.50                  | careful       |
+| `scam_secrecy`        |  0.020 | 0.020 |     — | ≥ 0.50                  | no hit        |
+| `scam_prize_fee`      |  0.010 | 0.010 |     — | ≥ 0.50                  | no hit        |
+| `same_matter_0`       |  0.980 | 0.980 |     — | ≥ 0.85 link; ≥ 0.50 ask | linked        |
+| `follow_up_0`         |  0.040 | 0.040 |     — | ≥ 0.80                  | not reminder  |
+| `completes_0`         |  0.010 | 0.010 |     — | ≥ 0.90 paid; ≥ 0.60 ask | no            |
+| `sender_consistent_0` |  0.050 | 0.050 |     — | < 0.30 mismatch         | mismatch      |
 
 ## L11 vs L10
 
 - Model: `jev-1.14.0`
-- Latency: 981 ms
-- Tokens: 1197 in / 284 out
-- Questions: 11
+- Latency: 1127 ms
+- Tokens: 1285 in / 262 out
+- Questions: 10
 
-| Question              |  Answer |     p |  conf | Bar                     | Outcome       |
-| --------------------- | ------: | ----: | ----: | ----------------------- | ------------- |
-| `kind`                | renewal | 0.970 | 0.970 | max p ≥ 0.60            | kind accepted |
-| `needs_action`        |   0.190 | 0.190 |     — | ≥ 0.60                  | quiet         |
-| `scam_payment`        |   0.010 | 0.010 |     — | ≥ 0.50                  | no hit        |
-| `scam_pressure`       |   0.010 | 0.010 |     — | ≥ 0.50                  | no hit        |
-| `scam_impersonation`  |   0.340 | 0.340 |     — | ≥ 0.50                  | no hit        |
-| `scam_secrecy`        |   0.010 | 0.010 |     — | ≥ 0.50                  | no hit        |
-| `scam_prize_fee`      |   0.010 | 0.010 |     — | ≥ 0.50                  | no hit        |
-| `same_matter_0`       |   1.000 | 1.000 |     — | ≥ 0.85 link; ≥ 0.50 ask | linked        |
-| `follow_up_0`         |   0.160 | 0.160 |     — | ≥ 0.80                  | not reminder  |
-| `completes_0`         |   0.200 | 0.200 |     — | ≥ 0.90 paid; ≥ 0.60 ask | no            |
-| `sender_consistent_0` |   0.980 | 0.980 |     — | < 0.30 mismatch         | consistent    |
+| Question              |    Answer |     p |  conf | Bar                     | Outcome       |
+| --------------------- | --------: | ----: | ----: | ----------------------- | ------------- |
+| `kind`                | statement | 0.950 | 0.940 | max p ≥ 0.60            | kind accepted |
+| `needs_action`        |     0.210 | 0.210 |     — | ≥ 0.60                  | quiet         |
+| `scam_payment`        |     0.010 | 0.010 |     — | ≥ 0.50                  | no hit        |
+| `scam_pressure`       |     0.010 | 0.010 |     — | ≥ 0.50                  | no hit        |
+| `scam_secrecy`        |     0.010 | 0.010 |     — | ≥ 0.50                  | no hit        |
+| `scam_prize_fee`      |     0.010 | 0.010 |     — | ≥ 0.50                  | no hit        |
+| `same_matter_0`       |     0.990 | 0.990 |     — | ≥ 0.85 link; ≥ 0.50 ask | linked        |
+| `follow_up_0`         |     0.230 | 0.230 |     — | ≥ 0.80                  | not reminder  |
+| `completes_0`         |     0.190 | 0.190 |     — | ≥ 0.90 paid; ≥ 0.60 ask | no            |
+| `sender_consistent_0` |     0.980 | 0.980 |     — | < 0.30 mismatch         | consistent    |
 
 ## L16 vs L15
 
 - Model: `jev-1.14.0`
-- Latency: 945 ms
-- Tokens: 1621 in / 345 out
-- Questions: 13
+- Latency: 330 ms
+- Tokens: 1785 in / 324 out
+- Questions: 12
 
 | Question              |     Answer |     p |  conf | Bar                     | Outcome       |
 | --------------------- | ---------: | ----: | ----: | ----------------------- | ------------- |
 | `kind`                | collection | 1.000 | 1.000 | max p ≥ 0.60            | kind accepted |
-| `needs_action`        |      0.870 | 0.870 |     — | ≥ 0.60                  | action        |
+| `needs_action`        |      0.950 | 0.950 |     — | ≥ 0.60                  | action        |
 | `scam_payment`        |      0.020 | 0.020 |     — | ≥ 0.50                  | no hit        |
-| `scam_pressure`       |      0.020 | 0.020 |     — | ≥ 0.50                  | no hit        |
-| `scam_impersonation`  |      0.560 | 0.560 |     — | ≥ 0.50                  | careful       |
+| `scam_pressure`       |      0.030 | 0.030 |     — | ≥ 0.50                  | no hit        |
 | `scam_secrecy`        |      0.020 | 0.020 |     — | ≥ 0.50                  | no hit        |
 | `scam_prize_fee`      |      0.010 | 0.010 |     — | ≥ 0.50                  | no hit        |
-| `amount_due`          |         a0 | 0.970 | 0.940 | confidence ≥ 0.80       | use field     |
-| `due_date`            |         d0 | 0.980 | 0.960 | confidence ≥ 0.80       | use field     |
+| `amount_due`          |         a0 | 0.630 | 0.260 | confidence ≥ 0.70       | do not use    |
+| `due_date`            |         d0 | 0.970 | 0.940 | confidence ≥ 0.70       | use field     |
 | `same_matter_0`       |      0.990 | 0.990 |     — | ≥ 0.85 link; ≥ 0.50 ask | linked        |
 | `follow_up_0`         |      0.960 | 0.960 |     — | ≥ 0.80                  | reminder      |
 | `completes_0`         |      0.020 | 0.020 |     — | ≥ 0.90 paid; ≥ 0.60 ask | no            |
@@ -143,23 +137,22 @@ Run: 2026-11-24T12:22:25.748Z on Sprite `mailkeep`.
 ## L25 vs L01
 
 - Model: `jev-1.14.0`
-- Latency: 803 ms
-- Tokens: 1206 in / 283 out
-- Questions: 11
+- Latency: 1142 ms
+- Tokens: 1294 in / 262 out
+- Questions: 10
 
-| Question              |    Answer |     p |  conf | Bar                     | Outcome      |
-| --------------------- | --------: | ----: | ----: | ----------------------- | ------------ |
-| `kind`                | statement | 0.540 | 0.490 | max p ≥ 0.60            | ask kind     |
-| `needs_action`        |     0.020 | 0.020 |     — | ≥ 0.60                  | quiet        |
-| `scam_payment`        |     0.010 | 0.010 |     — | ≥ 0.50                  | no hit       |
-| `scam_pressure`       |     0.010 | 0.010 |     — | ≥ 0.50                  | no hit       |
-| `scam_impersonation`  |     0.380 | 0.380 |     — | ≥ 0.50                  | no hit       |
-| `scam_secrecy`        |     0.020 | 0.020 |     — | ≥ 0.50                  | no hit       |
-| `scam_prize_fee`      |     0.010 | 0.010 |     — | ≥ 0.50                  | no hit       |
-| `same_matter_0`       |     1.000 | 1.000 |     — | ≥ 0.85 link; ≥ 0.50 ask | linked       |
-| `follow_up_0`         |     0.020 | 0.020 |     — | ≥ 0.80                  | not reminder |
-| `completes_0`         |     0.020 | 0.020 |     — | ≥ 0.90 paid; ≥ 0.60 ask | no           |
-| `sender_consistent_0` |     0.980 | 0.980 |     — | < 0.30 mismatch         | consistent   |
+| Question              |    Answer |     p |  conf | Bar                     | Outcome       |
+| --------------------- | --------: | ----: | ----: | ----------------------- | ------------- |
+| `kind`                | statement | 1.000 | 1.000 | max p ≥ 0.60            | kind accepted |
+| `needs_action`        |     0.020 | 0.020 |     — | ≥ 0.60                  | quiet         |
+| `scam_payment`        |     0.010 | 0.010 |     — | ≥ 0.50                  | no hit        |
+| `scam_pressure`       |     0.010 | 0.010 |     — | ≥ 0.50                  | no hit        |
+| `scam_secrecy`        |     0.020 | 0.020 |     — | ≥ 0.50                  | no hit        |
+| `scam_prize_fee`      |     0.010 | 0.010 |     — | ≥ 0.50                  | no hit        |
+| `same_matter_0`       |     0.990 | 0.990 |     — | ≥ 0.85 link; ≥ 0.50 ask | linked        |
+| `follow_up_0`         |     0.030 | 0.030 |     — | ≥ 0.80                  | not reminder  |
+| `completes_0`         |     0.020 | 0.020 |     — | ≥ 0.90 paid; ≥ 0.60 ask | no            |
+| `sender_consistent_0` |     0.970 | 0.970 |     — | < 0.30 mismatch         | consistent    |
 
 ## Raw response sample (first pair)
 
@@ -170,14 +163,14 @@ Run: 2026-11-24T12:22:25.748Z on Sprite `mailkeep`.
     "kind": {
       "type": "choice",
       "choice": "collection",
-      "confidence": 0.87,
+      "confidence": 0.81,
       "probabilities": {
-        "bill": 0.12,
+        "bill": 0.17,
         "statement": 0,
         "renewal": 0,
         "appointment": 0,
         "government": 0,
-        "collection": 0.88,
+        "collection": 0.83,
         "payment_confirmation": 0,
         "marketing": 0,
         "personal": 0,
@@ -186,19 +179,15 @@ Run: 2026-11-24T12:22:25.748Z on Sprite `mailkeep`.
     },
     "needs_action": {
       "type": "noul",
-      "noul": 0.95
+      "noul": 0.99
     },
     "scam_payment": {
       "type": "noul",
-      "noul": 0.02
+      "noul": 0.01
     },
     "scam_pressure": {
       "type": "noul",
       "noul": 0.02
-    },
-    "scam_impersonation": {
-      "type": "noul",
-      "noul": 0.53
     },
     "scam_secrecy": {
       "type": "noul",
@@ -232,7 +221,7 @@ Run: 2026-11-24T12:22:25.748Z on Sprite `mailkeep`.
     },
     "follow_up_0": {
       "type": "noul",
-      "noul": 0.98
+      "noul": 0.99
     },
     "completes_0": {
       "type": "noul",
@@ -248,7 +237,7 @@ Run: 2026-11-24T12:22:25.748Z on Sprite `mailkeep`.
     },
     "follow_up_1": {
       "type": "noul",
-      "noul": 0.07
+      "noul": 0.04
     },
     "completes_1": {
       "type": "noul",
@@ -256,12 +245,12 @@ Run: 2026-11-24T12:22:25.748Z on Sprite `mailkeep`.
     },
     "sender_consistent_1": {
       "type": "noul",
-      "noul": 0.97
+      "noul": 0.98
     }
   },
   "usage": {
-    "input_tokens": 1984,
-    "output_tokens": 424
+    "input_tokens": 2185,
+    "output_tokens": 403
   }
 }
 ```

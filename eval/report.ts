@@ -126,7 +126,10 @@ const TUNING_LOG = `| Round | Changes | Lane | Link precision | Link recall | Am
 |---|---|---:|---:|---:|---:|---:|---:|---:|
 | Baseline (2026-11-24.1) | A§9/A§10 starting wording and thresholds | 63.3% | 38.9% | 77.8% | 22.2% | 77.8% | 5 | 30/30 |
 | Round 1 (2026-11-24.2) | Specific same-matter evidence; required-action and scam wording; field confidence 0.80 → 0.70 | 73.3% | 70.0% | 77.8% | 44.4% | 66.7% | 5 | 30/30 |
-| Round 2 (2026-11-24.3, final) | Contextual gift-card rule; retire unsupported impersonation judgment; explicit amount/deadline and quiet-mail wording; infoQuiet 0.85 → 0.75; non-thinking bounded OCR | pending | pending | pending | pending | pending | pending | pending |`;
+| Round 2 (2026-11-24.3, final) | Contextual gift-card rule; retire unsupported impersonation judgment; explicit amount/deadline and quiet-mail wording; infoQuiet 0.85 → 0.75; non-thinking bounded OCR | 96.7% | 72.7% | 88.9% | 11.1% | 88.9% | 1 | 30/30 |
+
+Round 2 removed the L16 timeout but exposed two unresolved quality gaps: same_matter sometimes selects an older letter (L03 → L01 instead of L02), and the more explicit amount question lowered choice confidence below the 0.70 field gate on eight payable letters. The two-round tuning budget is exhausted; no further prompt or threshold changes are allowed before the held-out run.
+`;
 
 export function renderEvalMarkdown(input: {
   runId: string;
