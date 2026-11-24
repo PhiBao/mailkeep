@@ -1,0 +1,861 @@
+{
+  "runId": "eval-20261124202849073",
+  "generatedAt": "2026-11-24T20:41:21.285Z",
+  "heldout": false,
+  "metrics": {
+    "letters": 30,
+    "laneAccuracy": 0.7333333333333333,
+    "unsafe": 0,
+    "falseAlarms": 5,
+    "scamsCaught": 3,
+    "scamsTotal": 3,
+    "linkPrecision": 0.7,
+    "linkRecall": 0.7777777777777778,
+    "amountAccuracy": 0.4444444444444444,
+    "dueAccuracy": 0.6666666666666666,
+    "askRate": 0.1,
+    "averageCostMicrousd": 390,
+    "averageLatencyMs": 402
+  },
+  "results": [
+    {
+      "id": "L06",
+      "letterId": "ltr_22ScYbcMy2MBluahWBA02",
+      "truth": {
+        "kind_ok": ["statement"],
+        "lanes_ok": ["handled"],
+        "needs_action": false,
+        "amount_cents": null,
+        "due_date": null,
+        "scam": false,
+        "links": [],
+        "closes": null
+      },
+      "lane": "handled",
+      "kind": "statement",
+      "amountCents": 3500,
+      "dueDate": null,
+      "relations": [],
+      "asks": [],
+      "status": "done",
+      "error": null,
+      "costMicrousd": 399,
+      "latencyMs": 529
+    },
+    {
+      "id": "L13",
+      "letterId": "ltr_TayR42Y7LrtC75M4T3otu",
+      "truth": {
+        "kind_ok": ["statement"],
+        "lanes_ok": ["handled"],
+        "needs_action": false,
+        "amount_cents": null,
+        "due_date": null,
+        "scam": false,
+        "links": [],
+        "closes": null
+      },
+      "lane": "handled",
+      "kind": "statement",
+      "amountCents": null,
+      "dueDate": null,
+      "relations": [],
+      "asks": [],
+      "status": "done",
+      "error": null,
+      "costMicrousd": 433,
+      "latencyMs": 683
+    },
+    {
+      "id": "L34",
+      "letterId": "ltr_hx6gCDeX1pGrs1Fxfkzli",
+      "truth": {
+        "kind_ok": ["statement"],
+        "lanes_ok": ["handled"],
+        "needs_action": false,
+        "amount_cents": null,
+        "due_date": null,
+        "scam": false,
+        "links": [
+          {
+            "to": "L13",
+            "relation": "same_matter",
+            "optional": true
+          }
+        ],
+        "closes": null
+      },
+      "lane": "handled",
+      "kind": "statement",
+      "amountCents": null,
+      "dueDate": null,
+      "relations": [
+        {
+          "to": "L13",
+          "relation": "same_matter"
+        }
+      ],
+      "asks": [],
+      "status": "done",
+      "error": null,
+      "costMicrousd": 239,
+      "latencyMs": 425
+    },
+    {
+      "id": "L04",
+      "letterId": "ltr_ZzMwA94a4QTAbta7bxqNz",
+      "truth": {
+        "kind_ok": ["government", "bill"],
+        "lanes_ok": ["needs_you"],
+        "needs_action": true,
+        "amount_cents": 128400,
+        "due_date": "2026-12-15",
+        "scam": false,
+        "links": [],
+        "closes": null
+      },
+      "lane": "careful",
+      "kind": "government",
+      "amountCents": null,
+      "dueDate": null,
+      "relations": [],
+      "asks": [],
+      "status": "done",
+      "error": null,
+      "costMicrousd": 462,
+      "latencyMs": 441
+    },
+    {
+      "id": "L20",
+      "letterId": "ltr_JeoGxwgFcMgys0a1Cdthk",
+      "truth": {
+        "kind_ok": ["marketing"],
+        "lanes_ok": ["handled"],
+        "needs_action": false,
+        "amount_cents": null,
+        "due_date": null,
+        "scam": false,
+        "links": [],
+        "closes": null
+      },
+      "lane": "handled",
+      "kind": "marketing",
+      "amountCents": null,
+      "dueDate": null,
+      "relations": [],
+      "asks": [],
+      "status": "done",
+      "error": null,
+      "costMicrousd": 221,
+      "latencyMs": 438
+    },
+    {
+      "id": "L01",
+      "letterId": "ltr_IRXjYrE5KSGsZRk8K6a66",
+      "truth": {
+        "kind_ok": ["bill"],
+        "lanes_ok": ["headsup"],
+        "needs_action": true,
+        "amount_cents": 8417,
+        "due_date": "2026-12-10",
+        "scam": false,
+        "links": [],
+        "closes": null
+      },
+      "lane": "headsup",
+      "kind": "bill",
+      "amountCents": 8417,
+      "dueDate": "2026-12-10",
+      "relations": [
+        {
+          "to": "L04",
+          "relation": "same_matter"
+        }
+      ],
+      "asks": ["link"],
+      "status": "done",
+      "error": null,
+      "costMicrousd": 425,
+      "latencyMs": 228
+    },
+    {
+      "id": "L15",
+      "letterId": "ltr_9-BaL_KcvasAXwH_3U18G",
+      "truth": {
+        "kind_ok": ["bill"],
+        "lanes_ok": ["headsup"],
+        "needs_action": true,
+        "amount_cents": 24000,
+        "due_date": "2026-12-02",
+        "scam": false,
+        "links": [],
+        "closes": null
+      },
+      "lane": "headsup",
+      "kind": "bill",
+      "amountCents": null,
+      "dueDate": "2026-12-02",
+      "relations": [],
+      "asks": [],
+      "status": "done",
+      "error": null,
+      "costMicrousd": 495,
+      "latencyMs": 229
+    },
+    {
+      "id": "L10",
+      "letterId": "ltr_7TpLEDGe_cr7NHzaqo7H3",
+      "truth": {
+        "kind_ok": ["renewal", "bill"],
+        "lanes_ok": ["headsup"],
+        "needs_action": true,
+        "amount_cents": 41200,
+        "due_date": "2027-01-03",
+        "scam": false,
+        "links": [],
+        "closes": null
+      },
+      "lane": "headsup",
+      "kind": "renewal",
+      "amountCents": 41200,
+      "dueDate": "2027-01-03",
+      "relations": [],
+      "asks": [],
+      "status": "done",
+      "error": null,
+      "costMicrousd": 504,
+      "latencyMs": 182
+    },
+    {
+      "id": "L21",
+      "letterId": "ltr_SF6bkk3GHPRaFWHR_XVNk",
+      "truth": {
+        "kind_ok": ["marketing"],
+        "lanes_ok": ["handled"],
+        "needs_action": false,
+        "amount_cents": null,
+        "due_date": null,
+        "scam": false,
+        "links": [],
+        "closes": null
+      },
+      "lane": "careful",
+      "kind": "marketing",
+      "amountCents": null,
+      "dueDate": null,
+      "relations": [],
+      "asks": [],
+      "status": "done",
+      "error": null,
+      "costMicrousd": 473,
+      "latencyMs": 280
+    },
+    {
+      "id": "L12",
+      "letterId": "ltr_G0Pei0OQJlxzksY9Pg87s",
+      "truth": {
+        "kind_ok": ["renewal", "government"],
+        "lanes_ok": ["headsup", "needs_you"],
+        "needs_action": true,
+        "amount_cents": 9600,
+        "due_date": "2026-12-31",
+        "scam": false,
+        "links": [],
+        "closes": null
+      },
+      "lane": "careful",
+      "kind": "renewal",
+      "amountCents": null,
+      "dueDate": null,
+      "relations": [],
+      "asks": [],
+      "status": "done",
+      "error": null,
+      "costMicrousd": 483,
+      "latencyMs": 602
+    },
+    {
+      "id": "L23",
+      "letterId": "ltr_41kH6MVyw9p7M22NQmnoU",
+      "truth": {
+        "kind_ok": ["appointment", "government"],
+        "lanes_ok": ["needs_you", "headsup"],
+        "needs_action": true,
+        "amount_cents": null,
+        "due_date": "2026-12-14",
+        "scam": false,
+        "links": [],
+        "closes": null
+      },
+      "lane": "headsup",
+      "kind": "appointment",
+      "amountCents": null,
+      "dueDate": "2026-12-14",
+      "relations": [],
+      "asks": [],
+      "status": "done",
+      "error": null,
+      "costMicrousd": 385,
+      "latencyMs": 493
+    },
+    {
+      "id": "L30",
+      "letterId": "ltr_C6JOOm2ZCkh8qEDhO-OjL",
+      "truth": {
+        "kind_ok": ["bill"],
+        "lanes_ok": ["headsup", "needs_you"],
+        "needs_action": true,
+        "amount_cents": 13240,
+        "due_date": "2026-12-12",
+        "scam": false,
+        "links": [],
+        "closes": null
+      },
+      "lane": "headsup",
+      "kind": "bill",
+      "amountCents": 13240,
+      "dueDate": "2026-12-12",
+      "relations": [],
+      "asks": [],
+      "status": "done",
+      "error": null,
+      "costMicrousd": 527,
+      "latencyMs": 442
+    },
+    {
+      "id": "L19",
+      "letterId": "ltr_JSoxBuSLPBhjVSGD0lumV",
+      "truth": {
+        "kind_ok": ["appointment", "other", "personal"],
+        "lanes_ok": ["handled", "headsup", "needs_you"],
+        "needs_action": true,
+        "amount_cents": null,
+        "due_date": null,
+        "scam": false,
+        "links": [],
+        "closes": null
+      },
+      "lane": "needs_you",
+      "kind": "other",
+      "amountCents": null,
+      "dueDate": null,
+      "relations": [],
+      "asks": ["check"],
+      "status": "done",
+      "error": null,
+      "costMicrousd": 403,
+      "latencyMs": 321
+    },
+    {
+      "id": "L22",
+      "letterId": "ltr_bhTUZHpV-20R4Bq6tiGoU",
+      "truth": {
+        "kind_ok": ["personal"],
+        "lanes_ok": ["handled"],
+        "needs_action": false,
+        "amount_cents": null,
+        "due_date": null,
+        "scam": false,
+        "links": [],
+        "closes": null
+      },
+      "lane": "handled",
+      "kind": "personal",
+      "amountCents": null,
+      "dueDate": null,
+      "relations": [],
+      "asks": [],
+      "status": "done",
+      "error": null,
+      "costMicrousd": 157,
+      "latencyMs": 390
+    },
+    {
+      "id": "L17",
+      "letterId": "ltr_FOsoXfpNA3g-7lIoNurh_",
+      "truth": {
+        "kind_ok": ["marketing", "other"],
+        "lanes_ok": ["careful"],
+        "needs_action": true,
+        "amount_cents": null,
+        "due_date": null,
+        "scam": true,
+        "links": [],
+        "closes": null
+      },
+      "lane": "careful",
+      "kind": "marketing",
+      "amountCents": null,
+      "dueDate": null,
+      "relations": [],
+      "asks": [],
+      "status": "done",
+      "error": null,
+      "costMicrousd": 456,
+      "latencyMs": 304
+    },
+    {
+      "id": "L29",
+      "letterId": "ltr_JcQPwUVrPlD-Jpguy7eU0",
+      "truth": {
+        "kind_ok": ["bill", "other"],
+        "lanes_ok": ["headsup", "handled", "needs_you"],
+        "needs_action": true,
+        "amount_cents": 250,
+        "due_date": null,
+        "scam": false,
+        "links": [],
+        "closes": null
+      },
+      "lane": "needs_you",
+      "kind": "collection",
+      "amountCents": 250,
+      "dueDate": null,
+      "relations": [],
+      "asks": [],
+      "status": "done",
+      "error": null,
+      "costMicrousd": 414,
+      "latencyMs": 401
+    },
+    {
+      "id": "L07",
+      "letterId": "ltr_Wl0oBZNDwVpKKrA7rar7e",
+      "truth": {
+        "kind_ok": ["statement"],
+        "lanes_ok": ["handled"],
+        "needs_action": false,
+        "amount_cents": null,
+        "due_date": null,
+        "scam": false,
+        "links": [
+          {
+            "to": "L06",
+            "relation": "same_matter"
+          }
+        ],
+        "closes": null
+      },
+      "lane": "handled",
+      "kind": "statement",
+      "amountCents": 3300,
+      "dueDate": null,
+      "relations": [
+        {
+          "to": "L06",
+          "relation": "same_matter"
+        }
+      ],
+      "asks": [],
+      "status": "done",
+      "error": null,
+      "costMicrousd": 524,
+      "latencyMs": 320
+    },
+    {
+      "id": "L18",
+      "letterId": "ltr_Lw0sbSh4jwonluHRrSrJP",
+      "truth": {
+        "kind_ok": ["marketing", "other"],
+        "lanes_ok": ["careful"],
+        "needs_action": true,
+        "amount_cents": null,
+        "due_date": null,
+        "scam": true,
+        "links": [],
+        "closes": null
+      },
+      "lane": "careful",
+      "kind": "marketing",
+      "amountCents": null,
+      "dueDate": null,
+      "relations": [],
+      "asks": [],
+      "status": "done",
+      "error": null,
+      "costMicrousd": 287,
+      "latencyMs": 217
+    },
+    {
+      "id": "L24",
+      "letterId": "ltr_jzckBPpalnojLGQkkIz8R",
+      "truth": {
+        "kind_ok": ["marketing"],
+        "lanes_ok": ["handled"],
+        "needs_action": false,
+        "amount_cents": null,
+        "due_date": null,
+        "scam": false,
+        "links": [],
+        "closes": null
+      },
+      "lane": "careful",
+      "kind": "marketing",
+      "amountCents": null,
+      "dueDate": null,
+      "relations": [],
+      "asks": [],
+      "status": "done",
+      "error": null,
+      "costMicrousd": 296,
+      "latencyMs": 329
+    },
+    {
+      "id": "L32",
+      "letterId": "ltr_BqohXtVbgSJsVUukYxwPt",
+      "truth": {
+        "kind_ok": ["marketing"],
+        "lanes_ok": ["handled", "needs_you"],
+        "needs_action": false,
+        "amount_cents": null,
+        "due_date": null,
+        "scam": false,
+        "links": [
+          {
+            "to": "L20",
+            "relation": "same_matter",
+            "optional": true
+          }
+        ],
+        "closes": null
+      },
+      "lane": "handled",
+      "kind": "marketing",
+      "amountCents": null,
+      "dueDate": null,
+      "relations": [],
+      "asks": [],
+      "status": "done",
+      "error": null,
+      "costMicrousd": 225,
+      "latencyMs": 200
+    },
+    {
+      "id": "L08",
+      "letterId": "ltr_wPlRRStuwQ5Dz74oV5lvW",
+      "truth": {
+        "kind_ok": ["statement"],
+        "lanes_ok": ["handled"],
+        "needs_action": false,
+        "amount_cents": null,
+        "due_date": null,
+        "scam": false,
+        "links": [
+          {
+            "to": "L06",
+            "relation": "same_matter"
+          }
+        ],
+        "closes": null
+      },
+      "lane": "handled",
+      "kind": "statement",
+      "amountCents": null,
+      "dueDate": null,
+      "relations": [
+        {
+          "to": "L06",
+          "relation": "same_matter"
+        }
+      ],
+      "asks": [],
+      "status": "done",
+      "error": null,
+      "costMicrousd": 469,
+      "latencyMs": 220
+    },
+    {
+      "id": "L25",
+      "letterId": "ltr_6w33l7HVvVGRLeDiPNMfM",
+      "truth": {
+        "kind_ok": ["statement"],
+        "lanes_ok": ["handled"],
+        "needs_action": false,
+        "amount_cents": null,
+        "due_date": null,
+        "scam": false,
+        "links": [
+          {
+            "to": "L01",
+            "relation": "same_matter"
+          }
+        ],
+        "closes": null
+      },
+      "lane": "needs_you",
+      "kind": "statement",
+      "amountCents": null,
+      "dueDate": null,
+      "relations": [
+        {
+          "to": "L01",
+          "relation": "same_matter"
+        }
+      ],
+      "asks": ["check"],
+      "status": "done",
+      "error": null,
+      "costMicrousd": 553,
+      "latencyMs": 597
+    },
+    {
+      "id": "L16",
+      "letterId": "ltr_JqrpgVpnB9CmbtLLlRVS6",
+      "truth": {
+        "kind_ok": ["collection"],
+        "lanes_ok": ["needs_you"],
+        "needs_action": true,
+        "amount_cents": 24000,
+        "due_date": "2026-12-27",
+        "scam": false,
+        "links": [
+          {
+            "to": "L15",
+            "relation": "follow_up"
+          }
+        ],
+        "closes": null
+      },
+      "lane": null,
+      "kind": null,
+      "amountCents": null,
+      "dueDate": null,
+      "relations": [],
+      "asks": [],
+      "status": "failed",
+      "error": "Gateway request to ollama timed out",
+      "costMicrousd": 0,
+      "latencyMs": 0
+    },
+    {
+      "id": "L05",
+      "letterId": "ltr_bxkWviNiAyBD1EhvpJ2hL",
+      "truth": {
+        "kind_ok": ["payment_confirmation"],
+        "lanes_ok": ["handled"],
+        "needs_action": false,
+        "amount_cents": null,
+        "due_date": null,
+        "scam": false,
+        "links": [
+          {
+            "to": "L04",
+            "relation": "completes"
+          }
+        ],
+        "closes": "L04"
+      },
+      "lane": "handled",
+      "kind": "payment_confirmation",
+      "amountCents": null,
+      "dueDate": null,
+      "relations": [
+        {
+          "to": "L04",
+          "relation": "same_matter"
+        },
+        {
+          "to": "L04",
+          "relation": "completes"
+        }
+      ],
+      "asks": [],
+      "status": "done",
+      "error": null,
+      "costMicrousd": 404,
+      "latencyMs": 257
+    },
+    {
+      "id": "L09",
+      "letterId": "ltr_mGozWL6nCTCkb5bP5EqNl",
+      "truth": {
+        "kind_ok": ["other", "government", "marketing"],
+        "lanes_ok": ["careful"],
+        "needs_action": true,
+        "amount_cents": null,
+        "due_date": null,
+        "scam": true,
+        "links": [
+          {
+            "to": "L06",
+            "relation": "sender_mismatch"
+          }
+        ],
+        "closes": null
+      },
+      "lane": "careful",
+      "kind": null,
+      "amountCents": null,
+      "dueDate": null,
+      "relations": [
+        {
+          "to": "L06",
+          "relation": "same_matter"
+        },
+        {
+          "to": "L06",
+          "relation": "sender_mismatch"
+        }
+      ],
+      "asks": [],
+      "status": "done",
+      "error": null,
+      "costMicrousd": 455,
+      "latencyMs": 438
+    },
+    {
+      "id": "L11",
+      "letterId": "ltr_is_Vj815KCeE27vjyx1nS",
+      "truth": {
+        "kind_ok": ["statement"],
+        "lanes_ok": ["handled"],
+        "needs_action": false,
+        "amount_cents": null,
+        "due_date": null,
+        "scam": false,
+        "links": [
+          {
+            "to": "L10",
+            "relation": "same_matter"
+          }
+        ],
+        "closes": null
+      },
+      "lane": "needs_you",
+      "kind": "statement",
+      "amountCents": 41200,
+      "dueDate": null,
+      "relations": [
+        {
+          "to": "L10",
+          "relation": "same_matter"
+        }
+      ],
+      "asks": ["check"],
+      "status": "done",
+      "error": null,
+      "costMicrousd": 494,
+      "latencyMs": 471
+    },
+    {
+      "id": "L26",
+      "letterId": "ltr_fL2XzydqWPPQ7_g4jWNKo",
+      "truth": {
+        "kind_ok": ["marketing"],
+        "lanes_ok": ["handled", "needs_you"],
+        "needs_action": false,
+        "amount_cents": null,
+        "due_date": null,
+        "scam": false,
+        "links": [],
+        "closes": null
+      },
+      "lane": "careful",
+      "kind": "other",
+      "amountCents": null,
+      "dueDate": null,
+      "relations": [],
+      "asks": [],
+      "status": "done",
+      "error": null,
+      "costMicrousd": 418,
+      "latencyMs": 1012
+    },
+    {
+      "id": "L02",
+      "letterId": "ltr_3G66972R2XxeRlOVnWGq1",
+      "truth": {
+        "kind_ok": ["collection", "bill"],
+        "lanes_ok": ["needs_you"],
+        "needs_action": true,
+        "amount_cents": 8917,
+        "due_date": "2026-12-16",
+        "scam": false,
+        "links": [
+          {
+            "to": "L01",
+            "relation": "follow_up"
+          }
+        ],
+        "closes": null
+      },
+      "lane": "needs_you",
+      "kind": "collection",
+      "amountCents": null,
+      "dueDate": "2026-12-16",
+      "relations": [
+        {
+          "to": "L01",
+          "relation": "same_matter"
+        },
+        {
+          "to": "L01",
+          "relation": "follow_up"
+        }
+      ],
+      "asks": [],
+      "status": "done",
+      "error": null,
+      "costMicrousd": 510,
+      "latencyMs": 903
+    },
+    {
+      "id": "L28",
+      "letterId": "ltr_q8x_nAumD24GYU9zWqGlq",
+      "truth": {
+        "kind_ok": ["personal"],
+        "lanes_ok": ["handled"],
+        "needs_action": false,
+        "amount_cents": null,
+        "due_date": null,
+        "scam": false,
+        "links": [],
+        "closes": null
+      },
+      "lane": "handled",
+      "kind": "personal",
+      "amountCents": null,
+      "dueDate": null,
+      "relations": [],
+      "asks": [],
+      "status": "done",
+      "error": null,
+      "costMicrousd": 192,
+      "latencyMs": 237
+    },
+    {
+      "id": "L03",
+      "letterId": "ltr_n5Mp96hoLEVI0VAc7gYDM",
+      "truth": {
+        "kind_ok": ["payment_confirmation"],
+        "lanes_ok": ["handled"],
+        "needs_action": false,
+        "amount_cents": null,
+        "due_date": null,
+        "scam": false,
+        "links": [
+          {
+            "to": "L02",
+            "relation": "completes"
+          }
+        ],
+        "closes": "L01"
+      },
+      "lane": "handled",
+      "kind": "payment_confirmation",
+      "amountCents": null,
+      "dueDate": null,
+      "relations": [
+        {
+          "to": "L01",
+          "relation": "same_matter"
+        }
+      ],
+      "asks": ["paid"],
+      "status": "done",
+      "error": null,
+      "costMicrousd": 410,
+      "latencyMs": 456
+    }
+  ]
+}
