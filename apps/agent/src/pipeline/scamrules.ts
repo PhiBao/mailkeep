@@ -9,7 +9,11 @@ export type ScamRule =
   | 'prize_fee';
 
 const RULES: Array<{ key: ScamRule; pattern: RegExp }> = [
-  { key: 'gift_card', pattern: /\bgift\s*cards?\b/i },
+  {
+    key: 'gift_card',
+    pattern:
+      /\bgift\s*cards?\b[^.!?]{0,120}\b(?:pay|send|purchase|buy|provide|load|transfer)\b|\b(?:pay|send|purchase|buy|provide|load|transfer)\b[^.!?]{0,120}\bgift\s*cards?\b/i,
+  },
   { key: 'crypto', pattern: /\b(?:bitcoin|crypto(?:currency)?)\b/i },
   { key: 'wire_transfer', pattern: /\b(?:wire\s+transfer|western\s+union|moneygram)\b/i },
   {

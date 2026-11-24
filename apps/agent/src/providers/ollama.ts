@@ -35,11 +35,19 @@ export async function chat(
   input: {
     model: string;
     messages: Array<{ role: string; content: string; images?: string[] }>;
+    think?: boolean;
+    numPredict?: number;
   },
 ): Promise<OllamaChatResult> {
+  const { think = false, numPredict, ...request } = input;
   try {
     const response = await client.request('ollama', 'POST', '/api/chat', {
-      json: { ...input, stream: false, options: { temperature: 0 } },
+      json: {
+        ...request,
+        stream: false,
+        think,
+        options: { temperature: 0, ...(numPredict ? { num_predict: numPredict } : {}) },
+      },
       timeoutMs: 120_000,
     });
     const parsed = nativeSchema.parse(response.json);
@@ -69,6 +77,7 @@ export async function chat(
         }),
         stream: false,
         temperature: 0,
+        ...(numPredict ? { max_tokens: numPredict } : {}),
       },
       timeoutMs: 120_000,
     });

@@ -3,7 +3,8 @@ import { scamRuleHits } from '../src/pipeline/scamrules.js';
 
 describe('code-owned scam rules', () => {
   it.each([
-    ['gift cards', 'gift_card'],
+    ['Pay the processing fee with gift cards', 'gift_card'],
+    ['Purchase gift cards and send the codes', 'gift_card'],
     ['bitcoin', 'crypto'],
     ['cryptocurrency', 'crypto'],
     ['wire transfer', 'wire_transfer'],
@@ -16,6 +17,14 @@ describe('code-owned scam rules', () => {
     ['not affiliated with any government agency', 'not_government'],
   ])('flags %s', (text, rule) => {
     expect(scamRuleHits(text)).toContain(rule);
+  });
+
+  it('does not treat gift-card rewards as a payment demand', () => {
+    expect(
+      scamRuleHits(
+        'Redeem points for statement credits, gift cards, or travel. No purchase necessary.',
+      ),
+    ).not.toContain('gift_card');
   });
 
   it('requires both a processing fee and prize language', () => {

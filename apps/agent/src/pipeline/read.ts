@@ -60,7 +60,12 @@ async function requestSummary(
       attempt === 0
         ? summaryPrompt(transcript, today)
         : `${summaryPrompt(transcript, today)}\n\nThe previous response failed validation: ${lastError}. Return corrected JSON only.`;
-    const result = await chat(client, { model, messages: [{ role: 'user', content: prompt }] });
+    const result = await chat(client, {
+      model,
+      messages: [{ role: 'user', content: prompt }],
+      think: false,
+      numPredict: 512,
+    });
     promptTokens += result.promptTokens;
     outputTokens += result.outputTokens;
     try {
@@ -141,6 +146,8 @@ export async function readLetterImage(
   const transcription = await chat(client, {
     model: input.model,
     messages: [{ role: 'user', content: R1_PROMPT, images: [input.bytes.toString('base64')] }],
+    think: false,
+    numPredict: 2048,
   });
   const quality = await measureQuality(input.bytes);
   return readTranscript(client, {

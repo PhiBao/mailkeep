@@ -8,10 +8,10 @@ export const T = {
   completesAsk: 0.6, // 0.6 ≤ p < 0.9 → Ask(paid)
   kindAccept: 0.6, // max kind probability below → Ask(kind)
   junk: 0.9, // P(marketing) ≥ and needs_action < 0.3 and no amount → handled
-  infoQuiet: 0.85, // P(statement|payment_confirmation|personal) ≥ and needs_action < 0.5 → handled
+  infoQuiet: 0.75, // P(statement|payment_confirmation|personal) ≥ and needs_action < 0.5 → handled
   needsAction: 0.6,
   fieldConfidence: 0.7, // amount_due / due_date choice confidence ≥ → use it
   bigAmountCents: 50000, // ≥ $500 → needs_you
   dueSoonDays: 7,
-  thresholdsVersion: '2026-11-24.2',
+  thresholdsVersion: '2026-11-24.3',
 } as const;

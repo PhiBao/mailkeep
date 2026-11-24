@@ -32,9 +32,9 @@ function input(): QuestionInput {
 }
 
 describe('Jev request builder', () => {
-  it('asks 33 questions for six past letters', () => {
+  it('asks 32 questions for six past letters', () => {
     const request = buildRequest(input(), 'jev-1.14.0');
-    expect(Object.keys(request.questions)).toHaveLength(33);
+    expect(Object.keys(request.questions)).toHaveLength(32);
     expect(request.model).toBe('jev-1.14.0');
   });
 

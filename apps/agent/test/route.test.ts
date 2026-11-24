@@ -12,7 +12,6 @@ function answers(overrides: Record<string, RouteAnswer> = {}): Record<string, Ro
     needs_action: { type: 'noul', noul: 0.9 },
     scam_payment: { type: 'noul', noul: 0.01 },
     scam_pressure: { type: 'noul', noul: 0.01 },
-    scam_impersonation: { type: 'noul', noul: 0.01 },
     scam_secrecy: { type: 'noul', noul: 0.01 },
     scam_prize_fee: { type: 'noul', noul: 0.01 },
     amount_due: {
@@ -89,6 +88,21 @@ describe('A10 routing', () => {
             choice: 'statement',
             confidence: 0.99,
             probabilities: { statement: 0.99 },
+          },
+          needs_action: { type: 'noul', noul: 0.2 },
+        }),
+      },
+      'handled',
+    ],
+    [
+      'a confident informational statement is handled at the tuned quiet bar',
+      {
+        answers: answers({
+          kind: {
+            type: 'choice',
+            choice: 'statement',
+            confidence: 0.78,
+            probabilities: { statement: 0.78, bill: 0.22 },
           },
           needs_action: { type: 'noul', noul: 0.2 },
         }),

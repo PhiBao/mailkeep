@@ -44,13 +44,14 @@ export interface QuestionInput {
 const KIND_CRITERIA: Record<Kind, string> = {
   bill: 'asks the recipient to pay an amount',
   statement:
-    'account statement, explanation of benefits, privacy notice, or policy documents confirming an existing term when no payment or renewal action is requested',
+    'an account statement, explanation of benefits, privacy notice, policy document, or notice of rate, coverage or term changes that reports existing terms and does not request payment, renewal or attendance',
   renewal: 'a policy, registration or membership that asks the recipient to renew now',
   appointment: 'a date the recipient must attend, such as an appointment or jury duty',
   government: 'a tax, benefits or legal notice from a government office',
   collection: 'a debt collector or past-due demand',
   payment_confirmation: 'confirms a payment was received or an account is paid',
-  marketing: 'an advert, offer, catalog, prize notice or donation request',
+  marketing:
+    'an advert, offer, catalog, prize notice, donation request, or nonpartisan civic reminder that does not claim to be a government office',
   personal: 'a personal letter or card',
   other: 'none of these',
 };
@@ -65,7 +66,7 @@ export function buildRequest(input: QuestionInput, model: string) {
     needs_action: {
       type: 'noul',
       instructions:
-        'The recipient of `new` is required to do something because of it: pay, reply, call, sign, renew or attend. Optional invitations, donations, offers, and courtesy replies do not count.',
+        'The recipient of `new` is required to do something because of it: pay, reply, call, sign, renew or attend. Optional invitations, donations, offers, courtesy replies, informational notices, rate or coverage changes, and letters saying no action is needed do not count.',
     },
     scam_payment: {
       type: 'noul',
@@ -76,11 +77,6 @@ export function buildRequest(input: QuestionInput, model: string) {
       type: 'noul',
       instructions:
         '`new` threatens arrest, loss of benefits or loss of property unless the recipient responds immediately. A routine deadline, reminder, or second notice without such a threat does not count.',
-    },
-    scam_impersonation: {
-      type: 'noul',
-      instructions:
-        '`new` is designed to impersonate a government office and asks for money or sensitive personal information, or says it is not affiliated with the government. Merely mentioning government, elections, voting, taxes, or benefits is not enough.',
     },
     scam_secrecy: {
       type: 'noul',
@@ -96,7 +92,8 @@ export function buildRequest(input: QuestionInput, model: string) {
   if (input.amountCandidates.length > 0) {
     questions.amount_due = {
       type: 'choice',
-      instructions: 'Which amount in `amount_candidates` must the recipient pay because of `new`?',
+      instructions:
+        'Which amount in `amount_candidates` is the total the recipient must pay now because of `new`? Include an explicitly stated late fee in the current total. Do not choose an assessed value, line item, minimum payment, past balance, optional donation or amount already paid. Choose none when no payment is required.',
       criteria: {
         ...Object.fromEntries(
           input.amountCandidates.map((candidate) => [
@@ -112,7 +109,7 @@ export function buildRequest(input: QuestionInput, model: string) {
     questions.due_date = {
       type: 'choice',
       instructions:
-        'Which date in `date_candidates` is the deadline the recipient must act by because of `new`?',
+        'Which date in `date_candidates` is the actual payment or action deadline for `new`? Do not choose the letter date, a statement period, coverage effective date, renewal start date or optional event date. Choose none when the recipient has no deadline.',
       criteria: {
         ...Object.fromEntries(
           input.dateCandidates.map((candidate) => [
