@@ -1,0 +1,120 @@
+.mom {
+  max-width: 42rem;
+  padding-top: var(--s6);
+  font-size: 21px;
+}
+
+.mom__header h1 {
+  margin-bottom: var(--s3);
+  font-size: var(--fs-display);
+  line-height: var(--lh-display);
+}
+
+.mom__header p {
+  color: var(--ink-2);
+  font-family: var(--serif);
+  font-size: 1.15rem;
+  line-height: var(--lh-body);
+}
+
+.mom__capture {
+  display: grid;
+  gap: var(--s3);
+  margin: var(--s6) 0;
+}
+
+.mom__capture input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.mom__camera,
+.mom__choose {
+  display: flex;
+  min-height: 64px;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  text-align: center;
+}
+
+.mom__camera {
+  border: 1px solid var(--needs);
+  border-radius: var(--r-control);
+  background: var(--needs);
+  color: var(--slip);
+  font-weight: 700;
+}
+
+.mom__choose {
+  min-height: 44px;
+  color: var(--link);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.mom__camera:focus-within,
+.mom__choose:focus-within {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.mom__result {
+  margin: var(--s5) 0 var(--s6);
+  padding: var(--s5);
+  border: 2px solid var(--ink);
+  border-radius: var(--r-slip);
+  background: var(--slip);
+  box-shadow: var(--shadow-slip);
+}
+
+.mom__result h2 {
+  margin-bottom: var(--s3);
+  font-size: var(--fs-h2);
+}
+
+.mom__result p {
+  margin-bottom: 0;
+  font-family: var(--serif);
+  font-size: 1.3em;
+  line-height: var(--lh-body);
+}
+
+.mom__recent {
+  padding-top: var(--s5);
+  border-top: 1px solid var(--rule);
+}
+
+.mom__recent ul {
+  display: grid;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.mom__recent li {
+  display: flex;
+  min-height: 64px;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s4);
+  border-bottom: 1px solid var(--rule);
+}
+
+.mom__recent li span {
+  font-family: var(--serif);
+}
+
+.mom__recent li strong {
+  color: var(--ink-2);
+  font-family: var(--sans);
+  font-size: var(--fs-meta);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}

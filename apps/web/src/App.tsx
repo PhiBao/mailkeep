@@ -2,6 +2,8 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router';
 import { Wordmark } from './components/Wordmark.js';
 import { Case } from './routes/Case.js';
 import { Letter } from './routes/Letter.js';
+import { Login } from './routes/Login.js';
+import { Mom } from './routes/Mom.js';
 import { Today } from './routes/Today.js';
 
 function Home() {
@@ -25,6 +27,8 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/mom" element={<Mom />} />
         <Route path="/today" element={<Today />} />
         <Route path="/cases/:id" element={<Case />} />
         <Route path="/letters/:id" element={<Letter />} />
