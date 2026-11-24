@@ -1,0 +1,7 @@
+node_modules
+dist
+.env
+*.db
+mailkeep-data/
+testset/build/
+eval/results/*.tmp
