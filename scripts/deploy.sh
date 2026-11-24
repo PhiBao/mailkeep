@@ -37,7 +37,7 @@ if ! sprite exec -o "$ORG" -s "$SPRITE" -- test -d /home/sprite/mailkeep/.git; t
 fi
 
 sprite exec -o "$ORG" -s "$SPRITE" -- bash -lc \
-  "cd ~/mailkeep && git fetch -q && git checkout -q '$SHA' && pnpm i --frozen-lockfile && pnpm build && node apps/agent/dist/cli/admin.js migrate"
+  "cd ~/mailkeep && git fetch -q && git checkout -q '$SHA' && corepack pnpm i --frozen-lockfile && corepack pnpm build && node apps/agent/dist/cli/admin.js migrate"
 
 ENV_VALUES="PORT=8080,MAILKEEP_PUBLIC_URL=$URL,MAILKEEP_DATA_DIR=/home/sprite/mailkeep-data,MAILKEEP_PINECONE_INDEX=mailkeep-letters,MAILKEEP_JEV_MODEL=jev-1.14.0,MAILKEEP_OLLAMA_MODEL=gemma4:31b,MAILKEEP_DEMO_HOUSEHOLD_ID=hh_demo,MAILKEEP_TICK_MIN_INTERVAL_S=300,LOG_LEVEL=info"
 
