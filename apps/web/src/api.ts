@@ -12,8 +12,8 @@ export async function apiFetch(path: string, init: RequestInit = {}): Promise<Re
   });
 }
 
-export async function fetchToday(): Promise<TodayDTO> {
-  const response = await apiFetch('/api/today');
+export async function fetchToday(demo = false): Promise<TodayDTO> {
+  const response = await apiFetch(demo ? '/api/demo/today' : '/api/today');
   if (!response.ok) throw new Error('Could not load today');
   return todaySchema.parse(await response.json());
 }

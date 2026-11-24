@@ -22,8 +22,10 @@ const timeFormat = new Intl.DateTimeFormat('en-US', {
 });
 const STEPS = ['Reading the photo', 'Looking through past letters', 'Deciding', 'Filing'];
 
-async function fetchLetter(id: string): Promise<LetterDTO> {
-  const response = await apiFetch(`/api/letters/${encodeURIComponent(id)}`);
+async function fetchLetter(id: string, demo = false): Promise<LetterDTO> {
+  const response = await apiFetch(
+    `${demo ? '/api/demo' : '/api'}/letters/${encodeURIComponent(id)}`,
+  );
   if (!response.ok) throw new Error('Could not load this letter');
   return letterSchema.parse(await response.json());
 }
@@ -49,21 +51,25 @@ function relationText(relation: LetterDTO['relations'][number]): string {
   return `same matter · ${relation.probability.toFixed(2)}`;
 }
 
-export function Letter() {
+export function Letter({ demo = false }: { demo?: boolean }) {
   const { id = '' } = useParams();
+  const apiBase = demo ? '/api/demo' : '/api';
   const queryClient = useQueryClient();
   const dialog = useRef<HTMLDialogElement>(null);
   const [toast, setToast] = useState('');
   const { data, isLoading, isError, refetch } = useQuery({
-    queryKey: ['letter', id],
-    queryFn: () => fetchLetter(id),
+    queryKey: ['letter', demo ? 'demo' : 'family', id],
+    queryFn: () => fetchLetter(id, demo),
     refetchInterval: (query) =>
       query.state.data && terminal(query.state.data.status) ? false : 1500,
   });
-  const { data: today } = useQuery({ queryKey: ['today'], queryFn: fetchToday });
+  const { data: today } = useQuery({
+    queryKey: ['today', demo ? 'demo' : 'family'],
+    queryFn: () => fetchToday(demo),
+  });
   const retry = useMutation({
     mutationFn: async () => {
-      const response = await apiFetch(`/api/letters/${encodeURIComponent(id)}/retry`, {
+      const response = await apiFetch(`${apiBase}/letters/${encodeURIComponent(id)}/retry`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: '{}',
@@ -72,7 +78,7 @@ export function Letter() {
     },
     onSuccess: () => {
       setToast('Trying again.');
-      void queryClient.invalidateQueries({ queryKey: ['letter', id] });
+      void queryClient.invalidateQueries({ queryKey: ['letter', demo ? 'demo' : 'family', id] });
     },
     onError: () => setToast("Couldn't retry. Please try again."),
   });
@@ -102,7 +108,7 @@ export function Letter() {
       : null;
   return (
     <main className="page letter">
-      <Link className="letter__back" to="/today">
+      <Link className="letter__back" to={demo ? '/demo' : '/today'}>
         ← Today
       </Link>
       {toast ? (
@@ -153,14 +159,16 @@ export function Letter() {
                 <Banner tone="warning">
                   Mailkeep couldn't finish this letter.{' '}
                   <span className="mono">{data.error ?? 'unknown error'}</span>{' '}
-                  <button
-                    type="button"
-                    className="button--quiet"
-                    disabled={retry.isPending}
-                    onClick={() => retry.mutate()}
-                  >
-                    Try again
-                  </button>
+                  {!demo ? (
+                    <button
+                      type="button"
+                      className="button--quiet"
+                      disabled={retry.isPending}
+                      onClick={() => retry.mutate()}
+                    >
+                      Try again
+                    </button>
+                  ) : null}
                 </Banner>
               ) : null}
 
@@ -198,7 +206,9 @@ export function Letter() {
                 <section className="letter__section">
                   <h2>Linked to</h2>
                   {data.caseId ? (
-                    <Link to={`/cases/${data.caseId}`}>Open the case file</Link>
+                    <Link to={`${demo ? '/demo' : ''}/cases/${data.caseId}`}>
+                      Open the case file
+                    </Link>
                   ) : null}
                   <ul className="letter__relations">
                     {data.relations.map((relation) => (
@@ -238,7 +248,9 @@ export function Letter() {
                     <ul className="letter__recall">
                       {data.recall.map((candidate) => (
                         <li key={candidate.letterId}>
-                          <Link to={`/letters/${candidate.letterId}`}>{candidate.title}</Link>
+                          <Link to={`${demo ? '/demo' : ''}/letters/${candidate.letterId}`}>
+                            {candidate.title}
+                          </Link>
                           <span className="mono">
                             {' '}
                             · recall{' '}

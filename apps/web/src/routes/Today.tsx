@@ -19,7 +19,7 @@ export function Today() {
   const [showAll, setShowAll] = useState(false);
   const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ['today'],
-    queryFn: fetchToday,
+    queryFn: () => fetchToday(false),
     refetchInterval: 30_000,
   });
   const answer = useMutation({

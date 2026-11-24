@@ -9,11 +9,14 @@ function dateBlock(value: string): { month: string; day: string } {
   };
 }
 
-export function DueLine({ due }: { due: DueLineDTO }) {
+export function DueLine({ due, demo = false }: { due: DueLineDTO; demo?: boolean }) {
   const block = due.dueDate ? dateBlock(due.dueDate) : { month: '—', day: '—' };
   const days = due.daysLeft;
   return (
-    <Link className={`due-line${days < 0 ? ' due-line--overdue' : ''}`} to={`/cases/${due.caseId}`}>
+    <Link
+      className={`due-line${days < 0 ? ' due-line--overdue' : ''}`}
+      to={`${demo ? '/demo' : ''}/cases/${due.caseId}`}
+    >
       <span className="due-line__date mono">
         <span>{block.month}</span>
         <strong>{block.day}</strong>

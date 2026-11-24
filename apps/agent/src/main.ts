@@ -8,6 +8,7 @@ import { GatewayClient } from './gateway/client.js';
 import { createApp } from './http/app.js';
 import { apiRoutes } from './http/routes/api.js';
 import { authRoutes } from './http/routes/auth.js';
+import { demoRoutes } from './http/routes/demo.js';
 import { hooksRoutes } from './http/routes/hooks.js';
 import { momRoutes } from './http/routes/mom.js';
 import { proofRoutes } from './http/routes/proof.js';
@@ -37,6 +38,7 @@ const queue = new PipelineQueue({ client, config, db });
 const app = createApp(config, (instance) => {
   instance.route('/', authRoutes({ config, db }));
   instance.route('/', apiRoutes({ config, db, queue }));
+  instance.route('/', demoRoutes({ config, db, queue }));
   instance.route('/', momRoutes({ db }));
   instance.route('/', proofRoutes({ proof }));
   instance.route('/', hooksRoutes({ config, db, client, queue }));

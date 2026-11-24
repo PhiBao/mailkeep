@@ -34,7 +34,7 @@ function eventLabel(event: CaseDTO['events'][number]): string {
   return `${event.actor === 'member' ? 'Family' : 'Mailkeep'} · ${event.type.replaceAll('_', ' ')}`;
 }
 
-export function Thread({ data }: { data: CaseDTO }) {
+export function Thread({ data, demo = false }: { data: CaseDTO; demo?: boolean }) {
   const items: ThreadItem[] = [
     ...data.letters.map((letter) => ({
       type: 'letter' as const,
@@ -57,7 +57,7 @@ export function Thread({ data }: { data: CaseDTO }) {
         const relations = data.relations.filter((relation) => relation.letterId === item.letter.id);
         return (
           <div className="thread__letter" key={`letter-${item.letter.id}`}>
-            <Slip letter={item.letter} />
+            <Slip letter={item.letter} to={`${demo ? '/demo' : ''}/letters/${item.letter.id}`} />
             {relations.map((relation) => (
               <p className="thread__relation mono" key={relation.id}>
                 {relationLabel(relation, data.accountTail)}

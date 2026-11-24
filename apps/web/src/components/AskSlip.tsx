@@ -6,12 +6,20 @@ import { Stamp } from './Stamp.js';
 export interface AskSlipProps {
   ask: AskDTO;
   busy?: boolean;
+  readOnly?: boolean;
+  demo?: boolean;
   onAnswer: (askId: string, answer: string) => Promise<void>;
 }
 
-export function AskSlip({ ask, busy = false, onAnswer }: AskSlipProps) {
+export function AskSlip({
+  ask,
+  busy = false,
+  readOnly = false,
+  demo = false,
+  onAnswer,
+}: AskSlipProps) {
   const [pending, setPending] = useState(false);
-  const disabled = busy || pending;
+  const disabled = busy || pending || readOnly;
   async function answer(value: string): Promise<void> {
     setPending(true);
     try {
@@ -25,7 +33,7 @@ export function AskSlip({ ask, busy = false, onAnswer }: AskSlipProps) {
       <div className="ask-slip__heading">
         <div>
           {ask.letterId ? (
-            <Link className="meta" to={`/letters/${ask.letterId}`}>
+            <Link className="meta" to={`${demo ? '/demo' : ''}/letters/${ask.letterId}`}>
               {ask.letterTitle}
             </Link>
           ) : (
@@ -43,6 +51,7 @@ export function AskSlip({ ask, busy = false, onAnswer }: AskSlipProps) {
             type="button"
             className={index === 0 ? 'button--primary' : 'button--secondary'}
             disabled={disabled}
+            title={readOnly ? 'Demo is read-only' : undefined}
             onClick={() => void answer(option.value)}
           >
             {option.label}

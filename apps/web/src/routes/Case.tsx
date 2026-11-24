@@ -15,23 +15,24 @@ const dateFormat = new Intl.DateTimeFormat('en-US', {
   timeZone: 'UTC',
 });
 
-async function fetchCase(id: string): Promise<CaseDTO> {
-  const response = await apiFetch(`/api/cases/${encodeURIComponent(id)}`);
+async function fetchCase(id: string, demo = false): Promise<CaseDTO> {
+  const response = await apiFetch(`${demo ? '/api/demo' : '/api'}/cases/${encodeURIComponent(id)}`);
   if (!response.ok) throw new Error('Could not load this case');
   return caseSchema.parse(await response.json());
 }
 
-export function Case() {
+export function Case({ demo = false }: { demo?: boolean }) {
   const { id = '' } = useParams();
+  const apiBase = demo ? '/api/demo' : '/api';
   const queryClient = useQueryClient();
   const [toast, setToast] = useState('');
   const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ['case', id],
-    queryFn: () => fetchCase(id),
+    queryFn: () => fetchCase(id, demo),
   });
   const update = useMutation({
     mutationFn: async (action: 'mark-paid' | 'reopen') => {
-      const response = await apiFetch(`/api/cases/${encodeURIComponent(id)}/${action}`, {
+      const response = await apiFetch(`${apiBase}/cases/${encodeURIComponent(id)}/${action}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: '{}',
@@ -64,7 +65,7 @@ export function Case() {
   const canReopen = data.status === 'paid' || data.status === 'closed';
   return (
     <main className="page case">
-      <Link className="case__back" to="/today">
+      <Link className="case__back" to={demo ? '/demo' : '/today'}>
         ← Today
       </Link>
       <header className="case__header">
@@ -88,13 +89,14 @@ export function Case() {
           {toast}
         </div>
       ) : null}
-      <Thread data={data} />
+      <Thread data={data} demo={demo} />
       <footer className="case__actions">
         {canMarkPaid ? (
           <button
             type="button"
             className="button--primary"
-            disabled={update.isPending}
+            disabled={update.isPending || demo}
+            title={demo ? 'Demo is read-only' : undefined}
             onClick={() => update.mutate('mark-paid')}
           >
             Mark paid
@@ -104,7 +106,8 @@ export function Case() {
           <button
             type="button"
             className="button--secondary"
-            disabled={update.isPending}
+            disabled={update.isPending || demo}
+            title={demo ? 'Demo is read-only' : undefined}
             onClick={() => update.mutate('reopen')}
           >
             Reopen
