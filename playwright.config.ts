@@ -20,6 +20,13 @@ function cachedChromium(): string | undefined {
       );
       if (existsSync(executable)) return executable;
     }
+    const fullRevisions = readdirSync(cache)
+      .filter((entry) => /^chromium-\d+$/.test(entry))
+      .sort((left, right) => Number(right.split('-').at(-1)) - Number(left.split('-').at(-1)));
+    for (const revision of fullRevisions) {
+      const executable = path.join(cache, revision, 'chrome-linux64', 'chrome');
+      if (existsSync(executable)) return executable;
+    }
   } catch {
     return undefined;
   }

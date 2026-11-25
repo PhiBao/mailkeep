@@ -1,4 +1,4 @@
-import { formatUsd, type LetterDTO, letterSchema } from '@mailkeep/shared';
+import { formatUsd, type LetterDTO, letterSchema, parentResultCopy } from '@mailkeep/shared';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRef, useState } from 'react';
 import { Link, useParams } from 'react-router';
@@ -174,7 +174,9 @@ export function Letter({ demo = false }: { demo?: boolean }) {
 
               <section className="letter__section">
                 <h2>What we told Ruth</h2>
-                <blockquote>{data.summaryParent ?? 'Mailkeep read this letter.'}</blockquote>
+                <blockquote>
+                  {parentNote?.bodyText ?? data.summaryParent ?? 'Mailkeep read this letter.'}
+                </blockquote>
                 <p className="meta">
                   {parentNote?.status === 'sent' && parentNote.sentAt
                     ? `Sent ${timeFormat.format(new Date(parentNote.sentAt))} · to ${parentNote.toEmail}`
@@ -186,7 +188,9 @@ export function Letter({ demo = false }: { demo?: boolean }) {
 
               <section className="letter__section">
                 <h2>What it needs</h2>
-                {data.amountCents !== null || data.dueDate || data.todoParent ? (
+                {data.lane === 'careful' ? (
+                  <p className="letter__needs">{parentResultCopy({ lane: 'careful' })}</p>
+                ) : data.amountCents !== null || data.dueDate || data.todoParent ? (
                   <p className="letter__needs">
                     {data.todoParent ?? 'Nothing'}
                     {data.amountCents !== null ? ` · ${formatUsd(data.amountCents)}` : ''}

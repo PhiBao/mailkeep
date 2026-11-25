@@ -131,6 +131,7 @@ const letter = {
       kind: 'parent_note',
       toEmail: 'kiter7396+mom@gmail.com',
       subject: 'Sarah will look at it',
+      bodyText: 'Hi Ruth, keep this one for now. Sarah will look at it. — Mailkeep',
       status: 'sent',
       suppressedReason: null,
       agentmailMessageId: 'msg_1',

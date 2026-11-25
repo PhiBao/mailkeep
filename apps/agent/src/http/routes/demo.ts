@@ -22,6 +22,7 @@ import {
   intakeFile,
 } from '../../pipeline/intake.js';
 import type { PipelineQueue } from '../../pipeline/queue.js';
+import { now as householdNow } from '../../util/clock.js';
 import { log } from '../../util/log.js';
 import { clientIp, SlidingWindowRateLimiter } from '../ratelimit.js';
 import type { Clock } from '../session.js';
@@ -105,10 +106,15 @@ function samplePath(id: DemoSampleId): string {
   return path.join(TESTSET_OUT_DIR, `${id}.jpg`);
 }
 
-function demoHousehold(db: DB, config: Config): { id: string } | undefined {
+function demoHousehold(
+  db: DB,
+  config: Config,
+): { id: string; clock_offset_days: number; timezone: string } | undefined {
   return db
-    .prepare('SELECT id FROM households WHERE id = ? AND is_demo = 1')
-    .get(config.MAILKEEP_DEMO_HOUSEHOLD_ID) as { id: string } | undefined;
+    .prepare('SELECT id, clock_offset_days, timezone FROM households WHERE id = ? AND is_demo = 1')
+    .get(config.MAILKEEP_DEMO_HOUSEHOLD_ID) as
+    | { id: string; clock_offset_days: number; timezone: string }
+    | undefined;
 }
 
 function demoLetter(db: DB, householdId: string, letterId: string): LetterRow | undefined {
@@ -157,11 +163,18 @@ function demoLetterDTO(db: DB, row: LetterRow): LetterDTO {
 
 function demoCaseDTO(db: DB, row: CaseRow): CaseDTO {
   const dto = buildCaseDTO(db, row);
+  const receivedAt = new Map(dto.letters.map((letter) => [letter.id, letter.receivedAt]));
   return caseSchema.parse({
     ...dto,
     letters: dto.letters.map((letter) => ({
       ...letter,
       imageUrl: `/api/demo/letters/${encodeURIComponent(letter.id)}/image`,
+    })),
+    events: dto.events.map((event) => ({
+      ...event,
+      createdAt: event.letterId
+        ? (receivedAt.get(event.letterId) ?? event.createdAt)
+        : event.createdAt,
     })),
   });
 }
@@ -356,7 +369,10 @@ export function demoRoutes(deps: DemoDeps): Hono {
       throw error;
     }
     const now = clock();
-    const householdId = deps.config.MAILKEEP_DEMO_HOUSEHOLD_ID;
+    const household = demoHousehold(deps.db, deps.config);
+    if (!household) return context.json({ error: 'not_found' }, 404);
+    const householdId = household.id;
+    const receivedAt = householdNow(household, now).toISOString();
     const sha256 = createHash('sha256').update(bytes).digest('hex');
     const existing = recentTrial(deps.db, householdId, sha256, now);
     if (existing) return context.json(demoLetterDTO(deps.db, existing), 202);
@@ -388,7 +404,6 @@ export function demoRoutes(deps: DemoDeps): Hono {
       return context.json({ error: 'sample_conflict' }, 409);
     }
 
-    const receivedAt = now.toISOString();
     try {
       deps.db
         .prepare(
@@ -404,8 +419,8 @@ export function demoRoutes(deps: DemoDeps): Hono {
           result.mime,
           result.sha256,
           result.localPath,
-          receivedAt,
-          receivedAt,
+          now.toISOString(),
+          now.toISOString(),
         );
     } catch (error) {
       const raced = recentTrial(deps.db, householdId, sha256, now);

@@ -322,6 +322,7 @@ function outboxRows(db: DB, letter: LetterRow) {
     kind: string;
     to_email: string;
     subject: string;
+    body_text: string;
     status: string;
     suppressed_reason: string | null;
     agentmail_message_id: string | null;
@@ -420,6 +421,7 @@ export function buildLetterDTO(db: DB, row: LetterRow): LetterDTO {
       kind: outbox.kind,
       toEmail: outbox.to_email,
       subject: outbox.subject,
+      bodyText: outbox.body_text,
       status: outbox.status,
       suppressedReason: outbox.suppressed_reason,
       agentmailMessageId: outbox.agentmail_message_id,

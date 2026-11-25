@@ -81,6 +81,8 @@ const letter = {
       kind: 'parent_note',
       toEmail: 'kiter7396+mom@gmail.com',
       subject: 'Sarah will look at: Past Due Water Bill Notice',
+      bodyText:
+        'Hi Ruth, the water bill is unpaid and now includes a late fee. Keep it for now. Sarah will look at it. — Mailkeep',
       status: 'sent',
       suppressedReason: null,
       agentmailMessageId: 'msg_1',
@@ -146,6 +148,30 @@ for (const width of [390, 1440]) {
     ).toBe(true);
   });
 }
+
+test('CAREFUL letters show safety copy instead of the raw call-to-action', async ({ page }) => {
+  const careful = {
+    ...letter,
+    id: 'ltr_scam',
+    title: 'Verify Member Card for Benefits',
+    summaryParent: 'The health plan needs to verify member card information.',
+    todoParent: 'Call the verification line to confirm card details.',
+    lane: 'careful',
+    outbox: [
+      {
+        ...letter.outbox[0],
+        bodyText:
+          "Hi Ruth, the letter looks like a scam. Don't pay it. Don't call the number on it. — Mailkeep",
+      },
+    ],
+  };
+  await page.route('**/api/letters/ltr_scam', (route) => route.fulfill({ json: careful }));
+  await page.route('**/api/today', (route) => route.fulfill({ json: today }));
+  await page.goto('/letters/ltr_scam');
+  await expect(page.locator('blockquote')).toContainText("Don't call the number on it");
+  await expect(page.locator('.letter__needs')).toContainText("Don't call the number on it");
+  await expect(page.getByText(/Call the verification line/)).toHaveCount(0);
+});
 
 test('Letter polls through processing and flips to done', async ({ page }) => {
   let reads = 0;

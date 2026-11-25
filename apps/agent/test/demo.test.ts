@@ -300,7 +300,7 @@ describe('public demo reads', () => {
       `INSERT INTO case_events
         (id, household_id, case_id, letter_id, type, actor, detail_json, created_at)
         VALUES ('evt_demo', 'hh_demo', 'case_demo', 'ltr_demo', 'opened', 'agent', '{}', ?)`,
-    ).run(clock().toISOString());
+    ).run('2026-11-23T00:00:00.000Z');
     db.prepare(
       `INSERT INTO outbox
         (id, household_id, to_email, kind, subject, body_text, related_id, status, created_at)
@@ -321,6 +321,7 @@ describe('public demo reads', () => {
     expect(caseResponse.status).toBe(200);
     const caseDto = caseSchema.parse(await caseResponse.json());
     expect(caseDto.letters[0]?.imageUrl).toBe('/api/demo/letters/ltr_demo/image');
+    expect(caseDto.events[0]?.createdAt).toBe(caseDto.letters[0]?.receivedAt);
 
     const letterResponse = await get('/api/demo/letters/ltr_demo');
     expect(letterResponse.status).toBe(200);
@@ -386,6 +387,7 @@ describe('demo sample runs', () => {
   });
 
   it('runs a known output through intake and the queue as a demo trial', async () => {
+    db.prepare("UPDATE households SET clock_offset_days = 1 WHERE id = 'hh_demo'").run();
     const response = await run(
       '/api/demo/samples/L02/run',
       {},
@@ -417,7 +419,8 @@ describe('demo sample runs', () => {
       trial: 1,
       submitted_by: null,
       status: 'queued',
-      received_at: clock().toISOString(),
+      received_at: new Date(NOW + 86_400_000).toISOString(),
+      created_at: clock().toISOString(),
     });
   });
 

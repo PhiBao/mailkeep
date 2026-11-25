@@ -154,6 +154,7 @@ export const outboxSchema = z.object({
   kind: z.enum(OUTBOX_KINDS),
   toEmail: z.string().email(),
   subject: z.string(),
+  bodyText: z.string(),
   status: z.enum(OUTBOX_STATUSES),
   suppressedReason: nullableString,
   agentmailMessageId: nullableString,

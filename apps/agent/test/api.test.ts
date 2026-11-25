@@ -751,6 +751,7 @@ describe('Today, case, and letter DTOs', () => {
       },
     ]);
     expect(dto.outbox.map((item) => item.id).sort()).toEqual(['out_a', 'out_ask']);
+    expect(dto.outbox.find((item) => item.id === 'out_a')?.bodyText).toBe('Body');
     expect(dto.decision).toEqual({
       modelId: 'jev-test',
       latencyMs: 123,
