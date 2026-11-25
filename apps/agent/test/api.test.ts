@@ -673,6 +673,34 @@ describe('Today, case, and letter DTOs', () => {
     expect(JSON.stringify(today)).not.toContain(directory);
   });
 
+  it('keeps CAREFUL and undated second notices in attention and hides paid-case asks', async () => {
+    await seedCase({ id: 'case_watch', status: 'watch', dueDate: null });
+    await seedCase({
+      id: 'case_second_no_due',
+      status: 'open',
+      dueDate: null,
+      secondNotice: true,
+    });
+    await seedCase({ id: 'case_paid_attention', status: 'paid', dueDate: '2026-11-20' });
+    seedAsk({ id: 'ask_paid_case', caseId: 'case_paid_attention' });
+    const response = await app.request(`${ORIGIN}/api/today`, {
+      headers: { Cookie: familyCookie },
+    });
+    const today = todaySchema.parse(await response.json());
+    expect(today.upcoming).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ caseId: 'case_watch', status: 'watch', daysLeft: 0 }),
+        expect.objectContaining({
+          caseId: 'case_second_no_due',
+          secondNotice: true,
+          daysLeft: 0,
+        }),
+      ]),
+    );
+    expect(today.upcoming.some((item) => item.caseId === 'case_paid_attention')).toBe(false);
+    expect(today.asks.some((ask) => ask.id === 'ask_paid_case')).toBe(false);
+  });
+
   it('builds CaseDTO with letters, events, and relations', async () => {
     const response = await app.request(`${ORIGIN}/api/cases/case_a`, {
       headers: { Cookie: familyCookie },

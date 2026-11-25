@@ -1,4 +1,4 @@
-import type { TodayDTO } from '@mailkeep/shared';
+import { formatUsd, type TodayDTO } from '@mailkeep/shared';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router';
@@ -11,6 +11,15 @@ import { Skeleton } from '../components/Skeleton.js';
 import { Slip } from '../components/Slip.js';
 import { Wordmark } from '../components/Wordmark.js';
 import '../styles/today.css';
+
+function formatDueDate(value: string): string {
+  return new Date(`${value}T00:00:00Z`).toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+    timeZone: 'UTC',
+  });
+}
 
 export function Today() {
   const queryClient = useQueryClient();
@@ -85,9 +94,11 @@ export function Today() {
     );
   }
 
+  const careful = data.upcoming.filter((due) => due.status === 'watch');
   const secondNotices = data.upcoming.filter((due) => due.secondNotice);
   const upcoming = showAll ? data.upcoming : data.upcoming.slice(0, 8);
-  const nothingNeedsYou = data.asks.length === 0 && secondNotices.length === 0;
+  const nothingNeedsYou =
+    data.asks.length === 0 && secondNotices.length === 0 && careful.length === 0;
 
   return (
     <main className="page today">
@@ -117,10 +128,28 @@ export function Today() {
         <h2 id="needs-you-title">Needs you</h2>
         {nothingNeedsYou ? (
           <Empty title="Nothing needs you right now.">
-            Mailkeep has read {data.handledThisWeek.count + data.recent.length} of Ruth's letters.
+            Mailkeep has quietly filed {data.handledThisWeek.count} of Ruth's letters this week.
           </Empty>
         ) : (
           <div className="today__asks">
+            {careful.map((due) => (
+              <article className="ask-slip" key={due.caseId}>
+                <div className="ask-slip__heading">
+                  <div>
+                    <Link className="meta" to={`/cases/${due.caseId}`}>
+                      {due.title}
+                    </Link>
+                    <h3>This letter looks like a scam.</h3>
+                  </div>
+                </div>
+                <p>Don't pay it or call the number on it. Open the case for details.</p>
+                <div className="ask-slip__actions">
+                  <Link className="button button--secondary" to={`/cases/${due.caseId}`}>
+                    Open case
+                  </Link>
+                </div>
+              </article>
+            ))}
             {secondNotices.map((due) => (
               <article className="ask-slip" key={due.caseId}>
                 <div className="ask-slip__heading">
@@ -132,8 +161,9 @@ export function Today() {
                   </div>
                 </div>
                 <p className="ask-slip__evidence mono">
-                  {due.counterparty} · due {due.dueDate} ·{' '}
-                  {due.amountCents === null ? 'no amount' : 'amount on case'}
+                  {due.counterparty}
+                  {due.dueDate ? ` · due ${formatDueDate(due.dueDate)}` : ' · no due date'}
+                  {due.amountCents === null ? ' · no amount' : ` · ${formatUsd(due.amountCents)}`}
                 </p>
                 <div className="ask-slip__actions">
                   <button

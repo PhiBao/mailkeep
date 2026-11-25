@@ -30,7 +30,11 @@ export function DueLine({ due, demo = false }: { due: DueLineDTO; demo?: boolean
       </span>
       <span className="due-line__amount mono">
         {due.amountCents === null ? 'No amount' : formatUsd(due.amountCents)}
-        <small>{days < 0 ? `${Math.abs(days)} days overdue` : `${days} days`}</small>
+        <small>
+          {days < 0
+            ? `${Math.abs(days)} ${Math.abs(days) === 1 ? 'day' : 'days'} overdue`
+            : `${days} ${days === 1 ? 'day' : 'days'}`}
+        </small>
       </span>
     </Link>
   );

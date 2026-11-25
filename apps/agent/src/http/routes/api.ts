@@ -558,15 +558,21 @@ export function buildTodayDTO(
     .prepare(
       `SELECT a.*, l.title AS letter_title FROM asks a
         LEFT JOIN letters l ON l.id = a.letter_id AND l.household_id = a.household_id
+        LEFT JOIN cases c ON c.id = a.case_id AND c.household_id = a.household_id
         WHERE a.household_id = ? AND a.status = 'open'
+          AND (a.case_id IS NULL OR c.status NOT IN ('paid', 'closed'))
         ORDER BY a.created_at DESC, a.id DESC`,
     )
     .all(member.household_id) as Array<AskRow & { letter_title: string | null }>;
   const caseRows = db
     .prepare(
       `SELECT * FROM cases
-        WHERE household_id = ? AND status IN ('open', 'overdue') AND due_date IS NOT NULL
-        ORDER BY due_date, created_at, id`,
+        WHERE household_id = ? AND (
+          status = 'watch'
+          OR (status IN ('open', 'overdue') AND (due_date IS NOT NULL OR second_notice = 1))
+        )
+        ORDER BY CASE WHEN status = 'watch' THEN 0 WHEN second_notice = 1 THEN 1 ELSE 2 END,
+          due_date IS NULL, due_date, created_at, id`,
     )
     .all(member.household_id) as CaseRow[];
   const start = weekStart(today);
@@ -622,7 +628,7 @@ export function buildTodayDTO(
       status: row.status,
       amountCents: row.amount_cents,
       dueDate: row.due_date,
-      daysLeft: daysLeft(today, row.due_date as string),
+      daysLeft: row.due_date ? daysLeft(today, String(row.due_date)) : 0,
       secondNotice: Boolean(row.second_notice),
     })),
     handledThisWeek: {

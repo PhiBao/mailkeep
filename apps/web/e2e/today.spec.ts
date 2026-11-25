@@ -64,6 +64,31 @@ const today = {
   recent: [],
 };
 
+test('Today keeps a CAREFUL watch case in Needs you without a due date', async ({ page }) => {
+  const carefulToday = {
+    ...structuredClone(today),
+    asks: [],
+    upcoming: [
+      {
+        caseId: 'case_watch',
+        title: 'Careful: Global Prize Center',
+        counterparty: 'Global Prize Center',
+        kind: 'marketing',
+        status: 'watch',
+        amountCents: null,
+        dueDate: null,
+        daysLeft: 0,
+        secondNotice: false,
+      },
+    ],
+    handledThisWeek: { count: 0, items: [] },
+  };
+  await page.route('**/api/today', (route) => route.fulfill({ json: carefulToday }));
+  await page.goto('/today');
+  await expect(page.getByRole('heading', { name: 'This letter looks like a scam.' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Nothing needs you right now.' })).toHaveCount(0);
+});
+
 for (const width of [390, 1440]) {
   test(`Today answers an Ask in place at ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: width === 390 ? 844 : 1000 });
