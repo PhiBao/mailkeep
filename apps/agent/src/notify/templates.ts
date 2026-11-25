@@ -72,7 +72,7 @@ export function familyAlert(input: {
         counterparty: input.route.caseChange.counterparty,
         kind: input.route.caseChange.kind,
       }),
-      body: `${input.route.notes.join(' ')}\nMailkeep linked the letters. ${input.link}`,
+      body: `${input.route.notes.join(' ')}\nMailkeep linked the letters. Reply PAID if it's been paid, or open ${input.link}`,
     };
   }
   if (input.route.lane === 'careful') {

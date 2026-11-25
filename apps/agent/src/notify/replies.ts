@@ -633,6 +633,49 @@ export async function syncCaseFileForLetter(
   });
 }
 
+export async function handleAlertReply(
+  deps: AskReplyDeps,
+  input: { alertId: string; memberId: string; text: string; via: 'email' | 'web' },
+): Promise<ReplyOutcome> {
+  const alert = deps.db.prepare('SELECT * FROM outbox WHERE id = ?').get(input.alertId) as
+    | ({ id: string; household_id: string; related_id: string | null } & {
+        kind: string;
+        status: string;
+      })
+    | undefined;
+  if (alert?.kind !== 'family_alert' || alert.status !== 'sent' || !alert.related_id)
+    return 'ignored';
+  const member = deps.db
+    .prepare('SELECT household_id, role FROM members WHERE id = ?')
+    .get(input.memberId) as { household_id: string; role: string } | undefined;
+  if (member?.role !== 'family' || member.household_id !== alert.household_id) return 'ignored';
+  if (!/^paid[.!]?$/i.test(stripQuotedText(input.text))) return 'unclear';
+  const letter = letterById(deps.db, alert.related_id);
+  if (letter.household_id !== alert.household_id || !letter.case_id) return 'ignored';
+  const caseId = letter.case_id;
+  const caseRow = getCase(deps.db, letter.household_id, caseId);
+  if (
+    !caseRow ||
+    !Number(caseRow.second_notice) ||
+    !['open', 'overdue'].includes(String(caseRow.status))
+  )
+    return 'ignored';
+  const result = deps.db.transaction(() => closeCase(deps.db, letter, caseId, 'paid'))();
+  if (deps.afterAnswer) {
+    await deps.afterAnswer(result);
+  } else {
+    try {
+      await syncCaseFileForLetter(deps, result);
+    } catch (error) {
+      log.error(
+        { event: 'alert_reply_casefile_failed', alertId: alert.id },
+        error instanceof Error ? error.message : String(error),
+      );
+    }
+  }
+  return 'answered';
+}
+
 export async function handleAskReply(
   deps: AskReplyDeps,
   input: { askId: string; memberId: string; text: string; via: 'email' | 'web' },

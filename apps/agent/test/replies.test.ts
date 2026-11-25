@@ -10,6 +10,7 @@ import { GatewayClient } from '../src/gateway/client.js';
 import {
   type AskReplyDeps,
   applyAskAnswer,
+  handleAlertReply,
   handleAskReply,
   stripQuotedText,
 } from '../src/notify/replies.js';
@@ -185,6 +186,23 @@ function seedAsk(
   return askId;
 }
 
+function seedAlert(secondNotice = true): string {
+  db.prepare('DELETE FROM outbox WHERE id = ?').run('out_alert');
+  db.prepare('UPDATE cases SET second_notice = ? WHERE id = ?').run(
+    secondNotice ? 1 : 0,
+    newCaseId,
+  );
+  db.prepare('UPDATE letters SET case_id = ? WHERE id = ?').run(newCaseId, letterId);
+  db.prepare(
+    `INSERT INTO outbox
+      (id, household_id, to_email, kind, subject, body_text, related_id, status,
+       agentmail_thread_id, created_at)
+     VALUES ('out_alert', 'hh_test', 'kiter7396@gmail.com', 'family_alert', 'Second notice',
+       'Reply PAID', ?, 'sent', 'thread_alert', ?)`,
+  ).run(letterId, new Date().toISOString());
+  return 'out_alert';
+}
+
 function deps(): AskReplyDeps {
   const config = loadConfig({
     MAILKEEP_DATA_DIR: directory,
@@ -248,6 +266,51 @@ describe('reply quote stripping', () => {
     ['SCAM\n> quoted line\nmore quoted text', 'SCAM'],
   ])('keeps only the answer', (text, expected) => {
     expect(stripQuotedText(text)).toBe(expected);
+  });
+});
+
+describe('second-notice alert replies', () => {
+  it('marks the matching open second-notice case paid from an exact PAID reply', async () => {
+    const alertId = seedAlert();
+    const afterAnswer = vi.fn().mockResolvedValue(undefined);
+    const outcome = await handleAlertReply(
+      { ...deps(), afterAnswer },
+      { alertId, memberId: familyId, text: 'PAID', via: 'email' },
+    );
+    expect(outcome).toBe('answered');
+    expect(afterAnswer).toHaveBeenCalledWith(
+      expect.objectContaining({ caseId: newCaseId, letterId, lane: 'handled' }),
+    );
+    expect(
+      (db.prepare('SELECT status FROM cases WHERE id = ?').get(newCaseId) as { status: string })
+        .status,
+    ).toBe('paid');
+    expect(
+      (db.prepare('SELECT lane FROM letters WHERE id = ?').get(letterId) as { lane: string }).lane,
+    ).toBe('handled');
+  });
+
+  it('rejects unclear text, the parent role, and a non-second-notice case', async () => {
+    const alertId = seedAlert();
+    expect(
+      await handleAlertReply(deps(), {
+        alertId,
+        memberId: familyId,
+        text: 'maybe tomorrow',
+        via: 'email',
+      }),
+    ).toBe('unclear');
+    expect(
+      await handleAlertReply(deps(), { alertId, memberId: parentId, text: 'PAID', via: 'email' }),
+    ).toBe('ignored');
+    seedAlert(false);
+    expect(
+      await handleAlertReply(deps(), { alertId, memberId: familyId, text: 'PAID', via: 'email' }),
+    ).toBe('ignored');
+    expect(
+      (db.prepare('SELECT status FROM cases WHERE id = ?').get(newCaseId) as { status: string })
+        .status,
+    ).toBe('open');
   });
 });
 

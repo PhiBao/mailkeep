@@ -129,6 +129,40 @@ describe('AgentMail intake', () => {
     ).toBe('answered');
   });
 
+  it('routes a family PAID reply on a sent alert thread instead of intake', async () => {
+    const family = addMember(db, {
+      householdId: 'hh_test',
+      email: 'kiter7396@gmail.com',
+      displayName: 'Sarah',
+      role: 'family',
+    });
+    db.prepare(
+      `INSERT INTO outbox
+        (id, household_id, to_email, kind, subject, body_text, related_id, status,
+         agentmail_thread_id, created_at)
+       VALUES ('out_alert', 'hh_test', 'kiter7396@gmail.com', 'family_alert', 'Second notice',
+         'Reply PAID', 'ltr_alert', 'sent', 'thread_1', ?)`,
+    ).run(new Date().toISOString());
+    const alertReplyHandler = vi.fn().mockResolvedValue('answered');
+    await pollAgentMail(
+      { ...deps(), alertReplyHandler },
+      adapter(
+        [message({ from: 'Sarah <kiter7396@gmail.com>', text: 'PAID', attachments: [] })],
+        Buffer.from('x'),
+      ),
+    );
+    expect(alertReplyHandler).toHaveBeenCalledWith(expect.objectContaining({ db }), {
+      alertId: 'out_alert',
+      memberId: family.id,
+      text: 'PAID',
+      via: 'email',
+    });
+    expect((db.prepare('SELECT count(*) AS n FROM letters').get() as { n: number }).n).toBe(0);
+    expect(
+      (db.prepare('SELECT outcome FROM inbound_seen').get() as { outcome: string }).outcome,
+    ).toBe('answered');
+  });
+
   it('caps a message at ten attachments', async () => {
     const bytes = await readFile(path.join(ROOT, 'testset/out/L01.jpg'));
     let downloads = 0;

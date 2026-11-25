@@ -3,7 +3,7 @@ import type { Config } from '../../config.js';
 import type { DB } from '../../db/db.js';
 import { getMemberByEmail } from '../../db/repo.js';
 import type { GatewayClient } from '../../gateway/client.js';
-import { handleAskReply } from '../../notify/replies.js';
+import { handleAlertReply, handleAskReply } from '../../notify/replies.js';
 import { intakeEmailAttachment, MAX_FILE_BYTES } from '../../pipeline/intake.js';
 import type { PipelineQueue } from '../../pipeline/queue.js';
 import {
@@ -20,6 +20,7 @@ export interface HookDeps {
   client: GatewayClient;
   queue: PipelineQueue;
   replyHandler?: typeof handleAskReply;
+  alertReplyHandler?: typeof handleAlertReply;
   poll?: typeof pollAgentMail;
 }
 
@@ -131,6 +132,36 @@ export async function pollAgentMail(deps: HookDeps, adapter?: MailAdapter): Prom
       } catch (error) {
         log.warn(
           { event: 'inbound_reply_failed', messageId: message.message_id, askId: openAsk.id },
+          error instanceof Error ? error.message : String(error),
+        );
+      }
+      continue;
+    }
+
+    const alert = deps.db
+      .prepare(
+        `SELECT id FROM outbox
+          WHERE household_id = ? AND agentmail_thread_id = ? AND kind = 'family_alert'
+            AND status = 'sent' AND related_id IS NOT NULL
+          ORDER BY created_at DESC LIMIT 1`,
+      )
+      .get(householdId, message.thread_id) as { id: string } | undefined;
+    if (alert) {
+      try {
+        const outcome = await (deps.alertReplyHandler ?? handleAlertReply)(deps, {
+          alertId: alert.id,
+          memberId,
+          text: message.text ?? '',
+          via: 'email',
+        });
+        deps.db
+          .prepare(
+            'INSERT INTO inbound_seen (agentmail_message_id, outcome, created_at) VALUES (?, ?, ?)',
+          )
+          .run(message.message_id, outcome, new Date().toISOString());
+      } catch (error) {
+        log.warn(
+          { event: 'inbound_alert_reply_failed', messageId: message.message_id, alertId: alert.id },
           error instanceof Error ? error.message : String(error),
         );
       }
