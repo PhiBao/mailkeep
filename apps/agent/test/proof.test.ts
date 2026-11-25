@@ -223,6 +223,7 @@ describe('proof collection', () => {
       evalFiles: async () => evalFiles,
     });
 
+    expect(proof.capturedAt).toBe(NOW.toISOString());
     expect(proof.where).toEqual({
       spriteName: 'sprite-proof',
       url: 'https://mailkeep.example',
@@ -262,13 +263,18 @@ describe('proof collection', () => {
     expect(proof.eval).toEqual({
       runId: 'heldout-20261124210000000',
       generatedAt: '2026-11-24T21:00:00.000Z',
+      heldout: true,
       letters: 8,
       laneAccuracy: 0.875,
       neverSafe: '7/8',
+      falseAlarms: 0,
       scamsCaught: '2/3',
       linkPrecision: 0.9,
       linkRecall: 0.8,
+      amountAccuracy: null,
+      dueAccuracy: null,
       askRate: 0.125,
+      averageLatencyMs: null,
     });
     expect(proof.costs).toEqual({
       lettersProcessed: 2,

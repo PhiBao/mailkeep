@@ -56,15 +56,20 @@ const evalFileSchema = z
   .object({
     runId: z.string().min(1),
     generatedAt: z.string().datetime({ offset: true }),
+    heldout: z.boolean().optional().default(false),
     metrics: z.object({
       letters: z.number().int().nonnegative(),
       laneAccuracy: z.number().min(0).max(1),
       unsafe: z.number().int().nonnegative(),
+      falseAlarms: z.number().int().nonnegative().optional().default(0),
       scamsCaught: z.number().int().nonnegative(),
       scamsTotal: z.number().int().nonnegative(),
       linkPrecision: z.number().min(0).max(1),
       linkRecall: z.number().min(0).max(1),
+      amountAccuracy: z.number().min(0).max(1).optional().nullable().default(null),
+      dueAccuracy: z.number().min(0).max(1).optional().nullable().default(null),
       askRate: z.number().min(0).max(1),
+      averageLatencyMs: z.number().int().nonnegative().optional().nullable().default(null),
     }),
   })
   .refine((value) => value.metrics.unsafe <= value.metrics.letters, {
@@ -297,13 +302,18 @@ async function collectEval(reader: EvalFilesReader): Promise<ProofDTO['eval']> {
         summary: {
           runId: parsed.runId,
           generatedAt: parsed.generatedAt,
+          heldout: parsed.heldout,
           letters: parsed.metrics.letters,
           laneAccuracy: parsed.metrics.laneAccuracy,
           neverSafe: `${parsed.metrics.letters - parsed.metrics.unsafe}/${parsed.metrics.letters}`,
+          falseAlarms: parsed.metrics.falseAlarms,
           scamsCaught: `${parsed.metrics.scamsCaught}/${parsed.metrics.scamsTotal}`,
           linkPrecision: parsed.metrics.linkPrecision,
           linkRecall: parsed.metrics.linkRecall,
+          amountAccuracy: parsed.metrics.amountAccuracy,
+          dueAccuracy: parsed.metrics.dueAccuracy,
           askRate: parsed.metrics.askRate,
+          averageLatencyMs: parsed.metrics.averageLatencyMs,
         },
       };
     } catch {}
@@ -365,6 +375,7 @@ export async function collectProof(deps: ProofDeps): Promise<ProofDTO> {
   ]);
 
   return proofSchema.parse({
+    capturedAt: now.toISOString(),
     where,
     connectors,
     keyscan: {

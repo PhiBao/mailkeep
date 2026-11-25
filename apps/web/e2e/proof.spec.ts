@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test';
 
 const proof = {
+  capturedAt: '2026-11-25T04:30:00.000Z',
   where: {
     spriteName: 'mailkeep',
     url: 'https://mailkeep-hl3m.sprites.app',
@@ -25,15 +26,20 @@ const proof = {
     { key: 'scamAny', bar: 0.5, effect: 'careful; never sets an amount owed' },
   ],
   eval: {
-    runId: 'eval-20261124205222457',
-    generatedAt: '2026-11-24T20:52:24.000Z',
-    letters: 30,
-    laneAccuracy: 0.9666666667,
-    neverSafe: '30/30',
-    scamsCaught: '3/3',
-    linkPrecision: 0.7272727273,
-    linkRecall: 0.8888888889,
-    askRate: 0.0333333333,
+    runId: 'heldout-20261125042539630',
+    generatedAt: '2026-11-25T04:26:39.619Z',
+    heldout: true,
+    letters: 6,
+    laneAccuracy: 0.8333333333333334,
+    neverSafe: '6/6',
+    falseAlarms: 0,
+    scamsCaught: '1/2',
+    linkPrecision: 1,
+    linkRecall: 1,
+    amountAccuracy: 0,
+    dueAccuracy: 1,
+    askRate: 0.3333333333333333,
+    averageLatencyMs: 726,
   },
   costs: {
     lettersProcessed: 32,
@@ -67,7 +73,9 @@ for (const width of [390, 1440]) {
       await expect(page.getByRole('heading', { name })).toBeVisible();
     }
     await expect(page.getByText('Provider keys found on this Sprite: 0')).toBeVisible();
-    await expect(page.getByText('96.7%')).toBeVisible();
+    await expect(page.getByText('83.3%')).toBeVisible();
+    await expect(page.getByText('held-out', { exact: false })).toBeVisible();
+    await expect(page.getByText('1/2')).toBeVisible();
     await expect(page.getByText('nzOp5iVC…')).toBeVisible();
     const text = await page.locator('body').textContent();
     expect(text).not.toContain('nzOp5iVCbA5OBl_eRQvEwQ');

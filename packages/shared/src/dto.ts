@@ -214,6 +214,7 @@ export const proofThresholdSchema = z.object({
 });
 
 export const proofSchema = z.object({
+  capturedAt: isoDateTime,
   where: z.object({
     spriteName: z.string(),
     url: z.string(),
@@ -238,13 +239,18 @@ export const proofSchema = z.object({
     .object({
       runId: z.string(),
       generatedAt: isoDateTime,
+      heldout: z.boolean().default(false),
       letters: z.number().int().nonnegative(),
       laneAccuracy: z.number().min(0).max(1),
       neverSafe: z.string(),
+      falseAlarms: z.number().int().nonnegative().default(0),
       scamsCaught: z.string(),
       linkPrecision: z.number().min(0).max(1),
       linkRecall: z.number().min(0).max(1),
+      amountAccuracy: z.number().min(0).max(1).nullable().default(null),
+      dueAccuracy: z.number().min(0).max(1).nullable().default(null),
       askRate: z.number().min(0).max(1),
+      averageLatencyMs: z.number().int().nonnegative().nullable().default(null),
     })
     .nullable(),
   costs: z.object({

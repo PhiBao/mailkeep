@@ -73,9 +73,13 @@ export function Proof() {
               {data.where.gitSha.slice(0, 12)}
             </a>
           </dd>
-          <dt>Uptime</dt>
+          <dt>Uptime at capture</dt>
           <dd>{data.where.uptime}</dd>
         </dl>
+        <p className="meta">
+          Service state and uptime are captured once when the Sprite boots; this page does not poll
+          the live process. Captured {data.capturedAt}.
+        </p>
       </section>
 
       <section className="proof__section" aria-labelledby="connectors">
@@ -147,21 +151,38 @@ export function Proof() {
         {data.eval ? (
           <>
             <p className="mono">
-              {data.eval.runId} · {data.eval.letters} letters · {data.eval.generatedAt}
+              {data.eval.runId} · {data.eval.letters} letters ·{' '}
+              {data.eval.heldout ? 'held-out' : 'non-held-out'} · {data.eval.generatedAt}
             </p>
             <dl className="proof__grid">
               <dt>Lane accuracy</dt>
               <dd>{pct(data.eval.laneAccuracy)}</dd>
               <dt>Never unsafe</dt>
               <dd>{data.eval.neverSafe}</dd>
+              <dt>False alarms</dt>
+              <dd>{data.eval.falseAlarms}</dd>
               <dt>Scams caught</dt>
               <dd>{data.eval.scamsCaught}</dd>
               <dt>Link precision</dt>
               <dd>{pct(data.eval.linkPrecision)}</dd>
               <dt>Link recall</dt>
               <dd>{pct(data.eval.linkRecall)}</dd>
+              <dt>Amount exact</dt>
+              <dd>
+                {data.eval.amountAccuracy === null ? 'Not reported' : pct(data.eval.amountAccuracy)}
+              </dd>
+              <dt>Due exact</dt>
+              <dd>
+                {data.eval.dueAccuracy === null ? 'Not reported' : pct(data.eval.dueAccuracy)}
+              </dd>
               <dt>Ask rate</dt>
               <dd>{pct(data.eval.askRate)}</dd>
+              <dt>Average decision latency</dt>
+              <dd>
+                {data.eval.averageLatencyMs === null
+                  ? 'Not reported'
+                  : `${data.eval.averageLatencyMs} ms`}
+              </dd>
             </dl>
             <a href="https://github.com/PhiBao/mailkeep/blob/main/EVAL.md">
               Read the full evaluation and tuning log
@@ -175,11 +196,11 @@ export function Proof() {
       <section className="proof__section" aria-labelledby="costs">
         <h2 id="costs">6. What it costs</h2>
         <dl className="proof__grid">
-          <dt>Letters processed</dt>
+          <dt>Letters with recorded cost</dt>
           <dd>{data.costs.lettersProcessed}</dd>
-          <dt>Total</dt>
+          <dt>Recorded estimate</dt>
           <dd>{usd(data.costs.totalMicrousd)}</dd>
-          <dt>Average per letter</dt>
+          <dt>Average recorded cost</dt>
           <dd>{usd(data.costs.averageMicrousd)}</dd>
           <dt>Jev estimate</dt>
           <dd>{usd(data.costs.jevMicrousd)}</dd>
