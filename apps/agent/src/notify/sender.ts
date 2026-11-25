@@ -22,6 +22,21 @@ interface OutboxRow {
   attempts: number;
 }
 
+function replyMessageId(db: DB, row: OutboxRow): string | null {
+  if (row.agentmail_message_id) return row.agentmail_message_id;
+  if (!row.agentmail_thread_id || row.kind !== 'ask' || !row.related_id) return null;
+  const askId = row.related_id.split(':')[0];
+  const original = db
+    .prepare(
+      `SELECT agentmail_message_id FROM outbox
+        WHERE household_id = ? AND related_id = ? AND kind = 'ask' AND status = 'sent'
+          AND agentmail_message_id IS NOT NULL
+        ORDER BY created_at DESC LIMIT 1`,
+    )
+    .get(row.household_id, askId) as { agentmail_message_id: string } | undefined;
+  return original?.agentmail_message_id ?? null;
+}
+
 export async function sendPending(deps: SenderDeps): Promise<void> {
   const rows = deps.db
     .prepare(
@@ -33,7 +48,7 @@ export async function sendPending(deps: SenderDeps): Promise<void> {
   if (!inboxId) throw new Error('No AgentMail inbox configured');
   for (const row of rows) {
     try {
-      const replyTarget = row.agentmail_message_id ?? row.agentmail_thread_id;
+      const replyTarget = replyMessageId(deps.db, row);
       const sent = replyTarget
         ? await replyToMessage(deps.client, {
             inboxId,

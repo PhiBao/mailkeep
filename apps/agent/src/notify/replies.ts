@@ -126,6 +126,20 @@ function askOptions(ask: AskRow): Array<{ value: string; label: string }> {
   return JSON.parse(ask.options_json) as Array<{ value: string; label: string }>;
 }
 
+function exactReplyChoice(
+  text: string,
+  options: Array<{ value: string; label: string }>,
+): string | null {
+  const normalize = (value: string) => value.toLowerCase().replace(/[^a-z0-9]+/g, '');
+  const answer = normalize(text);
+  if (!answer) return null;
+  const matches = options.filter(
+    (option) => normalize(option.value) === answer || normalize(option.label) === answer,
+  );
+  const choices = new Set(matches.map((option) => option.value));
+  return choices.size === 1 ? (choices.values().next().value ?? null) : null;
+}
+
 function letterById(db: DB, letterId: string): LetterRow {
   const row = db.prepare('SELECT * FROM letters WHERE id = ?').get(letterId) as
     | LetterRow
@@ -515,6 +529,7 @@ function queueOutbox(
     relatedId: string;
     suppressedReason: string | null;
     threadId: string | null;
+    replyMessageId?: string | null;
   },
 ): void {
   const existing = db
@@ -526,8 +541,8 @@ function queueOutbox(
   db.prepare(
     `INSERT INTO outbox
       (id, household_id, to_email, kind, subject, body_text, related_id, status, suppressed_reason,
-       agentmail_thread_id, created_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+       agentmail_message_id, agentmail_thread_id, created_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
   ).run(
     `out_${nanoid()}`,
     input.householdId,
@@ -538,6 +553,7 @@ function queueOutbox(
     input.relatedId,
     input.suppressedReason ? 'suppressed' : 'pending',
     input.suppressedReason,
+    input.replyMessageId ?? null,
     input.threadId,
     new Date().toISOString(),
   );
@@ -548,6 +564,14 @@ function queueClarification(deps: AskReplyDeps, ask: AskRow): void {
   const family = deps.db
     .prepare("SELECT email FROM members WHERE household_id = ? AND role = 'family'")
     .all(ask.household_id) as Array<{ email: string }>;
+  const original = deps.db
+    .prepare(
+      `SELECT agentmail_message_id FROM outbox
+        WHERE household_id = ? AND related_id = ? AND kind = 'ask' AND status = 'sent'
+          AND agentmail_message_id IS NOT NULL
+        ORDER BY created_at DESC LIMIT 1`,
+    )
+    .get(ask.household_id, ask.id) as { agentmail_message_id: string } | undefined;
   const link = `${deps.config.MAILKEEP_PUBLIC_URL.replace(/\/$/, '')}/letters/${ask.letter_id ?? ''}`;
   for (const member of family) {
     queueOutbox(deps.db, {
@@ -559,6 +583,7 @@ function queueClarification(deps: AskReplyDeps, ask: AskRow): void {
       relatedId: `${ask.id}:clarify`,
       suppressedReason: suppressionReason(letter),
       threadId: ask.agentmail_thread_id,
+      replyMessageId: original?.agentmail_message_id ?? null,
     });
   }
 }
@@ -689,19 +714,27 @@ export async function handleAskReply(
     .get(input.memberId) as { household_id: string; role: string } | undefined;
   if (member?.role !== 'family' || member.household_id !== ask.household_id) return 'ignored';
   const text = stripQuotedText(input.text);
-  const classificationInput = {
-    question: ask.question,
-    options: askOptions(ask),
-    text,
-    model: deps.config.MAILKEEP_JEV_MODEL,
-  };
-  const classification = deps.classify
-    ? await deps.classify(classificationInput)
-    : await classifyReply(deps.client, classificationInput);
+  const options = askOptions(ask);
+  const exact = exactReplyChoice(text, options);
+  const classification = exact
+    ? { choice: exact, confidence: 1 }
+    : deps.classify
+      ? await deps.classify({
+          question: ask.question,
+          options,
+          text,
+          model: deps.config.MAILKEEP_JEV_MODEL,
+        })
+      : await classifyReply(deps.client, {
+          question: ask.question,
+          options,
+          text,
+          model: deps.config.MAILKEEP_JEV_MODEL,
+        });
   if (
     classification.confidence < REPLY_CONFIDENCE ||
     classification.choice === 'unclear' ||
-    !askOptions(ask).some((option) => option.value === classification.choice)
+    !options.some((option) => option.value === classification.choice)
   ) {
     queueClarification(deps, ask);
     return 'unclear';

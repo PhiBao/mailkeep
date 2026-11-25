@@ -39,6 +39,36 @@ afterEach(async () => {
 });
 
 describe('outbox sender', () => {
+  it('replies to a clarification with the original ask message id', async () => {
+    db.prepare(
+      `INSERT INTO asks
+        (id, household_id, letter_id, qtype, question, evidence, options_json, status, created_at)
+       VALUES ('ask_1', 'hh_test', NULL, 'check', 'Check this', 'Evidence', '[]', 'open', ?)`,
+    ).run(new Date().toISOString());
+    db.prepare(
+      `INSERT INTO outbox
+        (id, household_id, to_email, kind, subject, body_text, related_id, status,
+         agentmail_message_id, agentmail_thread_id, created_at)
+       VALUES ('out_original', 'hh_test', 'kiter7396@gmail.com', 'ask', 'Question', 'Body',
+         'ask_1', 'sent', 'msg_original', 'thread_1', ?)`,
+    ).run(new Date().toISOString());
+    db.prepare(
+      `INSERT INTO outbox
+        (id, household_id, to_email, kind, subject, body_text, related_id, status,
+         agentmail_thread_id, created_at)
+       VALUES ('out_clarify', 'hh_test', 'kiter7396@gmail.com', 'ask', 'Re: Question', 'Clarify',
+         'ask_1:clarify', 'pending', 'thread_1', ?)`,
+    ).run(new Date().toISOString());
+    mocks.replyToMessage.mockResolvedValue({ message_id: 'msg_reply', thread_id: 'thread_1' });
+    const config = loadConfig({ MAILKEEP_DATA_DIR: directory });
+    await sendPending({ db, client: new GatewayClient({ config }), inboxId: 'inbox_1' });
+    expect(mocks.replyToMessage).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({ messageId: 'msg_original' }),
+    );
+    expect(mocks.sendMessage).not.toHaveBeenCalled();
+  });
+
   it('stores the sent thread on its ask so replies can be matched', async () => {
     db.prepare(
       `INSERT INTO asks

@@ -494,6 +494,25 @@ describe('ask answer effects', () => {
 });
 
 describe('reply classification', () => {
+  it('accepts an exact option reply without calling the model', async () => {
+    const askId = seedAsk('link', [
+      { value: 'yes', label: 'Yes' },
+      { value: 'no', label: 'No' },
+    ]);
+    const classify = vi.fn();
+    const runtime = { ...deps(), classify, afterAnswer: vi.fn() };
+    expect(
+      await handleAskReply(runtime, { askId, memberId: familyId, text: 'NO', via: 'email' }),
+    ).toBe('answered');
+    expect(classify).not.toHaveBeenCalled();
+    expect(
+      db.prepare('SELECT status, answer_key FROM asks WHERE id = ?').get(askId) as {
+        status: string;
+        answer_key: string;
+      },
+    ).toEqual({ status: 'answered', answer_key: 'no' });
+  });
+
   it('queues one clarification for a low-confidence reply', async () => {
     const askId = seedAsk('check', [{ value: 'handled_it', label: 'Handled it' }]);
     const classify = vi.fn().mockResolvedValue({ choice: 'handled_it', confidence: 0.5 });
@@ -510,7 +529,7 @@ describe('reply classification', () => {
     ).toBe('open');
   });
 
-  it('passes stripped text to the classifier and applies a confident answer', async () => {
+  it('passes stripped natural language to the classifier and applies a confident answer', async () => {
     const askId = seedAsk('check', [{ value: 'handled_it', label: 'Handled it' }]);
     const classify = vi.fn().mockResolvedValue({ choice: 'handled_it', confidence: 0.9 });
     const runtime = { ...deps(), classify, afterAnswer: vi.fn() };
@@ -518,11 +537,11 @@ describe('reply classification', () => {
       await handleAskReply(runtime, {
         askId,
         memberId: familyId,
-        text: 'HANDLED IT\n\nOn Tue, Nov 24, 2026, Sarah wrote:\n> old message',
+        text: 'I took care of it yesterday\n\nOn Tue, Nov 24, 2026, Sarah wrote:\n> old message',
         via: 'email',
       }),
     ).toBe('answered');
-    expect(classify.mock.calls[0]?.[0].text).toBe('HANDLED IT');
+    expect(classify.mock.calls[0]?.[0].text).toBe('I took care of it yesterday');
     expect(
       (db.prepare('SELECT status FROM asks WHERE id = ?').get(askId) as { status: string }).status,
     ).toBe('answered');
