@@ -28,3 +28,10 @@ Recorded by `scripts/sprite-setup.sh` on 2026-11-24.
 - App: `mailkeep-clock`; machine `d8d2123c9d36d8`; hourly schedule; restart policy `no`.
 - Command: `fly machine run curlimages/curl:8.11.1 --app mailkeep-clock --schedule hourly --restart no -- -fsS -m 20 -X POST https://mailkeep-hl3m.sprites.app/tick`.
 - Setup script: `scripts/clock-setup.sh`.
+
+## Network policy
+
+- Applied from the dev machine with `scripts/network-policy.sh` via `POST /v1/sprites/mailkeep/policy/network`.
+- Rules: Fly defaults; allow `api.sprites.dev`, `*.agentmail.to`, `cdn.agentmail.to`, `github.com`, `*.githubusercontent.com`, `registry.npmjs.org`; explicit deny `example.org`; deny `*`.
+- Verified on the Sprite: `dig example.org` → REFUSED; `github.com` and `cdn.agentmail.to` resolve; provider smoke 5/5 PASS.
+- `sprite checkpoint list` shows pre-deploy checkpoints through v63.
