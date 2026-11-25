@@ -255,6 +255,7 @@ button:disabled {
 }
 
 .slip__title {
+  display: block;
   margin: 0 0 var(--s1);
   font-family: var(--serif);
   font-size: var(--fs-body);
@@ -263,6 +264,7 @@ button:disabled {
 }
 
 .slip__meta {
+  display: block;
   margin-bottom: var(--s2);
   color: var(--ink-2);
   font-size: var(--fs-meta);
