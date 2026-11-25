@@ -73,9 +73,13 @@ Between runs, all `source=sample, trial=1` rows, their local files and Pinecone 
 - `15a6d67` — demo trial timestamps use the household clock; demo case events use the linked letter's date; the letter DTO includes the parent-note body; CAREFUL letters show safety copy in both parent sections.
 - `378902b` — the demo clock recalculates from the fixed demo date so it cannot drift when the real date changes.
 
+## Separate live-loop proof
+
+- Real Gmail → AgentMail intake, second-notice alert, exact `PAID` reply and private Box case-file update were verified on `60365e4`. Exact message IDs, case IDs, Box version and residual notes are in [live-loop-proof.md](live-loop-proof.md).
+- The public demo rehearsals above remain the reliable no-login recording path. They suppress outbound email and do not replace the live-loop evidence.
+
 ## Not rehearsed on the public path
 
-- `/mom` camera upload and inbound AgentMail email: T15 still needs the human inbound proof.
-- Live “PAID” reply closing a case: T18 depends on T15. Unit/effect tests pass, but no live reply was claimed.
+- `/mom` camera upload on a physical phone: the backend upload path is tested, but no phone-camera rehearsal is claimed.
 - Public Box folder: H8 still needs the founder to share folder `440822123671` as “People with the link · Can view.”
 - Founder video, voice, social post and form submission: human-only H9/H10. Nothing was recorded, posted or submitted.

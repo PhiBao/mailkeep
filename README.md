@@ -139,14 +139,14 @@ Live proof: two clean sample runs on decision build `378902b` joined seeded case
 | Area                      | Status         | Evidence                                                                                                                                  |
 | ------------------------- | -------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
 | Live demo and proof       | Live           | [/demo](https://mailkeep-hl3m.sprites.app/demo), [/proof](https://mailkeep-hl3m.sprites.app/proof)                                        |
-| Real provider pipeline    | Live           | 21-letter demo seed; L03 upload and parent-note email; five-provider smoke                                                                |
+| Real provider pipeline    | Live           | 21-letter demo seed; real Gmail → AgentMail → parent/family alert → PAID → case/Box loop; five-provider smoke                             |
 | Magic-link session        | Live           | AgentMail message `<010001a20f7d6240-a40b0d24-2102-4bf8-82dc-58290fddafdd-000000@email.amazonses.com>`; callback created `/today` session |
 | Scheduled chase           | Live           | `mailkeep-clock` hourly machine; Sprite `tick_complete` log                                                                               |
 | Egress policy             | Live           | `example.org` REFUSED; gateway and AgentMail CDN allowed                                                                                  |
 | Unit/integration tests    | Passing        | 196 agent tests, shared tests and eval selection/report tests                                                                             |
 | Browser tests             | Passing        | Today, Case, Letter, Mom/Login, Proof, Demo, Shoebox, ten states, CAREFUL safety copy and 55 anti-slop checks                             |
-| T15 human inbound email   | Awaiting human | Webhook configured path returns 202; fresh inbound proof still needed                                                                     |
-| T18 live PAID reply       | Awaiting T15   | Unit/effect tests pass                                                                                                                    |
+| T15 human inbound email   | Live           | Cedar bill and second-notice photos processed from Gmail through AgentMail; [live-loop proof](docs/live-loop-proof.md)                    |
+| T18 live PAID reply       | Live           | Exact PAID on the Cedar alert thread marked the case paid, letter handled and versioned Box `case.md`                                     |
 | T25 exact L01 amount copy | Known gap      | Live API returned amount null; UI fixture verifies intended copy                                                                          |
 | H8 Box public sharing     | Awaiting human | Folder exists; shared view link not yet supplied                                                                                          |
 | Video/social/form         | Human tasks    | Scripts/package are prepared; nothing posted or submitted                                                                                 |
