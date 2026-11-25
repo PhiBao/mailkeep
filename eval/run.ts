@@ -17,6 +17,7 @@ import {
   type LetterTruth,
   renderEvalMarkdown,
 } from './report.js';
+import { selectEvalLetters } from './select.js';
 
 const ROOT = fileURLToPath(new URL('../', import.meta.url));
 const heldout = process.argv.includes('--heldout');
@@ -27,9 +28,7 @@ const truth = JSON.parse(await readFile(path.join(ROOT, 'testset/truth.json'), '
   string,
   { id: string; received: string; photo: string; heldout: boolean; truth: LetterTruth }
 >;
-const letters = Object.values(truth)
-  .filter((letter) => letter.heldout === heldout)
-  .sort((left, right) => left.received.localeCompare(right.received));
+const { letters, evaluatedIds, historyIds } = selectEvalLetters(Object.values(truth), heldout);
 
 const config = loadConfig();
 const db = openDb(path.join(config.MAILKEEP_DATA_DIR, 'mailkeep.db'));
@@ -87,6 +86,11 @@ try {
       string,
       unknown
     >;
+    if (!evaluatedIds.has(letter.id)) {
+      if (row.status !== 'done') throw new Error(`Held-out history ${letter.id} did not finish`);
+      console.log(`${letter.id}: history ready`);
+      continue;
+    }
     const relationRows = db
       .prepare('SELECT other_letter_id, relation FROM relations WHERE letter_id = ?')
       .all(intake.letterId) as Array<{ other_letter_id: string; relation: string }>;
@@ -123,12 +127,22 @@ try {
 
 const metrics = computeMetrics(results);
 const generatedAt = new Date().toISOString();
-const payload = { runId, generatedAt, heldout, metrics, results };
+const payload = {
+  runId,
+  generatedAt,
+  heldout,
+  historyLetterIds: [...historyIds],
+  metrics,
+  results,
+};
 await mkdir(path.join(ROOT, 'eval/results'), { recursive: true });
 await writeFile(
   path.join(ROOT, 'eval/results', `${runId}.json`),
   `${JSON.stringify(payload, null, 2)}\n`,
 );
+const previousMarkdown = heldout
+  ? await readFile(path.join(ROOT, 'EVAL.md'), 'utf8').catch(() => undefined)
+  : undefined;
 await writeFile(
   path.join(ROOT, 'EVAL.md'),
   renderEvalMarkdown({
@@ -139,6 +153,7 @@ await writeFile(
     results,
     modelIds: [config.MAILKEEP_JEV_MODEL, config.MAILKEEP_OLLAMA_MODEL],
     thresholdsVersion: T.thresholdsVersion,
+    previousMarkdown,
   }),
 );
 console.log(JSON.stringify(metrics, null, 2));
