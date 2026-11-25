@@ -13,6 +13,7 @@ import { addMember, createHousehold } from '../src/db/repo.js';
 import type { GatewayClient } from '../src/gateway/client.js';
 import {
   DEMO_SAMPLE_IDS,
+  DEMO_TODAY,
   DEMO_TRIAL_TTL_MS,
   type DemoDeps,
   demoRoutes,
@@ -287,6 +288,7 @@ describe('public demo reads', () => {
       caseId: 'case_demo',
       transcript: 'DEMO TRANSCRIPT',
       lane: 'handled',
+      createdAt: `${DEMO_TODAY}T12:00:00.000Z`,
     });
     await seedLetter({
       id: 'ltr_private',
@@ -387,7 +389,7 @@ describe('demo sample runs', () => {
   });
 
   it('runs a known output through intake and the queue as a demo trial', async () => {
-    db.prepare("UPDATE households SET clock_offset_days = 1 WHERE id = 'hh_demo'").run();
+    db.prepare("UPDATE households SET clock_offset_days = 99 WHERE id = 'hh_demo'").run();
     const response = await run(
       '/api/demo/samples/L02/run',
       {},
@@ -419,7 +421,7 @@ describe('demo sample runs', () => {
       trial: 1,
       submitted_by: null,
       status: 'queued',
-      received_at: new Date(NOW + 86_400_000).toISOString(),
+      received_at: `${DEMO_TODAY}T12:00:00.000Z`,
       created_at: clock().toISOString(),
     });
   });

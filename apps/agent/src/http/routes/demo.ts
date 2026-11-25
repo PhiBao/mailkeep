@@ -22,7 +22,7 @@ import {
   intakeFile,
 } from '../../pipeline/intake.js';
 import type { PipelineQueue } from '../../pipeline/queue.js';
-import { now as householdNow } from '../../util/clock.js';
+import { now as householdNow, todayIso } from '../../util/clock.js';
 import { log } from '../../util/log.js';
 import { clientIp, SlidingWindowRateLimiter } from '../ratelimit.js';
 import type { Clock } from '../session.js';
@@ -30,6 +30,8 @@ import { buildCaseDTO, buildLetterDTO, buildTodayDTO } from './api.js';
 
 const HOUR_MS = 60 * 60_000;
 export const DEMO_TRIAL_TTL_MS = 24 * HOUR_MS;
+export const DEMO_TODAY = '2026-12-09';
+const DAY_MS = 86_400_000;
 const SAMPLE_IP_RATE = 5;
 const SAMPLE_GLOBAL_RATE = 30;
 const TESTSET_OUT_DIR = fileURLToPath(new URL('../../../../../testset/out/', import.meta.url));
@@ -109,12 +111,25 @@ function samplePath(id: DemoSampleId): string {
 function demoHousehold(
   db: DB,
   config: Config,
+  realNow = new Date(),
 ): { id: string; clock_offset_days: number; timezone: string } | undefined {
-  return db
+  const household = db
     .prepare('SELECT id, clock_offset_days, timezone FROM households WHERE id = ? AND is_demo = 1')
     .get(config.MAILKEEP_DEMO_HOUSEHOLD_ID) as
     | { id: string; clock_offset_days: number; timezone: string }
     | undefined;
+  if (!household) return undefined;
+  const realToday = todayIso({ clock_offset_days: 0, timezone: household.timezone }, realNow);
+  const offset = Math.round(
+    (Date.parse(`${DEMO_TODAY}T00:00:00Z`) - Date.parse(`${realToday}T00:00:00Z`)) / DAY_MS,
+  );
+  if (offset !== household.clock_offset_days) {
+    db.prepare('UPDATE households SET clock_offset_days = ? WHERE id = ?').run(
+      offset,
+      household.id,
+    );
+  }
+  return { ...household, clock_offset_days: offset };
 }
 
 function demoLetter(db: DB, householdId: string, letterId: string): LetterRow | undefined {
@@ -245,7 +260,8 @@ export function demoRoutes(deps: DemoDeps): Hono {
   });
 
   app.get('/api/demo/today', (context) => {
-    if (!demoHousehold(deps.db, deps.config)) return context.json({ error: 'not_found' }, 404);
+    if (!demoHousehold(deps.db, deps.config, clock()))
+      return context.json({ error: 'not_found' }, 404);
     const today = buildTodayDTO(
       deps.db,
       { household_id: deps.config.MAILKEEP_DEMO_HOUSEHOLD_ID },
@@ -255,7 +271,8 @@ export function demoRoutes(deps: DemoDeps): Hono {
   });
 
   app.get('/api/demo/cases/:id', (context) => {
-    if (!demoHousehold(deps.db, deps.config)) return context.json({ error: 'not_found' }, 404);
+    if (!demoHousehold(deps.db, deps.config, clock()))
+      return context.json({ error: 'not_found' }, 404);
     const row = demoCase(deps.db, deps.config.MAILKEEP_DEMO_HOUSEHOLD_ID, context.req.param('id'));
     return row
       ? context.json(demoCaseDTO(deps.db, row))
@@ -263,7 +280,8 @@ export function demoRoutes(deps: DemoDeps): Hono {
   });
 
   app.get('/api/demo/letters/:id', (context) => {
-    if (!demoHousehold(deps.db, deps.config)) return context.json({ error: 'not_found' }, 404);
+    if (!demoHousehold(deps.db, deps.config, clock()))
+      return context.json({ error: 'not_found' }, 404);
     const row = demoLetter(
       deps.db,
       deps.config.MAILKEEP_DEMO_HOUSEHOLD_ID,
@@ -275,7 +293,8 @@ export function demoRoutes(deps: DemoDeps): Hono {
   });
 
   app.get('/api/demo/letters/:id/image', async (context) => {
-    if (!demoHousehold(deps.db, deps.config)) return context.json({ error: 'not_found' }, 404);
+    if (!demoHousehold(deps.db, deps.config, clock()))
+      return context.json({ error: 'not_found' }, 404);
     const row = demoLetter(
       deps.db,
       deps.config.MAILKEEP_DEMO_HOUSEHOLD_ID,
@@ -299,7 +318,8 @@ export function demoRoutes(deps: DemoDeps): Hono {
   });
 
   app.get('/api/demo/letters/:id/decision', (context) => {
-    if (!demoHousehold(deps.db, deps.config)) return context.json({ error: 'not_found' }, 404);
+    if (!demoHousehold(deps.db, deps.config, clock()))
+      return context.json({ error: 'not_found' }, 404);
     const letter = demoLetter(
       deps.db,
       deps.config.MAILKEEP_DEMO_HOUSEHOLD_ID,
@@ -324,12 +344,14 @@ export function demoRoutes(deps: DemoDeps): Hono {
   });
 
   app.get('/api/demo/samples', (context) => {
-    if (!demoHousehold(deps.db, deps.config)) return context.json({ error: 'not_found' }, 404);
+    if (!demoHousehold(deps.db, deps.config, clock()))
+      return context.json({ error: 'not_found' }, 404);
     return context.json(DEMO_SAMPLE_IDS.map(sampleDTO));
   });
 
   app.get('/api/demo/samples/:id/image', async (context) => {
-    if (!demoHousehold(deps.db, deps.config)) return context.json({ error: 'not_found' }, 404);
+    if (!demoHousehold(deps.db, deps.config, clock()))
+      return context.json({ error: 'not_found' }, 404);
     const id = context.req.param('id');
     if (!isSampleId(id)) return context.json({ error: 'not_found' }, 404);
     let bytes: Buffer;
@@ -348,7 +370,8 @@ export function demoRoutes(deps: DemoDeps): Hono {
   app.post('/api/demo/samples/:id/run', async (context) => {
     const id = context.req.param('id');
     if (!isSampleId(id)) return context.json({ error: 'not_found' }, 404);
-    if (!demoHousehold(deps.db, deps.config)) return context.json({ error: 'not_found' }, 404);
+    if (!demoHousehold(deps.db, deps.config, clock()))
+      return context.json({ error: 'not_found' }, 404);
 
     const ipLimit = limiter.check(`ip:${clientIp(context)}`, SAMPLE_IP_RATE, HOUR_MS);
     if (!ipLimit.allowed) {
@@ -369,7 +392,7 @@ export function demoRoutes(deps: DemoDeps): Hono {
       throw error;
     }
     const now = clock();
-    const household = demoHousehold(deps.db, deps.config);
+    const household = demoHousehold(deps.db, deps.config, clock());
     if (!household) return context.json({ error: 'not_found' }, 404);
     const householdId = household.id;
     const receivedAt = householdNow(household, now).toISOString();
