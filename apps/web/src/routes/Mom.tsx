@@ -6,7 +6,7 @@ import {
   type TodayDTO,
   todaySchema,
 } from '@mailkeep/shared';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRef, useState } from 'react';
 import { apiFetch } from '../api.js';
 import { Banner } from '../components/Banner.js';
@@ -40,6 +40,7 @@ function resultCopy(letter: LetterDTO): string {
 }
 
 export function Mom() {
+  const queryClient = useQueryClient();
   const cameraInput = useRef<HTMLInputElement>(null);
   const fileInput = useRef<HTMLInputElement>(null);
   const [newestId, setNewestId] = useState<string | null>(null);
@@ -55,7 +56,10 @@ export function Mom() {
       if (!letter) throw new Error('No letter was accepted');
       return letter;
     },
-    onSuccess: (letter) => setNewestId(letter.id),
+    onSuccess: (letter) => {
+      setNewestId(letter.id);
+      void queryClient.invalidateQueries({ queryKey: ['mom'] });
+    },
   });
   const { data: newest } = useQuery({
     queryKey: ['mom-letter', newestId],
@@ -120,6 +124,11 @@ export function Mom() {
           Choose a file instead
         </label>
       </div>
+      {upload.isPending ? (
+        <div role="status">
+          <Banner>Uploading your photo and reading the letter…</Banner>
+        </div>
+      ) : null}
       {upload.isError ? (
         <Banner tone="warning">That file could not be read. Please try another photo.</Banner>
       ) : null}

@@ -31,7 +31,8 @@ function outcome(check: CheckDTO): string {
 
 export function ChecksTable({ checks }: { checks: CheckDTO[] }) {
   return (
-    <div className="checks">
+    // biome-ignore lint/a11y/noNoninteractiveTabindex: the overflowing table is a keyboard-scrollable region
+    <section className="checks" aria-label="Decision checks" tabIndex={0}>
       <table>
         <thead>
           <tr>
@@ -65,6 +66,6 @@ export function ChecksTable({ checks }: { checks: CheckDTO[] }) {
           ))}
         </tbody>
       </table>
-    </div>
+    </section>
   );
 }

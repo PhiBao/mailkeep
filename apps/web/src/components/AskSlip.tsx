@@ -44,6 +44,9 @@ export function AskSlip({
         <Stamp lane="needs_you" />
       </div>
       <p className="ask-slip__evidence mono">{ask.evidence}</p>
+      {readOnly ? (
+        <p className="meta">Demo is read-only. Open the letter to inspect the evidence.</p>
+      ) : null}
       <div className="ask-slip__actions">
         {ask.options.map((option, index) => (
           <button

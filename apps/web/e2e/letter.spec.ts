@@ -1,5 +1,9 @@
 import { expect, test } from '@playwright/test';
 
+test.beforeAll(async ({ request }) => {
+  await request.get('/');
+});
+
 const image = `data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="400" height="520"><rect width="400" height="520" fill="#fffdf8"/><path d="M28 40h344M28 70h300M28 100h320M28 130h260" stroke="#6e7584" stroke-width="4"/></svg>')}`;
 const letter = {
   id: 'ltr_L02',
@@ -142,7 +146,7 @@ for (const width of [390, 1440]) {
     await page.getByText('Show what Mailkeep read', { exact: true }).click();
     await expect(page.getByText(/PAST DUE/)).toBeVisible();
     await page.getByRole('button', { name: /Letter from Riverbend/ }).click();
-    await expect(page.getByRole('dialog')).toBeVisible();
+    await expect(page.getByRole('dialog', { name: 'Letter photo' })).toBeVisible();
     await page.getByRole('button', { name: 'Close photo' }).click();
     await expect(page.getByRole('dialog')).not.toBeVisible();
     await page.screenshot({ path: `docs/screens/letter-${width}.png`, fullPage: true });
@@ -199,7 +203,8 @@ test('Letter polls through processing and flips to done', async ({ page }) => {
   });
   await page.route('**/api/today', (route) => route.fulfill({ json: today }));
   await page.goto('/letters/ltr_L02');
-  await expect(page.getByText('Reading the photo', { exact: false })).toBeVisible();
+  await expect(page.getByRole('listitem').filter({ hasText: 'Reading the photo' })).toBeVisible();
+  await expect(page.getByRole('status')).toContainText('Reading the photo');
   await expect(page.getByRole('heading', { name: 'Past Due Water Bill Notice' })).toBeVisible();
   await expect(page.getByText('NEEDS YOU', { exact: true })).toBeVisible({ timeout: 6000 });
 });

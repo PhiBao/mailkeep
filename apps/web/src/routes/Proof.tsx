@@ -115,7 +115,8 @@ export function Proof() {
 
       <section className="proof__section" aria-labelledby="thresholds">
         <h2 id="thresholds">4. How it decides</h2>
-        <div className="proof__table-wrap">
+        {/* biome-ignore lint/a11y/noNoninteractiveTabindex: the overflowing table is a keyboard-scrollable region */}
+        <section className="proof__table-wrap" aria-label="Decision thresholds" tabIndex={0}>
           <table>
             <thead>
               <tr>
@@ -138,7 +139,7 @@ export function Proof() {
               ))}
             </tbody>
           </table>
-        </div>
+        </section>
       </section>
 
       <section className="proof__section" aria-labelledby="eval">

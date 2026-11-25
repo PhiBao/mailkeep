@@ -131,7 +131,15 @@ export function Letter({ demo = false }: { demo?: boolean }) {
       <div className="letter__layout">
         <section className="letter__photo" aria-label="Letter photo">
           <button type="button" onClick={() => dialog.current?.showModal()}>
-            <img src={data.imageUrl} alt={`Letter from ${data.senderOrg ?? 'unknown sender'}`} />
+            {data.mime === 'application/pdf' ? (
+              <object
+                data={data.imageUrl}
+                type="application/pdf"
+                aria-label={`PDF letter from ${data.senderOrg ?? 'unknown sender'}`}
+              />
+            ) : (
+              <img src={data.imageUrl} alt={`Letter from ${data.senderOrg ?? 'unknown sender'}`} />
+            )}
           </button>
           <details>
             <summary>Show what Mailkeep read</summary>
@@ -140,7 +148,10 @@ export function Letter({ demo = false }: { demo?: boolean }) {
         </section>
         <section className="letter__reading">
           {!terminal(data.status) ? (
-            <div className="letter__processing" aria-live="polite">
+            <div className="letter__processing">
+              <p className="sr-only" role="status">
+                {STEPS[currentStep(data.status)]}…
+              </p>
               <h1>{data.title}</h1>
               <ol>
                 {STEPS.map((step, index) => (
@@ -316,11 +327,19 @@ export function Letter({ demo = false }: { demo?: boolean }) {
           )}
         </section>
       </div>
-      <dialog ref={dialog} className="letter__dialog">
+      <dialog ref={dialog} className="letter__dialog" aria-label="Letter photo">
         <button type="button" aria-label="Close photo" onClick={() => dialog.current?.close()}>
           Close
         </button>
-        <img src={data.imageUrl} alt={`Full letter from ${data.senderOrg ?? 'unknown sender'}`} />
+        {data.mime === 'application/pdf' ? (
+          <object
+            data={data.imageUrl}
+            type="application/pdf"
+            aria-label={`Full PDF letter from ${data.senderOrg ?? 'unknown sender'}`}
+          />
+        ) : (
+          <img src={data.imageUrl} alt={`Full letter from ${data.senderOrg ?? 'unknown sender'}`} />
+        )}
       </dialog>
     </main>
   );

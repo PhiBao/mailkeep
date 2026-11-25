@@ -91,6 +91,7 @@ export function Case({ demo = false }: { demo?: boolean }) {
       ) : null}
       <Thread data={data} demo={demo} />
       <footer className="case__actions">
+        {demo ? <p className="meta">Demo is read-only. Actions are disabled.</p> : null}
         {canMarkPaid ? (
           <button
             type="button"

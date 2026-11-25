@@ -102,6 +102,7 @@ export function Today() {
 
   return (
     <main className="page today">
+      <h1 className="sr-only">Today</h1>
       <header className="today__header">
         <Link to="/today" aria-label="Mailkeep today">
           <Wordmark />
