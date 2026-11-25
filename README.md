@@ -143,7 +143,7 @@ Live proof: two clean sample runs on decision build `378902b` joined seeded case
 | Magic-link session        | Live           | AgentMail message `<010001a20f7d6240-a40b0d24-2102-4bf8-82dc-58290fddafdd-000000@email.amazonses.com>`; callback created `/today` session |
 | Scheduled chase           | Live           | `mailkeep-clock` hourly machine; Sprite `tick_complete` log                                                                               |
 | Egress policy             | Live           | `example.org` REFUSED; gateway and AgentMail CDN allowed                                                                                  |
-| Unit/integration tests    | Passing        | 194 agent tests, shared tests and eval selection/report tests                                                                             |
+| Unit/integration tests    | Passing        | 196 agent tests, shared tests and eval selection/report tests                                                                             |
 | Browser tests             | Passing        | Today, Case, Letter, Mom/Login, Proof, Demo, Shoebox, ten states, CAREFUL safety copy and 55 anti-slop checks                             |
 | T15 human inbound email   | Awaiting human | Webhook configured path returns 202; fresh inbound proof still needed                                                                     |
 | T18 live PAID reply       | Awaiting T15   | Unit/effect tests pass                                                                                                                    |

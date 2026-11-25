@@ -165,6 +165,39 @@ describe('AgentMail intake', () => {
     ).toBe('answered');
   });
 
+  it('hydrates a reply body when the list endpoint omits text', async () => {
+    const family = addMember(db, {
+      householdId: 'hh_test',
+      email: 'kiter7396@gmail.com',
+      displayName: 'Sarah',
+      role: 'family',
+    });
+    db.prepare(
+      `INSERT INTO asks
+        (id, household_id, letter_id, qtype, question, evidence, options_json, status,
+         agentmail_thread_id, created_at)
+       VALUES ('ask_1', 'hh_test', NULL, 'check', 'Check this', 'Evidence', '[]', 'open', 'thread_1', ?)`,
+    ).run(new Date().toISOString());
+    const mail = adapter(
+      [message({ from: 'Sarah <kiter7396@gmail.com>', text: undefined, attachments: [] })],
+      Buffer.from('x'),
+    );
+    mail.getMessage = vi.fn().mockResolvedValue(
+      message({
+        from: 'Sarah <kiter7396@gmail.com>',
+        text: 'HANDLED IT\n\nVào Thứ 4, 25 thg 11, 2026 đã viết:\n> old',
+        attachments: [],
+      }),
+    );
+    const replyHandler = vi.fn().mockResolvedValue('answered');
+    await pollAgentMail({ ...deps(), replyHandler }, mail);
+    expect(mail.getMessage).toHaveBeenCalledWith('kiter@agentmail.to', 'message_1');
+    expect(replyHandler).toHaveBeenCalledWith(
+      expect.objectContaining({ db }),
+      expect.objectContaining({ memberId: family.id, text: expect.stringContaining('HANDLED IT') }),
+    );
+  });
+
   it('routes a family reply to the matching open ask instead of intake', async () => {
     const family = addMember(db, {
       householdId: 'hh_test',

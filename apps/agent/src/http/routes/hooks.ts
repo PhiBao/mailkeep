@@ -9,6 +9,7 @@ import type { PipelineQueue } from '../../pipeline/queue.js';
 import {
   downloadAttachment,
   getAttachment,
+  getMessage,
   listInboxes,
   listMessages,
 } from '../../providers/agentmail.js';
@@ -42,6 +43,7 @@ export interface AttachmentMetadata {
 
 export interface MailAdapter {
   listMessages: (inboxId: string, after: string) => Promise<InboundMessage[]>;
+  getMessage?: (inboxId: string, messageId: string) => Promise<InboundMessage>;
   getAttachment: (
     inboxId: string,
     messageId: string,
@@ -112,6 +114,7 @@ async function pollAgentMailOnce(deps: HookDeps, adapter?: MailAdapter): Promise
     },
     getAttachment: async (inboxId, messageId, attachmentId) =>
       getAttachment(deps.client, { inboxId, messageId, attachmentId }),
+    getMessage: async (inboxId, messageId) => getMessage(deps.client, { inboxId, messageId }),
     downloadAttachment,
   };
   const inboxId =
@@ -136,6 +139,10 @@ async function pollAgentMailOnce(deps: HookDeps, adapter?: MailAdapter): Promise
     }
     const householdId = String(member.household_id);
     const memberId = String(member.id);
+    const detailedMessage =
+      message.text === undefined && mail.getMessage
+        ? await mail.getMessage(inboxId, message.message_id)
+        : message;
     const openAsk = deps.db
       .prepare(
         "SELECT * FROM asks WHERE household_id = ? AND agentmail_thread_id = ? AND status = 'open' ORDER BY created_at LIMIT 1",
@@ -146,7 +153,7 @@ async function pollAgentMailOnce(deps: HookDeps, adapter?: MailAdapter): Promise
         const outcome = await (deps.replyHandler ?? handleAskReply)(deps, {
           askId: openAsk.id,
           memberId: memberId,
-          text: message.text ?? '',
+          text: detailedMessage.text ?? '',
           via: 'email',
         });
         finishMessage(deps.db, message.message_id, outcome);
@@ -173,7 +180,7 @@ async function pollAgentMailOnce(deps: HookDeps, adapter?: MailAdapter): Promise
         const outcome = await (deps.alertReplyHandler ?? handleAlertReply)(deps, {
           alertId: alert.id,
           memberId,
-          text: message.text ?? '',
+          text: detailedMessage.text ?? '',
           via: 'email',
         });
         finishMessage(deps.db, message.message_id, outcome);

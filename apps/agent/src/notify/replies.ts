@@ -116,9 +116,13 @@ export type ReplyOutcome = 'answered' | 'unclear' | 'ignored';
 
 export function stripQuotedText(value: string): string {
   const lines = value.replace(/\r\n?/g, '\n').split('\n');
-  const cutoff = lines.findIndex((line) =>
-    /^(?:On\s+.+\s+wrote:|From:\s|>{1,}|-{2,}\s*Original Message\s*-{2,})/i.test(line.trim()),
-  );
+  const cutoff = lines.findIndex((line, index) => {
+    const candidate = `${line.trim()} ${lines[index + 1]?.trim() ?? ''}`.trim();
+    return (
+      /^(?:On\s+.+\s+wrote:|From:\s|>{1,}|-{2,}\s*Original Message\s*-{2,})/i.test(line.trim()) ||
+      /^Vào\s+.+\s+đã\s+viết:/i.test(candidate)
+    );
+  });
   return (cutoff < 0 ? lines : lines.slice(0, cutoff)).join('\n').trim().slice(0, 500);
 }
 
@@ -131,7 +135,7 @@ function exactReplyChoice(
   options: Array<{ value: string; label: string }>,
 ): string | null {
   const normalize = (value: string) => value.toLowerCase().replace(/[^a-z0-9]+/g, '');
-  const answer = normalize(text);
+  const answer = normalize(text.split('\n').find((line) => line.trim()) ?? '');
   if (!answer) return null;
   const matches = options.filter(
     (option) => normalize(option.value) === answer || normalize(option.label) === answer,

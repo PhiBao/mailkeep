@@ -264,6 +264,10 @@ describe('reply quote stripping', () => {
     ['NOT OURS\n\n-----Original Message-----\nFrom: Mailkeep\nSent: today', 'NOT OURS'],
     ['YES\n\nFrom: Mailkeep <mail@example.com>\nSent: today\nTo: Sarah', 'YES'],
     ['SCAM\n> quoted line\nmore quoted text', 'SCAM'],
+    [
+      'NO\n\nVào Thứ 4, 25 thg 11, 2026 vào lúc 15:36 yujita <s@example.com> đã\nviết:\n\n> old',
+      'NO',
+    ],
   ])('keeps only the answer', (text, expected) => {
     expect(stripQuotedText(text)).toBe(expected);
   });
