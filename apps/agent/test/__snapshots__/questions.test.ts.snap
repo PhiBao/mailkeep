@@ -188,8 +188,10 @@ exports[`Jev request builder > matches the A9 request snapshot 1`] = `
         "phones": [
           "(555) 010-4471",
         ],
+        "recall_score": 0.8,
         "received": "2026-11-10",
         "sender": "Riverbend Water Utility",
+        "tail_match": true,
         "text": "November water bill for $84.17 due December 10.",
       },
       {
@@ -202,8 +204,10 @@ exports[`Jev request builder > matches the A9 request snapshot 1`] = `
         "phones": [
           "(555) 010-4471",
         ],
+        "recall_score": 0.8,
         "received": "2026-11-11",
         "sender": "Riverbend Water Utility",
+        "tail_match": true,
         "text": "November water bill for $84.17 due December 10.",
       },
       {
@@ -216,8 +220,10 @@ exports[`Jev request builder > matches the A9 request snapshot 1`] = `
         "phones": [
           "(555) 010-4471",
         ],
+        "recall_score": 0.8,
         "received": "2026-11-12",
         "sender": "Riverbend Water Utility",
+        "tail_match": true,
         "text": "November water bill for $84.17 due December 10.",
       },
       {
@@ -230,8 +236,10 @@ exports[`Jev request builder > matches the A9 request snapshot 1`] = `
         "phones": [
           "(555) 010-4471",
         ],
+        "recall_score": 0.8,
         "received": "2026-11-13",
         "sender": "Riverbend Water Utility",
+        "tail_match": true,
         "text": "November water bill for $84.17 due December 10.",
       },
       {
@@ -244,8 +252,10 @@ exports[`Jev request builder > matches the A9 request snapshot 1`] = `
         "phones": [
           "(555) 010-4471",
         ],
+        "recall_score": 0.8,
         "received": "2026-11-14",
         "sender": "Riverbend Water Utility",
+        "tail_match": true,
         "text": "November water bill for $84.17 due December 10.",
       },
       {
@@ -258,8 +268,10 @@ exports[`Jev request builder > matches the A9 request snapshot 1`] = `
         "phones": [
           "(555) 010-4471",
         ],
+        "recall_score": 0.8,
         "received": "2026-11-15",
         "sender": "Riverbend Water Utility",
+        "tail_match": true,
         "text": "November water bill for $84.17 due December 10.",
       },
     ],

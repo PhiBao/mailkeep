@@ -434,6 +434,8 @@ export async function runLetter(
             lane: letter.lane,
             text: letter.transcript ?? '',
             phones: JSON.parse(letter.phones_json ?? '[]') as string[],
+            recallScore: candidate.recallScore,
+            tailMatch: candidate.tailMatch,
           });
           routePast.push({
             letterId: letter.id,

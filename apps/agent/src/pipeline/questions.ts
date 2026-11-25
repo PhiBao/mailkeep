@@ -18,6 +18,8 @@ export interface DecisionPast {
   lane: Lane | null;
   text: string;
   phones: string[];
+  recallScore: number | null;
+  tailMatch: boolean;
 }
 
 export interface AmountCandidate {
@@ -164,6 +166,8 @@ export function buildRequest(input: QuestionInput, model: string) {
         lane: past.lane,
         text: past.text.slice(0, 600),
         phones: past.phones,
+        recall_score: past.recallScore,
+        tail_match: past.tailMatch,
       })),
       amount_candidates: input.amountCandidates,
       date_candidates: input.dateCandidates,

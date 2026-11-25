@@ -265,10 +265,13 @@ function recallCandidates(db: DB, letter: LetterRow, decision: DecisionRow | und
         receivedAt: row.received_at,
         kind: row.kind ?? (typeof entry.kind === 'string' ? entry.kind : null),
         lane: row.lane ?? (typeof entry.lane === 'string' ? entry.lane : null),
-        recallScore: scores.get(id) ?? null,
-        tailMatch: Boolean(
-          letter.account_tail && row.account_tail && letter.account_tail === row.account_tail,
-        ),
+        recallScore:
+          scores.get(id) ?? (typeof entry.recall_score === 'number' ? entry.recall_score : null),
+        tailMatch:
+          entry.tail_match === true ||
+          Boolean(
+            letter.account_tail && row.account_tail && letter.account_tail === row.account_tail,
+          ),
         sameMatterProbability: sameMatterProbability(decision.response_json, index),
       },
     ];

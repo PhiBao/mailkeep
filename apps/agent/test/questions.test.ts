@@ -13,6 +13,8 @@ function past(index: number): DecisionPast {
     lane: 'headsup',
     text: 'November water bill for $84.17 due December 10.',
     phones: ['(555) 010-4471'],
+    recallScore: 0.8,
+    tailMatch: true,
   };
 }
 
