@@ -4,7 +4,7 @@ import type { DB } from '../../db/db.js';
 import { getMemberByEmail } from '../../db/repo.js';
 import type { GatewayClient } from '../../gateway/client.js';
 import { handleAskReply } from '../../notify/replies.js';
-import { intakeEmailAttachment } from '../../pipeline/intake.js';
+import { intakeEmailAttachment, MAX_FILE_BYTES } from '../../pipeline/intake.js';
 import type { PipelineQueue } from '../../pipeline/queue.js';
 import {
   downloadAttachment,
@@ -20,6 +20,7 @@ export interface HookDeps {
   client: GatewayClient;
   queue: PipelineQueue;
   replyHandler?: typeof handleAskReply;
+  poll?: typeof pollAgentMail;
 }
 
 export interface InboundMessage {
@@ -35,6 +36,7 @@ export interface InboundMessage {
 export interface AttachmentMetadata {
   attachment_id: string;
   download_url: string;
+  size?: number;
 }
 
 export interface MailAdapter {
@@ -142,6 +144,7 @@ export async function pollAgentMail(deps: HookDeps, adapter?: MailAdapter): Prom
       if (!attachmentId) continue;
       try {
         const metadata = await mail.getAttachment(inboxId, message.message_id, attachmentId);
+        if (metadata.size !== undefined && metadata.size > MAX_FILE_BYTES) continue;
         const bytes = await mail.downloadAttachment(metadata.download_url);
         const intake = await intakeEmailAttachment({
           bytes,
@@ -179,13 +182,18 @@ export async function pollAgentMail(deps: HookDeps, adapter?: MailAdapter): Prom
 }
 
 let pollTimer: ReturnType<typeof setTimeout> | undefined;
+let lastPingAt = 0;
+const MIN_PING_INTERVAL_MS = 5_000;
 
 export function hooksRoutes(deps: HookDeps): Hono {
   const app = new Hono();
   app.post('/hooks/agentmail', (context) => {
+    const now = Date.now();
+    if (now - lastPingAt < MIN_PING_INTERVAL_MS) return context.json({ accepted: true }, 202);
+    lastPingAt = now;
     if (pollTimer) clearTimeout(pollTimer);
     pollTimer = setTimeout(() => {
-      void pollAgentMail(deps).catch((error: unknown) => {
+      void (deps.poll ?? pollAgentMail)(deps).catch((error: unknown) => {
         log.error(
           { event: 'agentmail_poll_failed' },
           error instanceof Error ? error.message : String(error),

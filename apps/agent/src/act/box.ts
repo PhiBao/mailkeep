@@ -29,9 +29,11 @@ interface LetterRow {
   trial: number;
 }
 
-function safeName(value: string): string {
+export function safeBoxName(value: string): string {
   return value
     .replace(/\$[\d,]+(?:\.\d{2})?/g, '')
+    .replace(/\b\d{3}-\d{2}-\d{4}\b/g, '')
+    .replace(/\b[A-Z0-9-]{8,}\b/gi, '')
     .replace(/\b\d{6,}\b/g, '')
     .replace(/[\\/:*?"<>|]/g, '-')
     .replace(/\s+/g, ' ')
@@ -115,7 +117,7 @@ export async function updateCaseFile(
       )
       .get(input.caseId, input.householdId) as { received_at: string } | undefined;
     const date = (firstLetter?.received_at ?? new Date().toISOString()).slice(0, 10);
-    const folderName = safeName(
+    const folderName = safeBoxName(
       `${date.slice(0, 7)} ${String(caseRow.counterparty)} — ${String(caseRow.title)} (${input.caseId})`,
     );
     folderId = await ensureFolder(client, household.box_cases_folder_id ?? '', folderName);
@@ -183,7 +185,7 @@ export async function fileLetter(
 ): Promise<void> {
   const household = await ensureHouseholdFolders(client, db, input.householdId);
   const date = input.letter.received_at.slice(0, 10);
-  const title = safeName(input.letter.title || 'Letter');
+  const title = safeBoxName(input.letter.title || 'Letter');
   let folderId = household.box_other_folder_id ?? '';
   if (input.letter.trial) {
     folderId = await ensureFolder(client, household.box_trials_folder_id ?? '', date);
@@ -197,7 +199,7 @@ export async function fileLetter(
       folderId = caseRow.box_folder_id;
     } else {
       const month = date.slice(0, 7);
-      const folderName = safeName(
+      const folderName = safeBoxName(
         `${month} ${input.caseChange.counterparty} — ${input.caseChange.title} (${input.caseId})`,
       );
       folderId = await ensureFolder(client, household.box_cases_folder_id ?? '', folderName);

@@ -60,7 +60,12 @@ export function getHousehold(db: DB, householdId: string) {
 }
 
 export function getMemberByEmail(db: DB, email: string) {
-  return db.prepare('SELECT * FROM members WHERE email = ?').get(email.toLowerCase()) as
-    | Record<string, unknown>
-    | undefined;
+  return db
+    .prepare(
+      `SELECT m.* FROM members m
+         JOIN households h ON h.id = m.household_id
+        WHERE m.email = ? AND h.is_demo = 0
+        ORDER BY m.created_at, m.id LIMIT 1`,
+    )
+    .get(email.toLowerCase()) as Record<string, unknown> | undefined;
 }

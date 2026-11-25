@@ -76,7 +76,14 @@ export async function getAttachment(
 }
 
 export async function downloadAttachment(downloadUrl: string): Promise<Buffer> {
-  const response = await fetch(downloadUrl, { signal: AbortSignal.timeout(30_000) });
+  const url = new URL(downloadUrl);
+  if (url.protocol !== 'https:' || url.hostname !== 'cdn.agentmail.to') {
+    throw new Error('Attachment URL is not an approved AgentMail CDN URL');
+  }
+  const response = await fetch(url, {
+    signal: AbortSignal.timeout(30_000),
+    redirect: 'error',
+  });
   if (!response.ok) throw new Error(`Attachment download returned HTTP ${response.status}`);
   return Buffer.from(await response.arrayBuffer());
 }

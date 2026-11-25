@@ -20,10 +20,14 @@ export async function extractPdf(pdfPath: string, workDir: string): Promise<PdfE
 
   await mkdir(workDir, { recursive: true });
   const prefix = path.join(workDir, 'page');
-  await execFileAsync('pdftoppm', ['-r', '150', '-f', '1', '-l', '2', '-jpeg', pdfPath, prefix], {
-    timeout: TIMEOUT_MS,
-    maxBuffer: 10 * 1024 * 1024,
-  });
+  await execFileAsync(
+    'pdftoppm',
+    ['-r', '150', '-scale-to', '2000', '-f', '1', '-l', '2', '-jpeg', pdfPath, prefix],
+    {
+      timeout: TIMEOUT_MS,
+      maxBuffer: 10 * 1024 * 1024,
+    },
+  );
   const files = (await readdir(workDir)).filter((file) => /^page-\d+\.jpg$/.test(file)).sort();
   return { text: stdout, images: files.map((file) => path.join(workDir, file)) };
 }
