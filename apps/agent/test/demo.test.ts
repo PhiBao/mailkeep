@@ -282,6 +282,9 @@ describe('public demo reads', () => {
 
   it('returns scoped validated DTOs with demo URLs and no private paths or transcripts', async () => {
     await seedCase({ id: 'case_demo' });
+    db.prepare(
+      "UPDATE cases SET box_folder_id = 'private_box_folder' WHERE id = 'case_demo'",
+    ).run();
     await seedCase({ id: 'case_private', householdId: 'hh_private' });
     const demoPath = await seedLetter({
       id: 'ltr_demo',
@@ -305,9 +308,10 @@ describe('public demo reads', () => {
     ).run('2026-11-23T00:00:00.000Z');
     db.prepare(
       `INSERT INTO outbox
-        (id, household_id, to_email, kind, subject, body_text, related_id, status, created_at)
-        VALUES ('out_demo', 'hh_demo', 'parent@example.com', 'parent_note', 'Demo', 'Body',
-          'ltr_demo', 'suppressed', ?)`,
+        (id, household_id, to_email, kind, subject, body_text, related_id, status,
+         agentmail_message_id, agentmail_thread_id, created_at)
+        VALUES ('out_demo', 'hh_demo', 'kiter7396@gmail.com', 'parent_note', 'Demo', 'Body',
+          'ltr_demo', 'suppressed', 'private_message_id', 'private_thread_id', ?)`,
     ).run(clock().toISOString());
 
     const todayResponse = await get('/api/demo/today');
@@ -322,6 +326,7 @@ describe('public demo reads', () => {
     const caseResponse = await get('/api/demo/cases/case_demo');
     expect(caseResponse.status).toBe(200);
     const caseDto = caseSchema.parse(await caseResponse.json());
+    expect(caseDto.boxFolderUrl).toBeNull();
     expect(caseDto.letters[0]?.imageUrl).toBe('/api/demo/letters/ltr_demo/image');
     expect(caseDto.events[0]?.createdAt).toBe(caseDto.letters[0]?.receivedAt);
 
@@ -335,6 +340,15 @@ describe('public demo reads', () => {
       decision: { rawResponseUrl: '/api/demo/letters/ltr_demo/decision' },
     });
     expect(letterDto.recall).toEqual([]);
+    expect(letterDto.submittedBy).toBeNull();
+    expect(letterDto.outbox[0]).toMatchObject({
+      toEmail: 'ruth@example.invalid',
+      agentmailMessageId: null,
+      agentmailThreadId: null,
+    });
+    expect(JSON.stringify(letterDto)).not.toContain('kiter7396@gmail.com');
+    expect(JSON.stringify(letterDto)).not.toContain('private_message_id');
+    expect(JSON.stringify(caseDto)).not.toContain('private_box_folder');
 
     const decision = await get('/api/demo/letters/ltr_demo/decision');
     expect(decision.status).toBe(200);

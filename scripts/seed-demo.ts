@@ -15,8 +15,8 @@ import { todayIso } from '../apps/agent/src/util/clock.js';
 const exec = promisify(execFile);
 const ROOT = fileURLToPath(new URL('../', import.meta.url));
 const HOUSEHOLD_ID = 'hh_demo';
-const PARENT_EMAIL = 'kiter7396+mom@gmail.com';
-const FAMILY_EMAIL = 'kiter7396@gmail.com';
+const PARENT_EMAIL = 'ruth@example.invalid';
+const FAMILY_EMAIL = 'family@example.invalid';
 const DEMO_TODAY = '2026-12-09';
 
 interface SeedMeta {

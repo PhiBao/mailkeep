@@ -35,11 +35,16 @@ export function Demo() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [rateLimited, setRateLimited] = useState(false);
+  const [retryAfterSeconds, setRetryAfterSeconds] = useState(0);
   const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ['demo-today'],
     queryFn: fetchDemoToday,
   });
-  const { data: samples } = useQuery({ queryKey: ['demo-samples'], queryFn: fetchSamples });
+  const {
+    data: samples,
+    isError: samplesError,
+    refetch: refetchSamples,
+  } = useQuery({ queryKey: ['demo-samples'], queryFn: fetchSamples });
   const run = useMutation({
     mutationFn: async (sampleId: string) => {
       const response = await apiFetch(`/api/demo/samples/${encodeURIComponent(sampleId)}/run`, {
@@ -49,6 +54,7 @@ export function Demo() {
       });
       if (response.status === 429) {
         setRateLimited(true);
+        setRetryAfterSeconds(Number(response.headers.get('Retry-After')) || 0);
         throw new Error('rate limited');
       }
       if (!response.ok) throw new Error('Could not run this sample');
@@ -56,6 +62,7 @@ export function Demo() {
     },
     onSuccess: (letter) => {
       setRateLimited(false);
+      setRetryAfterSeconds(0);
       void queryClient.invalidateQueries({ queryKey: ['demo-today'] });
       navigate(`/demo/letters/${letter.id}`);
     },
@@ -87,7 +94,18 @@ export function Demo() {
       </Banner>
       {rateLimited ? (
         <Banner tone="warning">
-          Lots of people are trying this right now. Try again in a few minutes.
+          Lots of people are trying this right now.{' '}
+          {retryAfterSeconds > 0
+            ? `Try again in about ${Math.max(1, Math.ceil(retryAfterSeconds / 60))} minute(s).`
+            : 'Try again in a few minutes.'}
+        </Banner>
+      ) : null}
+      {run.isError && !rateLimited ? (
+        <Banner tone="warning">
+          Couldn't run that sample.{' '}
+          <button type="button" className="button--quiet" onClick={() => run.reset()}>
+            Dismiss
+          </button>
         </Banner>
       ) : null}
       <section className="demo__section" aria-labelledby="run-sample">
@@ -95,7 +113,14 @@ export function Demo() {
         <p>
           Watch Mailkeep read a letter, compare it with Ruth's earlier mail, and file the result.
         </p>
-        {samples ? (
+        {samplesError ? (
+          <Banner tone="warning">
+            Couldn't load the samples.{' '}
+            <button type="button" className="button--quiet" onClick={() => void refetchSamples()}>
+              Retry
+            </button>
+          </Banner>
+        ) : samples ? (
           <div className="demo__samples">
             {samples.map((sample) => (
               <button

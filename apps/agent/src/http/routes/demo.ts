@@ -214,7 +214,14 @@ function demoLetterDTO(db: DB, row: LetterRow): LetterDTO {
   const dto = buildLetterDTO(db, row);
   return letterSchema.parse({
     ...dto,
+    submittedBy: null,
     imageUrl: `/api/demo/letters/${encodeURIComponent(row.id)}/image`,
+    outbox: dto.outbox.map((item) => ({
+      ...item,
+      toEmail: item.kind === 'parent_note' ? 'ruth@example.invalid' : 'family@example.invalid',
+      agentmailMessageId: null,
+      agentmailThreadId: null,
+    })),
     decision: dto.decision
       ? {
           ...dto.decision,
@@ -229,6 +236,7 @@ function demoCaseDTO(db: DB, row: CaseRow): CaseDTO {
   const receivedAt = new Map(dto.letters.map((letter) => [letter.id, letter.receivedAt]));
   return caseSchema.parse({
     ...dto,
+    boxFolderUrl: null,
     letters: dto.letters.map((letter) => ({
       ...letter,
       imageUrl: `/api/demo/letters/${encodeURIComponent(letter.id)}/image`,
