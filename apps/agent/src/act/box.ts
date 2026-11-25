@@ -244,7 +244,7 @@ export async function fileLetter(
     contentType: 'text/markdown',
   });
 
-  if (input.caseId && input.caseChange) {
+  if (input.caseId && input.caseChange && !input.letter.trial) {
     const caseRow = db
       .prepare('SELECT * FROM cases WHERE id = ? AND household_id = ?')
       .get(input.caseId, input.householdId) as Record<string, unknown>;

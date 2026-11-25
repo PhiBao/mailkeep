@@ -426,6 +426,40 @@ describe('demo sample runs', () => {
     });
   });
 
+  it('restores seeded case state after the last trial expires', async () => {
+    await seedCase({ id: 'case_seeded', title: 'November Water Bill' });
+    await seedLetter({ id: 'ltr_seed', caseId: 'case_seeded' });
+    db.prepare(
+      `UPDATE cases SET account_tail = '4471', amount_cents = 8917, due_date = '2026-12-10',
+        second_notice = 0, contradiction = 0, box_folder_id = 'box_case',
+        box_casefile_id = 'box_case_file' WHERE id = 'case_seeded'`,
+    ).run();
+    const baseline = db.prepare('SELECT * FROM cases WHERE id = ?').get('case_seeded');
+    const response = await run('/api/demo/samples/L02/run');
+    expect(response.status).toBe(202);
+    const sample = letterSchema.parse(await response.json());
+    expect(
+      db.prepare('SELECT v FROM kv WHERE k = ?').get('demo:case-baseline:hh_demo'),
+    ).toBeDefined();
+    db.prepare('UPDATE letters SET case_id = ? WHERE id = ?').run('case_seeded', sample.id);
+    db.prepare(
+      `UPDATE cases SET title = 'Past Due Water Bill Notice', kind = 'collection', status = 'overdue',
+        amount_cents = NULL, due_date = '2026-12-16', second_notice = 1, updated_at = ? WHERE id = ?`,
+    ).run(clock().toISOString(), 'case_seeded');
+    db.prepare(
+      `INSERT INTO case_events
+        (id, household_id, case_id, letter_id, type, actor, detail_json, created_at)
+       VALUES ('evt_trial', 'hh_demo', 'case_seeded', ?, 'reminder_received', 'agent', '{}', ?)`,
+    ).run(sample.id, clock().toISOString());
+    currentTime += DEMO_TRIAL_TTL_MS + 1;
+    expect(await purgeExpiredTrials(db, undefined, clock)).toBe(1);
+    expect(db.prepare('SELECT * FROM cases WHERE id = ?').get('case_seeded')).toEqual(baseline);
+    expect(db.prepare('SELECT 1 FROM case_events WHERE id = ?').get('evt_trial')).toBeUndefined();
+    expect(
+      db.prepare('SELECT v FROM kv WHERE k = ?').get('demo:case-baseline:hh_demo'),
+    ).toBeUndefined();
+  });
+
   it('uses the real intake implementation by default without provider calls', async () => {
     app = mount({
       readFile: async (filePath) => readFile(filePath),

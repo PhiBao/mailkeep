@@ -79,6 +79,7 @@ type LetterRow = Parameters<typeof buildLetterDTO>[1] & {
   created_at: string;
 };
 type CaseRow = Parameters<typeof buildCaseDTO>[1];
+type DemoCaseBaseline = Array<Record<string, unknown>>;
 type DemoFileReader = (filePath: string) => Promise<Buffer>;
 type DemoIntake = (input: IntakeInput) => Promise<IntakeResult>;
 
@@ -142,6 +143,53 @@ function demoCase(db: DB, householdId: string, caseId: string): CaseRow | undefi
   return db
     .prepare('SELECT * FROM cases WHERE id = ? AND household_id = ?')
     .get(caseId, householdId) as CaseRow | undefined;
+}
+
+function caseBaselineKey(householdId: string): string {
+  return `demo:case-baseline:${householdId}`;
+}
+
+function ensureCaseBaseline(db: DB, householdId: string): void {
+  const key = caseBaselineKey(householdId);
+  if (db.prepare('SELECT v FROM kv WHERE k = ?').get(key)) return;
+  const rows = db
+    .prepare('SELECT * FROM cases WHERE household_id = ? ORDER BY id')
+    .all(householdId) as DemoCaseBaseline;
+  db.prepare('INSERT OR IGNORE INTO kv (k, v) VALUES (?, ?)').run(key, JSON.stringify(rows));
+}
+
+function restoreCaseBaseline(db: DB, householdId: string): void {
+  const key = caseBaselineKey(householdId);
+  const stored = db.prepare('SELECT v FROM kv WHERE k = ?').get(key) as { v: string } | undefined;
+  if (!stored) return;
+  const rows = JSON.parse(stored.v) as DemoCaseBaseline;
+  db.prepare('DELETE FROM cases WHERE household_id = ?').run(householdId);
+  const insert = db.prepare(
+    `INSERT INTO cases
+      (id, household_id, title, counterparty, account_tail, kind, status, amount_cents, due_date,
+       second_notice, contradiction, box_folder_id, box_casefile_id, created_at, updated_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+  );
+  for (const row of rows) {
+    insert.run(
+      row.id,
+      row.household_id,
+      row.title,
+      row.counterparty,
+      row.account_tail,
+      row.kind,
+      row.status,
+      row.amount_cents,
+      row.due_date,
+      row.second_notice,
+      row.contradiction,
+      row.box_folder_id,
+      row.box_casefile_id,
+      row.created_at,
+      row.updated_at,
+    );
+  }
+  db.prepare('DELETE FROM kv WHERE k = ?').run(key);
 }
 
 function recentTrial(
@@ -454,6 +502,7 @@ export function demoRoutes(deps: DemoDeps): Hono {
 
     const row = demoLetter(deps.db, householdId, result.letterId);
     if (!row) throw new Error('Sample letter was not persisted');
+    ensureCaseBaseline(deps.db, householdId);
     const dto = demoLetterDTO(deps.db, row);
     enqueue(deps, row.id);
     return context.json(dto, 202);
@@ -509,9 +558,11 @@ export async function purgeExpiredTrials(
 
   let deleted = 0;
   const localPaths: string[] = [];
+  const householdIds = new Set<string>();
   const caseIds = new Map<string, { householdId: string; caseId: string }>();
   db.transaction(() => {
     for (const row of rows) {
+      householdIds.add(row.household_id);
       db.prepare(
         `DELETE FROM outbox
           WHERE household_id = ? AND (
@@ -570,6 +621,13 @@ export async function purgeExpiredTrials(
         caseId,
       );
       db.prepare('DELETE FROM cases WHERE id = ? AND household_id = ?').run(caseId, householdId);
+    }
+
+    for (const householdId of householdIds) {
+      const remaining = db
+        .prepare('SELECT 1 FROM letters WHERE household_id = ? AND trial = 1 LIMIT 1')
+        .get(householdId);
+      if (!remaining) restoreCaseBaseline(db, householdId);
     }
   })();
 
