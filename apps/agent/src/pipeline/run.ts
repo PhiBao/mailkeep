@@ -8,6 +8,7 @@ import { addCaseEvent, saveCaseChange, saveRelations } from '../cases/repo.js';
 import type { Config } from '../config.js';
 import type { DB } from '../db/db.js';
 import type { GatewayClient } from '../gateway/client.js';
+import { failureEmail } from '../notify/templates.js';
 import { embed } from '../providers/pinecone.js';
 import { withTaskHold } from '../sprite/tasks.js';
 import { todayIso } from '../util/clock.js';
@@ -186,6 +187,7 @@ function queueFailure(deps: PipelineDeps, row: LetterRow, message: string): void
   const family = deps.db
     .prepare("SELECT email FROM members WHERE household_id = ? AND role = 'family'")
     .all(row.household_id) as Array<{ email: string }>;
+  const email = failureEmail({ title: row.title ?? 'a letter', error: message });
   for (const member of family) {
     deps.db
       .prepare(
@@ -196,8 +198,8 @@ function queueFailure(deps: PipelineDeps, row: LetterRow, message: string): void
         `out_${nanoid()}`,
         row.household_id,
         member.email,
-        `Mailkeep couldn't finish: ${row.title ?? 'a letter'}`,
-        `Mailkeep couldn't finish this letter. ${message}`,
+        email.subject.replace(/[\r\n]+/g, ' ').trim(),
+        email.body,
         row.id,
         new Date().toISOString(),
       );

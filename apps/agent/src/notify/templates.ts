@@ -116,3 +116,13 @@ export function retakeEmail(): { subject: string; body: string } {
     body: 'The photo was too dark or blurry to read. Please take another one in good light.',
   };
 }
+
+export function failureEmail(input: { title: string; error: string }): {
+  subject: string;
+  body: string;
+} {
+  return {
+    subject: `Mailkeep couldn't finish: ${input.title}`,
+    body: `Mailkeep couldn't finish this letter. ${input.error} Sarah will check it.`,
+  };
+}
