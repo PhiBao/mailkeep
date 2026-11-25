@@ -323,6 +323,53 @@ describe('A10 routing', () => {
     expect(result.amountCents).toBeNull();
   });
 
+  it.each([
+    ['photo quality', { qualityFlagged: true }],
+    ['summary failure', { r2Failed: true }],
+  ] as const)('does not pay a case when %s requires review', (_name, flags) => {
+    const result = route(
+      input({
+        ...flags,
+        past: [past()],
+        answers: answers({
+          same_matter_0: { type: 'noul', noul: 0.97 },
+          completes_0: { type: 'noul', noul: 0.96 },
+        }),
+      }),
+    );
+    expect(result.lane).toBe('needs_you');
+    expect(result.caseChange).toBeNull();
+    expect(result.asks).toContainEqual(expect.objectContaining({ qtype: 'check' }));
+  });
+
+  it('does not update or reopen a case from a quality-flagged photo', () => {
+    for (const caseStatus of ['open', 'paid'] as const) {
+      const result = route(
+        input({
+          qualityFlagged: true,
+          past: [past({ caseStatus })],
+          answers: answers({
+            same_matter_0: { type: 'noul', noul: 0.97 },
+            follow_up_0: { type: 'noul', noul: 0.93 },
+          }),
+        }),
+      );
+      expect(result.caseChange).toBeNull();
+      expect(result.asks).toContainEqual(expect.objectContaining({ qtype: 'check' }));
+    }
+  });
+
+  it('keeps scam safety routing when a photo is quality-flagged', () => {
+    const result = route(
+      input({
+        qualityFlagged: true,
+        answers: answers({ scam_payment: { type: 'noul', noul: 0.5 } }),
+      }),
+    );
+    expect(result.lane).toBe('careful');
+    expect(result.caseChange).toMatchObject({ action: 'watch', status: 'watch' });
+  });
+
   it('asks paid in the completion uncertainty band', () => {
     const result = route(
       input({

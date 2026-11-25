@@ -465,20 +465,24 @@ export function route(input: RouteInput): RouteOutput {
     }
   }
 
-  if ((input.qualityFlagged || input.r2Failed) && lane === 'handled') {
-    lane = 'needs_you';
-    asks.push({
-      qtype: 'check',
-      question: 'Can you check this letter?',
-      evidence: input.qualityFlagged
-        ? 'The photo quality was flagged.'
-        : 'The summary step failed.',
-      options: [
-        { value: 'handled_it', label: 'Handled it' },
-        { value: 'not_ours', label: 'Not ours' },
-        { value: 'scam', label: 'Scam' },
-      ],
-    });
+  if (input.qualityFlagged || input.r2Failed) {
+    const reviewCaseChange = caseChange && caseChange.action !== 'watch';
+    if (lane === 'handled' || reviewCaseChange) {
+      if (lane === 'handled') lane = 'needs_you';
+      caseChange = null;
+      asks.push({
+        qtype: 'check',
+        question: 'Can you check this letter?',
+        evidence: input.qualityFlagged
+          ? 'The photo quality was flagged.'
+          : 'The summary step failed.',
+        options: [
+          { value: 'handled_it', label: 'Handled it' },
+          { value: 'not_ours', label: 'Not ours' },
+          { value: 'scam', label: 'Scam' },
+        ],
+      });
+    }
   }
 
   if (lane === 'needs_you' && asks.length === 0 && !familyAlert) familyAlert = true;
