@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import { mkdtemp, readFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
@@ -196,6 +197,95 @@ describe('AgentMail intake', () => {
       expect.objectContaining({ db }),
       expect.objectContaining({ memberId: family.id, text: expect.stringContaining('HANDLED IT') }),
     );
+  });
+
+  it('retries hydration without advancing the poll watermark', async () => {
+    addMember(db, {
+      householdId: 'hh_test',
+      email: 'kiter7396@gmail.com',
+      displayName: 'Sarah',
+      role: 'family',
+    });
+    db.prepare(
+      `INSERT INTO asks
+        (id, household_id, letter_id, qtype, question, evidence, options_json, status,
+         agentmail_thread_id, created_at)
+       VALUES ('ask_1', 'hh_test', NULL, 'check', 'Check this', 'Evidence', '[]', 'open', 'thread_1', ?)`,
+    ).run(new Date().toISOString());
+    const mail = adapter(
+      [message({ from: 'Sarah <kiter7396@gmail.com>', text: undefined, attachments: [] })],
+      Buffer.from('x'),
+    );
+    mail.getMessage = vi
+      .fn()
+      .mockRejectedValueOnce(new Error('temporary detail failure'))
+      .mockResolvedValueOnce(
+        message({ from: 'Sarah <kiter7396@gmail.com>', text: 'HANDLED IT', attachments: [] }),
+      );
+    const replyHandler = vi.fn().mockResolvedValue('answered');
+    await pollAgentMail({ ...deps(), replyHandler }, mail);
+    expect((db.prepare('SELECT count(*) AS n FROM inbound_seen').get() as { n: number }).n).toBe(0);
+    expect(db.prepare("SELECT v FROM kv WHERE k = 'last_poll_at'").get()).toBeUndefined();
+    await pollAgentMail({ ...deps(), replyHandler }, mail);
+    expect(replyHandler).toHaveBeenCalledTimes(1);
+    expect(
+      (db.prepare('SELECT outcome FROM inbound_seen').get() as { outcome: string }).outcome,
+    ).toBe('answered');
+    expect(db.prepare("SELECT v FROM kv WHERE k = 'last_poll_at'").get()).toBeDefined();
+  });
+
+  it('retries a transient attachment metadata failure without losing the message', async () => {
+    const bytes = await readFile(path.join(ROOT, 'testset/out/L01.jpg'));
+    const enqueue = vi.fn().mockResolvedValue(undefined);
+    const mail = adapter([message()], bytes);
+    mail.getAttachment = vi
+      .fn()
+      .mockRejectedValueOnce(new Error('temporary metadata failure'))
+      .mockResolvedValueOnce({
+        attachment_id: 'attachment_1',
+        download_url: 'https://cdn.example/file',
+      });
+    await pollAgentMail({ ...deps(), queue: { enqueue } as unknown as PipelineQueue }, mail);
+    expect((db.prepare('SELECT count(*) AS n FROM letters').get() as { n: number }).n).toBe(0);
+    expect((db.prepare('SELECT count(*) AS n FROM inbound_seen').get() as { n: number }).n).toBe(0);
+    expect(db.prepare("SELECT v FROM kv WHERE k = 'last_poll_at'").get()).toBeUndefined();
+    await pollAgentMail({ ...deps(), queue: { enqueue } as unknown as PipelineQueue }, mail);
+    expect(enqueue).toHaveBeenCalledTimes(1);
+    expect((db.prepare('SELECT count(*) AS n FROM letters').get() as { n: number }).n).toBe(1);
+    expect(
+      (db.prepare('SELECT outcome FROM inbound_seen').get() as { outcome: string }).outcome,
+    ).toBe('processed');
+  });
+
+  it('hydrates empty reply text and attachments omitted by the list endpoint', async () => {
+    const bytes = await readFile(path.join(ROOT, 'testset/out/L01.jpg'));
+    const enqueue = vi.fn().mockResolvedValue(undefined);
+    const mail = adapter([message({ text: '', attachments: undefined })], bytes);
+    mail.getMessage = vi
+      .fn()
+      .mockResolvedValue(message({ text: '', attachments: [{ attachment_id: 'attachment_1' }] }));
+    await pollAgentMail({ ...deps(), queue: { enqueue } as unknown as PipelineQueue }, mail);
+    expect(mail.getMessage).toHaveBeenCalledWith('kiter@agentmail.to', 'message_1');
+    expect(enqueue).toHaveBeenCalledTimes(1);
+  });
+
+  it('re-enqueues a duplicate attachment when its existing letter failed', async () => {
+    const bytes = await readFile(path.join(ROOT, 'testset/out/L01.jpg'));
+    const sha256 = createHash('sha256').update(bytes).digest('hex');
+    const now = new Date().toISOString();
+    db.prepare(
+      `INSERT INTO letters
+        (id, household_id, source, trial, submitted_by, received_at, status, mime, sha256,
+         local_path, error, created_at, updated_at)
+       VALUES ('ltr_failed', 'hh_test', 'email', 0, NULL, ?, 'failed', 'image/jpeg', ?, ?, 'failed', ?, ?)`,
+    ).run(now, sha256, path.join(directory, 'missing.jpg'), now, now);
+    const enqueue = vi.fn().mockResolvedValue(undefined);
+    await pollAgentMail(
+      { ...deps(), queue: { enqueue } as unknown as PipelineQueue },
+      adapter([message()], bytes),
+    );
+    expect(enqueue).toHaveBeenCalledWith('ltr_failed');
+    expect((db.prepare('SELECT count(*) AS n FROM letters').get() as { n: number }).n).toBe(1);
   });
 
   it('routes a family reply to the matching open ask instead of intake', async () => {

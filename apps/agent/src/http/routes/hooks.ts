@@ -4,7 +4,7 @@ import type { DB } from '../../db/db.js';
 import { getMemberByEmail } from '../../db/repo.js';
 import type { GatewayClient } from '../../gateway/client.js';
 import { handleAlertReply, handleAskReply } from '../../notify/replies.js';
-import { intakeEmailAttachment, MAX_FILE_BYTES } from '../../pipeline/intake.js';
+import { IntakeError, intakeEmailAttachment, MAX_FILE_BYTES } from '../../pipeline/intake.js';
 import type { PipelineQueue } from '../../pipeline/queue.js';
 import {
   downloadAttachment,
@@ -129,105 +129,149 @@ async function pollAgentMailOnce(deps: HookDeps, adapter?: MailAdapter): Promise
   ).toISOString();
   const messages = await mail.listMessages(inboxId, after);
 
+  let retryNeeded = false;
   for (const message of messages) {
     if (!claimMessage(deps.db, message.message_id)) continue;
-    const email = senderEmail(message.from);
-    const member = email ? getMemberByEmail(deps.db, email) : undefined;
-    if (!member) {
-      finishMessage(deps.db, message.message_id, 'ignored_sender');
-      continue;
-    }
-    const householdId = String(member.household_id);
-    const memberId = String(member.id);
-    const detailedMessage =
-      message.text === undefined && mail.getMessage
-        ? await mail.getMessage(inboxId, message.message_id)
-        : message;
-    const openAsk = deps.db
-      .prepare(
-        "SELECT * FROM asks WHERE household_id = ? AND agentmail_thread_id = ? AND status = 'open' ORDER BY created_at LIMIT 1",
-      )
-      .get(householdId, message.thread_id) as { id: string } | undefined;
-    if (openAsk) {
-      try {
-        const outcome = await (deps.replyHandler ?? handleAskReply)(deps, {
-          askId: openAsk.id,
-          memberId: memberId,
-          text: detailedMessage.text ?? '',
-          via: 'email',
-        });
-        finishMessage(deps.db, message.message_id, outcome);
-      } catch (error) {
-        releaseMessage(deps.db, message.message_id);
-        log.warn(
-          { event: 'inbound_reply_failed', messageId: message.message_id, askId: openAsk.id },
-          error instanceof Error ? error.message : String(error),
-        );
+    try {
+      const email = senderEmail(message.from);
+      const member = email ? getMemberByEmail(deps.db, email) : undefined;
+      if (!member) {
+        finishMessage(deps.db, message.message_id, 'ignored_sender');
+        continue;
       }
-      continue;
-    }
+      const householdId = String(member.household_id);
+      const memberId = String(member.id);
+      const detailedMessage =
+        mail.getMessage && (!message.text?.trim() || message.attachments === undefined)
+          ? await mail.getMessage(inboxId, message.message_id)
+          : message;
+      const openAsk = deps.db
+        .prepare(
+          "SELECT * FROM asks WHERE household_id = ? AND agentmail_thread_id = ? AND status = 'open' ORDER BY created_at LIMIT 1",
+        )
+        .get(householdId, detailedMessage.thread_id) as { id: string } | undefined;
+      if (openAsk) {
+        try {
+          const outcome = await (deps.replyHandler ?? handleAskReply)(deps, {
+            askId: openAsk.id,
+            memberId,
+            text: detailedMessage.text ?? '',
+            via: 'email',
+          });
+          finishMessage(deps.db, message.message_id, outcome);
+        } catch (error) {
+          releaseMessage(deps.db, message.message_id);
+          retryNeeded = true;
+          log.warn(
+            { event: 'inbound_reply_failed', messageId: message.message_id, askId: openAsk.id },
+            error instanceof Error ? error.message : String(error),
+          );
+        }
+        continue;
+      }
 
-    const alert = deps.db
-      .prepare(
-        `SELECT id FROM outbox
-          WHERE household_id = ? AND agentmail_thread_id = ? AND kind = 'family_alert'
-            AND status = 'sent' AND related_id IS NOT NULL
-          ORDER BY created_at DESC LIMIT 1`,
-      )
-      .get(householdId, message.thread_id) as { id: string } | undefined;
-    if (alert) {
-      try {
-        const outcome = await (deps.alertReplyHandler ?? handleAlertReply)(deps, {
-          alertId: alert.id,
-          memberId,
-          text: detailedMessage.text ?? '',
-          via: 'email',
-        });
-        finishMessage(deps.db, message.message_id, outcome);
-      } catch (error) {
-        releaseMessage(deps.db, message.message_id);
-        log.warn(
-          { event: 'inbound_alert_reply_failed', messageId: message.message_id, alertId: alert.id },
-          error instanceof Error ? error.message : String(error),
-        );
+      const alert = deps.db
+        .prepare(
+          `SELECT id FROM outbox
+            WHERE household_id = ? AND agentmail_thread_id = ? AND kind = 'family_alert'
+              AND status = 'sent' AND related_id IS NOT NULL
+            ORDER BY created_at DESC LIMIT 1`,
+        )
+        .get(householdId, detailedMessage.thread_id) as { id: string } | undefined;
+      if (alert) {
+        try {
+          const outcome = await (deps.alertReplyHandler ?? handleAlertReply)(deps, {
+            alertId: alert.id,
+            memberId,
+            text: detailedMessage.text ?? '',
+            via: 'email',
+          });
+          finishMessage(deps.db, message.message_id, outcome);
+        } catch (error) {
+          releaseMessage(deps.db, message.message_id);
+          retryNeeded = true;
+          log.warn(
+            {
+              event: 'inbound_alert_reply_failed',
+              messageId: message.message_id,
+              alertId: alert.id,
+            },
+            error instanceof Error ? error.message : String(error),
+          );
+        }
+        continue;
       }
-      continue;
-    }
 
-    const attachments = attachmentList(message.attachments).slice(0, 10);
-    let processed = 0;
-    for (const attachment of attachments) {
-      const attachmentId = String(attachment.attachment_id ?? '');
-      if (!attachmentId) continue;
-      try {
-        const metadata = await mail.getAttachment(inboxId, message.message_id, attachmentId);
-        if (metadata.size !== undefined && metadata.size > MAX_FILE_BYTES) continue;
-        const bytes = await mail.downloadAttachment(metadata.download_url);
-        const intake = await intakeEmailAttachment({
-          bytes,
-          householdId,
-          memberId,
-          receivedAt: message.timestamp ?? new Date().toISOString(),
-          dataDir: deps.config.MAILKEEP_DATA_DIR,
-          db: deps.db,
-        });
-        if (!intake.duplicate) await deps.queue.enqueue(intake.letterId);
-        processed += 1;
-      } catch (error) {
-        log.warn(
-          { event: 'inbound_attachment_failed', messageId: message.message_id, attachmentId },
-          error instanceof Error ? error.message : String(error),
-        );
+      const attachments = attachmentList(detailedMessage.attachments).slice(0, 10);
+      let processed = 0;
+      let messageRetryNeeded = false;
+      for (const attachment of attachments) {
+        const attachmentId = String(attachment.attachment_id ?? '');
+        if (!attachmentId) continue;
+        try {
+          const metadata = await mail.getAttachment(inboxId, message.message_id, attachmentId);
+          if (metadata.size !== undefined && metadata.size > MAX_FILE_BYTES) continue;
+          const bytes = await mail.downloadAttachment(metadata.download_url);
+          const intake = await intakeEmailAttachment({
+            bytes,
+            householdId,
+            memberId,
+            receivedAt: detailedMessage.timestamp ?? new Date().toISOString(),
+            dataDir: deps.config.MAILKEEP_DATA_DIR,
+            db: deps.db,
+          });
+          if (!intake.duplicate) {
+            await deps.queue.enqueue(intake.letterId);
+          } else {
+            const existing = deps.db
+              .prepare('SELECT status, error FROM letters WHERE id = ?')
+              .get(intake.letterId) as { status: string; error: string | null } | undefined;
+            if (
+              existing &&
+              (existing.status === 'failed' || (existing.status === 'acting' && existing.error))
+            ) {
+              await deps.queue.enqueue(intake.letterId);
+            }
+          }
+          processed += 1;
+        } catch (error) {
+          if (error instanceof IntakeError) {
+            log.warn(
+              { event: 'inbound_attachment_rejected', messageId: message.message_id, attachmentId },
+              error instanceof Error ? error.message : String(error),
+            );
+            continue;
+          }
+          messageRetryNeeded = true;
+          log.warn(
+            { event: 'inbound_attachment_failed', messageId: message.message_id, attachmentId },
+            error instanceof Error ? error.message : String(error),
+          );
+        }
       }
+      if (messageRetryNeeded) {
+        releaseMessage(deps.db, message.message_id);
+        retryNeeded = true;
+      } else {
+        finishMessage(deps.db, message.message_id, processed > 0 ? 'processed' : 'no_attachments');
+      }
+    } catch (error) {
+      releaseMessage(deps.db, message.message_id);
+      retryNeeded = true;
+      log.warn(
+        { event: 'inbound_message_failed', messageId: message.message_id },
+        error instanceof Error ? error.message : String(error),
+      );
     }
-    finishMessage(deps.db, message.message_id, processed > 0 ? 'processed' : 'no_attachments');
   }
 
-  deps.db
-    .prepare(
-      "INSERT INTO kv (k, v) VALUES ('last_poll_at', ?) ON CONFLICT(k) DO UPDATE SET v = excluded.v",
-    )
-    .run(new Date().toISOString());
+  if (!retryNeeded) {
+    deps.db
+      .prepare(
+        "INSERT INTO kv (k, v) VALUES ('last_poll_at', ?) ON CONFLICT(k) DO UPDATE SET v = excluded.v",
+      )
+      .run(new Date().toISOString());
+  }
 }
 
 let pollTimer: ReturnType<typeof setTimeout> | undefined;
