@@ -109,6 +109,7 @@ export async function sendMessage(
         text: input.text,
         attachments: input.attachments,
       },
+      retry: 0,
     },
   );
   return sendSchema.parse(response.json);
@@ -122,7 +123,7 @@ export async function replyToMessage(
     'agentmail',
     'POST',
     `/v0/inboxes/${encodeURIComponent(input.inboxId)}/messages/${encodeURIComponent(input.messageId)}/reply`,
-    { json: { text: input.text, subject: input.subject } },
+    { json: { text: input.text, subject: input.subject }, retry: 0 },
   );
   return sendSchema.parse(response.json);
 }

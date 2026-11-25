@@ -37,7 +37,19 @@ function replyMessageId(db: DB, row: OutboxRow): string | null {
   return original?.agentmail_message_id ?? null;
 }
 
+const activeSends = new WeakMap<DB, Promise<void>>();
+
 export async function sendPending(deps: SenderDeps): Promise<void> {
+  const active = activeSends.get(deps.db);
+  if (active) return active;
+  const send = sendPendingOnce(deps).finally(() => {
+    activeSends.delete(deps.db);
+  });
+  activeSends.set(deps.db, send);
+  return send;
+}
+
+async function sendPendingOnce(deps: SenderDeps): Promise<void> {
   const rows = deps.db
     .prepare(
       "SELECT * FROM outbox WHERE status = 'pending' AND attempts < 3 ORDER BY created_at LIMIT 20",

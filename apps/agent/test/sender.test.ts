@@ -69,6 +69,34 @@ describe('outbox sender', () => {
     expect(mocks.sendMessage).not.toHaveBeenCalled();
   });
 
+  it('shares one in-flight send when workers overlap', async () => {
+    db.prepare(
+      `INSERT INTO outbox
+        (id, household_id, to_email, kind, subject, body_text, status, created_at)
+       VALUES ('out_1', 'hh_test', 'kiter7396+mom@gmail.com', 'parent_note', 'Note', 'Body', 'pending', ?)`,
+    ).run(new Date().toISOString());
+    let release: (() => void) | undefined;
+    const gate = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    mocks.sendMessage.mockImplementation(async () => {
+      await gate;
+      return { message_id: 'msg_1', thread_id: 'thread_1' };
+    });
+    const config = loadConfig({ MAILKEEP_DATA_DIR: directory });
+    const deps = { db, client: new GatewayClient({ config }), inboxId: 'inbox_1' };
+    const first = sendPending(deps);
+    const second = sendPending(deps);
+    expect(mocks.sendMessage).toHaveBeenCalledTimes(1);
+    release?.();
+    await Promise.all([first, second]);
+    expect(mocks.sendMessage).toHaveBeenCalledTimes(1);
+    expect(
+      (db.prepare('SELECT status FROM outbox WHERE id = ?').get('out_1') as { status: string })
+        .status,
+    ).toBe('sent');
+  });
+
   it('stores the sent thread on its ask so replies can be matched', async () => {
     db.prepare(
       `INSERT INTO asks
