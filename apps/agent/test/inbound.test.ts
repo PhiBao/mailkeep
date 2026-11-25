@@ -96,6 +96,75 @@ describe('AgentMail intake', () => {
     expect((db.prepare('SELECT count(*) AS n FROM inbound_seen').get() as { n: number }).n).toBe(1);
   });
 
+  it('shares one provider poll when two polls overlap', async () => {
+    const bytes = await readFile(path.join(ROOT, 'testset/out/L01.jpg'));
+    let release: (() => void) | undefined;
+    const gate = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    const mail = adapter([message()], bytes);
+    const listMessages = vi.fn(async () => {
+      await gate;
+      return [message()];
+    });
+    mail.listMessages = listMessages;
+    const enqueue = vi.fn().mockResolvedValue(undefined);
+    const queue = { enqueue } as unknown as PipelineQueue;
+    const first = pollAgentMail({ ...deps(), queue }, mail);
+    const second = pollAgentMail({ ...deps(), queue }, mail);
+    expect(listMessages).toHaveBeenCalledTimes(1);
+    release?.();
+    await Promise.all([first, second]);
+    expect(enqueue).toHaveBeenCalledTimes(1);
+    expect((db.prepare('SELECT count(*) AS n FROM inbound_seen').get() as { n: number }).n).toBe(1);
+  });
+
+  it('does not enqueue identical attachments from two messages twice', async () => {
+    const bytes = await readFile(path.join(ROOT, 'testset/out/L01.jpg'));
+    const enqueue = vi.fn().mockResolvedValue(undefined);
+    await pollAgentMail(
+      { ...deps(), queue: { enqueue } as unknown as PipelineQueue },
+      adapter([message({ message_id: 'message_1' }), message({ message_id: 'message_2' })], bytes),
+    );
+    expect(enqueue).toHaveBeenCalledTimes(1);
+    expect((db.prepare('SELECT count(*) AS n FROM letters').get() as { n: number }).n).toBe(1);
+    expect((db.prepare('SELECT count(*) AS n FROM inbound_seen').get() as { n: number }).n).toBe(2);
+  });
+
+  it('releases a failed reply claim so the next poll can retry', async () => {
+    const family = addMember(db, {
+      householdId: 'hh_test',
+      email: 'kiter7396@gmail.com',
+      displayName: 'Sarah',
+      role: 'family',
+    });
+    db.prepare(
+      `INSERT INTO asks
+        (id, household_id, letter_id, qtype, question, evidence, options_json, status,
+         agentmail_thread_id, created_at)
+       VALUES ('ask_1', 'hh_test', NULL, 'check', 'Check this', 'Evidence', '[]', 'open', 'thread_1', ?)`,
+    ).run(new Date().toISOString());
+    const replyHandler = vi
+      .fn()
+      .mockRejectedValueOnce(new Error('temporary'))
+      .mockResolvedValueOnce('answered');
+    const mail = adapter(
+      [message({ from: 'Sarah <kiter7396@gmail.com>', text: 'HANDLED IT', attachments: [] })],
+      Buffer.from('x'),
+    );
+    await pollAgentMail({ ...deps(), replyHandler }, mail);
+    expect((db.prepare('SELECT count(*) AS n FROM inbound_seen').get() as { n: number }).n).toBe(0);
+    await pollAgentMail({ ...deps(), replyHandler }, mail);
+    expect(replyHandler).toHaveBeenCalledTimes(2);
+    expect(replyHandler).toHaveBeenLastCalledWith(
+      expect.objectContaining({ db }),
+      expect.objectContaining({ memberId: family.id }),
+    );
+    expect(
+      (db.prepare('SELECT outcome FROM inbound_seen').get() as { outcome: string }).outcome,
+    ).toBe('answered');
+  });
+
   it('routes a family reply to the matching open ask instead of intake', async () => {
     const family = addMember(db, {
       householdId: 'hh_test',

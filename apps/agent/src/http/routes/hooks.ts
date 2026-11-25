@@ -70,7 +70,41 @@ function attachmentList(value: unknown): Array<Record<string, unknown>> {
   return [];
 }
 
+const activePolls = new WeakMap<DB, Promise<void>>();
+
+function claimMessage(db: DB, messageId: string): boolean {
+  return (
+    db
+      .prepare(
+        `INSERT OR IGNORE INTO inbound_seen (agentmail_message_id, outcome, created_at)
+         VALUES (?, 'processing', ?)`,
+      )
+      .run(messageId, new Date().toISOString()).changes === 1
+  );
+}
+
+function finishMessage(db: DB, messageId: string, outcome: string): void {
+  db.prepare('UPDATE inbound_seen SET outcome = ? WHERE agentmail_message_id = ?').run(
+    outcome,
+    messageId,
+  );
+}
+
+function releaseMessage(db: DB, messageId: string): void {
+  db.prepare('DELETE FROM inbound_seen WHERE agentmail_message_id = ?').run(messageId);
+}
+
 export async function pollAgentMail(deps: HookDeps, adapter?: MailAdapter): Promise<void> {
+  const active = activePolls.get(deps.db);
+  if (active) return active;
+  const poll = pollAgentMailOnce(deps, adapter).finally(() => {
+    activePolls.delete(deps.db);
+  });
+  activePolls.set(deps.db, poll);
+  return poll;
+}
+
+async function pollAgentMailOnce(deps: HookDeps, adapter?: MailAdapter): Promise<void> {
   const mail: MailAdapter = adapter ?? {
     listMessages: async (inboxId, after) => {
       const result = await listMessages(deps.client, { inboxId, after, limit: 100 });
@@ -93,20 +127,11 @@ export async function pollAgentMail(deps: HookDeps, adapter?: MailAdapter): Prom
   const messages = await mail.listMessages(inboxId, after);
 
   for (const message of messages) {
-    if (
-      deps.db
-        .prepare('SELECT 1 FROM inbound_seen WHERE agentmail_message_id = ?')
-        .get(message.message_id)
-    )
-      continue;
+    if (!claimMessage(deps.db, message.message_id)) continue;
     const email = senderEmail(message.from);
     const member = email ? getMemberByEmail(deps.db, email) : undefined;
     if (!member) {
-      deps.db
-        .prepare(
-          'INSERT INTO inbound_seen (agentmail_message_id, outcome, created_at) VALUES (?, ?, ?)',
-        )
-        .run(message.message_id, 'ignored_sender', new Date().toISOString());
+      finishMessage(deps.db, message.message_id, 'ignored_sender');
       continue;
     }
     const householdId = String(member.household_id);
@@ -124,12 +149,9 @@ export async function pollAgentMail(deps: HookDeps, adapter?: MailAdapter): Prom
           text: message.text ?? '',
           via: 'email',
         });
-        deps.db
-          .prepare(
-            'INSERT INTO inbound_seen (agentmail_message_id, outcome, created_at) VALUES (?, ?, ?)',
-          )
-          .run(message.message_id, outcome, new Date().toISOString());
+        finishMessage(deps.db, message.message_id, outcome);
       } catch (error) {
+        releaseMessage(deps.db, message.message_id);
         log.warn(
           { event: 'inbound_reply_failed', messageId: message.message_id, askId: openAsk.id },
           error instanceof Error ? error.message : String(error),
@@ -154,12 +176,9 @@ export async function pollAgentMail(deps: HookDeps, adapter?: MailAdapter): Prom
           text: message.text ?? '',
           via: 'email',
         });
-        deps.db
-          .prepare(
-            'INSERT INTO inbound_seen (agentmail_message_id, outcome, created_at) VALUES (?, ?, ?)',
-          )
-          .run(message.message_id, outcome, new Date().toISOString());
+        finishMessage(deps.db, message.message_id, outcome);
       } catch (error) {
+        releaseMessage(deps.db, message.message_id);
         log.warn(
           { event: 'inbound_alert_reply_failed', messageId: message.message_id, alertId: alert.id },
           error instanceof Error ? error.message : String(error),
@@ -185,7 +204,7 @@ export async function pollAgentMail(deps: HookDeps, adapter?: MailAdapter): Prom
           dataDir: deps.config.MAILKEEP_DATA_DIR,
           db: deps.db,
         });
-        await deps.queue.enqueue(intake.letterId);
+        if (!intake.duplicate) await deps.queue.enqueue(intake.letterId);
         processed += 1;
       } catch (error) {
         log.warn(
@@ -194,15 +213,7 @@ export async function pollAgentMail(deps: HookDeps, adapter?: MailAdapter): Prom
         );
       }
     }
-    deps.db
-      .prepare(
-        'INSERT INTO inbound_seen (agentmail_message_id, outcome, created_at) VALUES (?, ?, ?)',
-      )
-      .run(
-        message.message_id,
-        processed > 0 ? 'processed' : 'no_attachments',
-        new Date().toISOString(),
-      );
+    finishMessage(deps.db, message.message_id, processed > 0 ? 'processed' : 'no_attachments');
   }
 
   deps.db
