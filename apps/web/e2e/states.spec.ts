@@ -98,7 +98,8 @@ test('letter processing steps', async ({ page }) => {
     todoParent: null,
   });
   await page.goto('/letters/ltr_state');
-  await expect(page.getByText('Reading the photo', { exact: false })).toBeVisible();
+  await expect(page.getByRole('listitem').filter({ hasText: 'Reading the photo' })).toBeVisible();
+  await expect(page.getByRole('status')).toContainText('Reading the photo');
   await page.screenshot({ path: 'docs/screens/state-processing.png', fullPage: true });
 });
 

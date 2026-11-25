@@ -144,7 +144,7 @@ Live proof: two clean canonical runs on product build `d6de088` joined seeded ca
 | Scheduled chase           | Live           | `mailkeep-clock` hourly machine; Sprite `tick_complete` log                                                                               |
 | Egress policy             | Live           | `example.org` REFUSED; gateway and AgentMail CDN allowed                                                                                  |
 | Unit/integration tests    | Passing        | 226 agent tests, shared tests and eval selection/report tests                                                                             |
-| Browser tests             | Passing        | Today, Case, Letter, Mom/Login, Proof, Demo, Shoebox, ten states, CAREFUL safety copy and 55 anti-slop checks                             |
+| Browser tests             | Passing        | 91 Playwright tests across public, family and parent paths; 3 human-only launches skipped                                                 |
 | T15 human inbound email   | Live           | Cedar bill and second-notice photos processed from Gmail through AgentMail; [live-loop proof](docs/live-loop-proof.md)                    |
 | T18 live PAID reply       | Live           | Exact PAID on the Cedar alert thread marked the case paid, letter handled and versioned Box `case.md`                                     |
 | T25 exact L01 amount copy | Known gap      | Live API returned amount null; UI fixture verifies intended copy                                                                          |

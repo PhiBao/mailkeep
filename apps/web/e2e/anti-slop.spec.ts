@@ -181,16 +181,20 @@ const caseDto = {
   relations: letter.relations,
 };
 const proof = {
+  capturedAt: '2026-11-25T14:30:00.000Z',
   where: {
     spriteName: 'mailkeep',
     url: 'https://mailkeep-hl3m.sprites.app',
     serviceStatus: 'running',
-    gitSha: 'ebed2a42d79ca5f6969fd32d29a1f51a1dbbed7b',
+    gitSha: 'be76da8568fc8bb5a33765f36cb2621bbb83aeaf',
     uptime: '2h 14m',
   },
   connectors: [
-    { provider: 'typesafe', connectionIdPrefix: 'nzOp5iVC', credentialLocation: 'Fly connector' },
+    { provider: 'agentmail', connectionIdPrefix: 'oFVcFZMw', credentialLocation: 'Fly connector' },
+    { provider: 'box', connectionIdPrefix: 'D6Q3d2I6', credentialLocation: 'Fly connector' },
     { provider: 'ollama', connectionIdPrefix: 'Xuv-D-ig', credentialLocation: 'Fly connector' },
+    { provider: 'pinecone', connectionIdPrefix: 'anVdybVe', credentialLocation: 'Fly connector' },
+    { provider: 'typesafe', connectionIdPrefix: 'nzOp5iVC', credentialLocation: 'Fly connector' },
   ],
   keyscan: {
     found: 0,
@@ -201,13 +205,18 @@ const proof = {
   eval: {
     runId: 'heldout-20261125042539630',
     generatedAt: '2026-11-25T04:26:39.619Z',
+    heldout: true,
     letters: 6,
-    laneAccuracy: 0.8333,
+    laneAccuracy: 0.8333333333333334,
     neverSafe: '6/6',
+    falseAlarms: 0,
     scamsCaught: '1/2',
     linkPrecision: 1,
     linkRecall: 1,
-    askRate: 0.3333,
+    amountAccuracy: 0,
+    dueAccuracy: 1,
+    askRate: 0.3333333333333333,
+    averageLatencyMs: 726,
   },
   costs: {
     lettersProcessed: 32,
