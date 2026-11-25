@@ -9,6 +9,7 @@ import { loadConfig } from '../src/config.js';
 import { type DB, openDb } from '../src/db/db.js';
 import { migrate } from '../src/db/migrate.js';
 import { addMember, createHousehold } from '../src/db/repo.js';
+import { GatewayClient } from '../src/gateway/client.js';
 import { apiRoutes, MAX_UPLOAD_BODY_BYTES } from '../src/http/routes/api.js';
 import { momRoutes } from '../src/http/routes/mom.js';
 import { issueSession, SESSION_COOKIE, type SessionMember } from '../src/http/session.js';
@@ -217,7 +218,12 @@ function seedDecision(input: {
     input.letterId,
     input.householdId ?? 'hh_a',
     JSON.stringify({
-      state: { today: '2026-11-24', past: input.past ?? [] },
+      state: {
+        today: '2026-11-24',
+        past: input.past ?? [],
+        amount_candidates: [],
+        date_candidates: [],
+      },
       questions: { same_matter_0: {}, same_matter_1: {} },
     }),
     JSON.stringify({
@@ -282,7 +288,10 @@ beforeEach(async () => {
   const config = loadConfig({ MAILKEEP_PUBLIC_URL: ORIGIN, MAILKEEP_DATA_DIR: directory });
   const queue = { enqueue } as unknown as Pick<PipelineQueue, 'enqueue'>;
   app = new Hono();
-  app.route('/', apiRoutes({ config, db, queue, now: clock }));
+  app.route(
+    '/',
+    apiRoutes({ config, db, client: new GatewayClient({ config }), queue, now: clock }),
+  );
   app.route('/', momRoutes({ db, now: clock }));
 
   await seedCase({
@@ -957,6 +966,7 @@ describe('ask answers and case actions', () => {
     expect(db.prepare('SELECT status FROM cases WHERE id = ?').get('case_a')).toEqual({
       status: 'paid',
     });
+    expect(db.prepare("SELECT v FROM kv WHERE k = 'case-sync:hh_a:case_a'").get()).toBeDefined();
     expect(
       db
         .prepare('SELECT status, answer_key, answered_by, answered_via FROM asks WHERE id = ?')
@@ -972,13 +982,32 @@ describe('ask answers and case actions', () => {
       .all() as Array<{ type: string; actor: string; member_id: string | null }>;
     expect(events).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({ type: 'marked_paid', actor: 'member', member_id: null }),
+        expect.objectContaining({ type: 'marked_paid', actor: 'member', member_id: family.id }),
         expect.objectContaining({ type: 'answered', actor: 'member', member_id: family.id }),
       ]),
     );
 
     const repeated = await jsonPost('/api/asks/ask_paid/answer', { answer: 'paid' });
     expect(repeated.status).toBe(409);
+  });
+
+  it('queues the same scam warning for a web answer as for email', async () => {
+    seedAsk({
+      id: 'ask_scam',
+      letterId: 'ltr_a',
+      caseId: 'case_a',
+      qtype: 'scam',
+      options: [
+        { value: 'scam', label: 'Scam' },
+        { value: 'real', label: 'Real' },
+      ],
+    });
+    const response = await jsonPost('/api/asks/ask_scam/answer', { answer: 'scam' });
+    expect(response.status).toBe(200);
+    expect(letterSchema.parse(await response.json()).lane).toBe('careful');
+    expect(
+      db.prepare("SELECT count(*) AS n FROM outbox WHERE related_id = 'ltr_a:answer-scam'").get(),
+    ).toEqual({ n: 2 });
   });
 
   it('rejects invalid answers and parent mutations without changing the ask', async () => {
@@ -999,6 +1028,13 @@ describe('ask answers and case actions', () => {
     const paid = await jsonPost('/api/cases/case_a/mark-paid', null);
     expect(paid.status).toBe(200);
     expect(caseSchema.parse(await paid.json()).status).toBe('paid');
+    expect(db.prepare('SELECT lane FROM letters WHERE id = ?').get('ltr_a')).toEqual({
+      lane: 'handled',
+    });
+    expect(db.prepare("SELECT v FROM kv WHERE k = 'case-sync:hh_a:case_a'").get()).toBeDefined();
+    expect(db.prepare('SELECT status FROM asks WHERE id = ?').get('ask_new')).toEqual({
+      status: 'answered',
+    });
     expect(
       db
         .prepare(

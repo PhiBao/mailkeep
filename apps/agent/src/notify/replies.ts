@@ -4,6 +4,7 @@ import { updateCaseFile } from '../act/box.js';
 import {
   addCaseEvent,
   getCase,
+  queueCaseFileSync,
   replaceRelations,
   saveCaseChange,
   saveRelations,
@@ -21,7 +22,6 @@ import {
   route,
 } from '../pipeline/route.js';
 import { type SystemOneResponse, systemOne } from '../providers/typesafe.js';
-import { log } from '../util/log.js';
 import { parseUsd } from '../util/money.js';
 import { familyAlert, parentNote } from './templates.js';
 
@@ -320,6 +320,7 @@ function closeCase(
   letter: LetterRow,
   caseId: string,
   status: 'paid' | 'closed',
+  member?: { id: string; via: 'email' | 'web' },
 ): AppliedAnswer {
   const caseRow = getCase(db, letter.household_id, caseId);
   if (!caseRow) throw new Error(`Case ${caseId} not found`);
@@ -357,14 +358,41 @@ function closeCase(
     `route:${letter.id}`,
     JSON.stringify(output),
   );
+  db.prepare(
+    `UPDATE asks SET status = 'answered', answer_key = ?, answered_by = ?, answered_via = ?, answered_at = ?
+      WHERE case_id = ? AND household_id = ? AND status = 'open'`,
+  ).run(
+    status === 'paid' ? 'paid' : 'closed',
+    member?.id ?? null,
+    member?.via ?? 'email',
+    new Date().toISOString(),
+    caseId,
+    letter.household_id,
+  );
   addCaseEvent(db, {
     householdId: letter.household_id,
     caseId,
     letterId: letter.id,
     type: status === 'paid' ? 'marked_paid' : 'closed',
     actor: 'member',
+    memberId: member?.id ?? null,
+    detail: { via: member?.via ?? 'email' },
   });
+  queueCaseFileSync(db, letter.household_id, caseId);
   return { householdId: letter.household_id, letterId: letter.id, caseId, lane: 'handled' };
+}
+
+export function markCasePaidWeb(
+  db: DB,
+  input: { householdId: string; caseId: string; memberId: string },
+): AppliedAnswer | null {
+  const letter = db
+    .prepare(
+      'SELECT * FROM letters WHERE case_id = ? AND household_id = ? ORDER BY received_at DESC, id DESC LIMIT 1',
+    )
+    .get(input.caseId, input.householdId) as LetterRow | undefined;
+  if (!letter) return null;
+  return closeCase(db, letter, input.caseId, 'paid', { id: input.memberId, via: 'web' });
 }
 
 function ensureAskedEvent(
@@ -442,14 +470,20 @@ export function applyAskAnswer(
       }
     } else if (ask.qtype === 'paid' && letter) {
       const caseId = letter.case_id ?? ask.case_id;
-      if (caseId && input.answer === 'paid') result = closeCase(db, letter, caseId, 'paid');
-      if (caseId && input.answer === 'not_ours') result = closeCase(db, letter, caseId, 'closed');
+      if (caseId && input.answer === 'paid')
+        result = closeCase(db, letter, caseId, 'paid', { id: input.memberId, via: input.via });
+      if (caseId && input.answer === 'not_ours')
+        result = closeCase(db, letter, caseId, 'closed', { id: input.memberId, via: input.via });
     } else if ((ask.qtype === 'scam' || ask.qtype === 'check') && letter) {
       if (input.answer === 'scam') result = commitRoute(db, letter, { scam: true });
       if (input.answer === 'real') result = commitRoute(db, letter, { scam: false });
       if (input.answer === 'handled_it' || input.answer === 'not_ours') {
         const caseId = letter.case_id ?? ask.case_id;
-        if (caseId) result = closeCase(db, letter, caseId, 'closed');
+        if (caseId)
+          result = closeCase(db, letter, caseId, 'closed', {
+            id: input.memberId,
+            via: input.via,
+          });
         else {
           result = {
             householdId: letter.household_id,
@@ -484,6 +518,7 @@ export function applyAskAnswer(
     db.prepare(
       "UPDATE asks SET status = 'answered', answer_key = ?, answered_by = ?, answered_via = ?, answered_at = ? WHERE id = ?",
     ).run(input.answer, input.memberId, input.via, new Date().toISOString(), ask.id);
+    if (result.caseId) queueCaseFileSync(db, result.householdId, result.caseId);
     return result;
   })();
 }
@@ -592,7 +627,7 @@ function queueClarification(deps: AskReplyDeps, ask: AskRow): void {
   }
 }
 
-function queueScamWarning(deps: AskReplyDeps, result: AppliedAnswer): void {
+export function queueScamWarning(deps: AskReplyDeps, result: AppliedAnswer): void {
   if (!result.letterId || result.lane !== 'careful') return;
   const letter = letterById(deps.db, result.letterId);
   const output = storedRoute(deps.db, letter.id);
@@ -689,19 +724,10 @@ export async function handleAlertReply(
     !['open', 'overdue'].includes(String(caseRow.status))
   )
     return 'ignored';
-  const result = deps.db.transaction(() => closeCase(deps.db, letter, caseId, 'paid'))();
-  if (deps.afterAnswer) {
-    await deps.afterAnswer(result);
-  } else {
-    try {
-      await syncCaseFileForLetter(deps, result);
-    } catch (error) {
-      log.error(
-        { event: 'alert_reply_casefile_failed', alertId: alert.id },
-        error instanceof Error ? error.message : String(error),
-      );
-    }
-  }
+  const result = deps.db.transaction(() =>
+    closeCase(deps.db, letter, caseId, 'paid', { id: input.memberId, via: input.via }),
+  )();
+  if (deps.afterAnswer) await deps.afterAnswer(result);
   return 'answered';
 }
 
@@ -753,14 +779,6 @@ export async function handleAskReply(
   if (deps.afterAnswer) {
     await deps.afterAnswer(result);
   } else {
-    try {
-      await syncCaseFileForLetter(deps, result);
-    } catch (error) {
-      log.error(
-        { event: 'reply_casefile_failed', askId: ask.id },
-        error instanceof Error ? error.message : String(error),
-      );
-    }
     queueScamWarning(deps, result);
   }
   return 'answered';

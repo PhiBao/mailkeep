@@ -624,6 +624,7 @@ export async function purgeExpiredTrials(
     }
 
     for (const householdId of householdIds) {
+      db.prepare('DELETE FROM kv WHERE k LIKE ?').run(`case-sync:${householdId}:%`);
       const remaining = db
         .prepare('SELECT 1 FROM letters WHERE household_id = ? AND trial = 1 LIMIT 1')
         .get(householdId);

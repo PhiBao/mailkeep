@@ -9,6 +9,16 @@ export function getCase(db: DB, householdId: string, caseId: string) {
     .get(householdId, caseId) as Record<string, unknown> | undefined;
 }
 
+export function queueCaseFileSync(db: DB, householdId: string, caseId: string): void {
+  db.prepare(
+    `INSERT INTO kv (k, v) VALUES (?, ?)
+     ON CONFLICT(k) DO UPDATE SET v = excluded.v`,
+  ).run(
+    `case-sync:${householdId}:${caseId}`,
+    JSON.stringify({ queuedAt: new Date().toISOString() }),
+  );
+}
+
 export function saveCaseChange(
   db: DB,
   input: { householdId: string; letterId: string; change: CaseChange },

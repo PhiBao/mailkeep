@@ -38,7 +38,7 @@ const proof = await collectProof({ config, db, client, keyscan, env: process.env
 const queue = new PipelineQueue({ client, config, db });
 const app = createApp(config, (instance) => {
   instance.route('/', authRoutes({ config, db }));
-  instance.route('/', apiRoutes({ config, db, queue }));
+  instance.route('/', apiRoutes({ config, db, client, queue }));
   instance.route('/', demoRoutes({ config, db, queue }));
   instance.route('/', momRoutes({ db }));
   instance.route('/', proofRoutes({ proof }));
@@ -60,4 +60,4 @@ process.on('SIGINT', shutdown);
 void resumePending({ client, config, db }, queue).catch((error: unknown) => {
   log.error({ event: 'resume_failed' }, error instanceof Error ? error.message : String(error));
 });
-startSenderWorker({ db, client, inboxId: config.MAILKEEP_AGENTMAIL_INBOX_ID });
+startSenderWorker({ db, client, config, inboxId: config.MAILKEEP_AGENTMAIL_INBOX_ID });

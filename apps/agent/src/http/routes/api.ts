@@ -15,10 +15,11 @@ import {
 } from '@mailkeep/shared';
 import { type Context, Hono } from 'hono';
 import { transitionCase } from '../../cases/machine.js';
-import { addCaseEvent } from '../../cases/repo.js';
+import { addCaseEvent, queueCaseFileSync } from '../../cases/repo.js';
 import type { Config } from '../../config.js';
 import type { DB } from '../../db/db.js';
-import { applyAskAnswer } from '../../notify/replies.js';
+import type { GatewayClient } from '../../gateway/client.js';
+import { applyAskAnswer, markCasePaidWeb, queueScamWarning } from '../../notify/replies.js';
 import {
   IntakeError,
   type IntakeResult,
@@ -124,6 +125,7 @@ interface DecisionRow {
 export interface ApiDeps {
   config: Config;
   db: DB;
+  client: GatewayClient;
   queue: Pick<PipelineQueue, 'enqueue'>;
   now?: Clock | undefined;
 }
@@ -954,6 +956,7 @@ export function apiRoutes(deps: ApiDeps): Hono {
       via: 'web',
     });
     if (!result) return context.json({ error: 'ask_closed' }, 409);
+    queueScamWarning(deps, result);
     if (result.letterId) {
       const letter = getHouseholdRow<LetterRow>(deps.db, member, 'letters', result.letterId);
       if (!letter) return context.json({ error: 'not_found' }, 404);
@@ -982,6 +985,17 @@ export function apiRoutes(deps: ApiDeps): Hono {
     }
     const now = clock().toISOString();
     deps.db.transaction(() => {
+      if (event === 'marked_paid') {
+        const applied = markCasePaidWeb(deps.db, {
+          householdId: member.household_id,
+          caseId: row.id,
+          memberId: member.id,
+        });
+        if (applied) {
+          queueCaseFileSync(deps.db, member.household_id, row.id);
+          return;
+        }
+      }
       const changed = deps.db
         .prepare(
           `UPDATE cases SET status = ?, updated_at = ?
@@ -997,6 +1011,7 @@ export function apiRoutes(deps: ApiDeps): Hono {
         memberId: member.id,
         detail: { via: 'web' },
       });
+      queueCaseFileSync(deps.db, member.household_id, row.id);
     })();
     const updated = getHouseholdRow<CaseRow>(deps.db, member, 'cases', row.id);
     return updated

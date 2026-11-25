@@ -1,3 +1,5 @@
+import { syncPendingCaseFiles } from '../act/case-sync.js';
+import type { Config } from '../config.js';
 import type { DB } from '../db/db.js';
 import type { GatewayClient } from '../gateway/client.js';
 import { listInboxes, replyToMessage, sendMessage } from '../providers/agentmail.js';
@@ -7,6 +9,10 @@ export interface SenderDeps {
   db: DB;
   client: GatewayClient;
   inboxId: string;
+}
+
+export interface SenderWorkerDeps extends SenderDeps {
+  config: Config;
 }
 
 interface OutboxRow {
@@ -97,9 +103,14 @@ async function sendPendingOnce(deps: SenderDeps): Promise<void> {
   }
 }
 
-export function startSenderWorker(deps: SenderDeps): void {
+export function startSenderWorker(deps: SenderWorkerDeps): void {
+  const run = () =>
+    Promise.all([
+      sendPending(deps),
+      syncPendingCaseFiles({ db: deps.db, client: deps.client, config: deps.config }),
+    ]).then(() => undefined);
   const timer = setInterval(() => {
-    void sendPending(deps).catch((error: unknown) => {
+    void run().catch((error: unknown) => {
       log.error(
         { event: 'outbox_worker_failed' },
         error instanceof Error ? error.message : String(error),
@@ -107,5 +118,10 @@ export function startSenderWorker(deps: SenderDeps): void {
     });
   }, 5000);
   timer.unref();
-  void sendPending(deps);
+  void run().catch((error: unknown) => {
+    log.error(
+      { event: 'outbox_worker_failed' },
+      error instanceof Error ? error.message : String(error),
+    );
+  });
 }
