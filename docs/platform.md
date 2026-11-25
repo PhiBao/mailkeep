@@ -20,7 +20,7 @@ Recorded by `scripts/sprite-setup.sh` on 2026-11-24.
 - Household: `hh_demo` · "Ruth's mail" · fixed demo date 2026-12-09.
 - Seed: 21 `demo=seed` letters through the real pipeline; 16 handled/headsup; all six required open cases present.
 - Box root folder: `440822123671`; per-case files are under `Cases`.
-- Live sample proof: L02 trial `ltr_zAIs3FpqDcCqHAWByfOiu` joined `case_zo1RyEj9hAIANY9ypKlTP` with same_matter 0.99 and follow_up 0.99.
+- Live sample proof: two clean L02 rehearsal trials joined `case_zo1RyEj9hAIANY9ypKlTP` with same_matter 0.99 and follow_up 0.99/0.98 on decision build `378902b`; exact IDs and timings are in `docs/demo-script.md`. Trials were reset after rehearsal.
 - H8 pending: share the Box root as “People with the link · Can view” and store the URL with `scripts/seed-demo.ts --box-link <url>`.
 
 ## Chase clock
@@ -34,4 +34,4 @@ Recorded by `scripts/sprite-setup.sh` on 2026-11-24.
 - Applied from the dev machine with `scripts/network-policy.sh` via `POST /v1/sprites/mailkeep/policy/network`.
 - Rules: Fly defaults; allow `api.sprites.dev`, `*.agentmail.to`, `cdn.agentmail.to`, `github.com`, `*.githubusercontent.com`, `registry.npmjs.org`; explicit deny `example.org`; deny `*`.
 - Verified on the Sprite: `dig example.org` → REFUSED; `github.com` and `cdn.agentmail.to` resolve; provider smoke 5/5 PASS.
-- `sprite checkpoint list` shows pre-deploy checkpoints through v63.
+- `sprite checkpoint list` shows pre-deploy checkpoints through v88.

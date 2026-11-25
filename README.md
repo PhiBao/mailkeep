@@ -12,7 +12,7 @@ A personal mail agent on a Fly.io Sprite for the adult child of an older parent.
 
 1. Open [/demo](https://mailkeep-hl3m.sprites.app/demo).
 2. Click **Riverbend PAST DUE**.
-3. Watch the live letter join the Nov 18 water-bill case with `same_matter=0.99` and `follow_up=0.99`.
+3. Watch the live letter join the Nov 18 water-bill case with `same_matter=0.99` and `follow_up≥0.80` (0.98–0.99 in rehearsal).
 4. Open [/proof](https://mailkeep-hl3m.sprites.app/proof) to see the Sprite, connectors, keyscan, thresholds, evaluation and cost.
 
 Proof: [live `/proof`](https://mailkeep-hl3m.sprites.app/proof) · [EVAL.md](EVAL.md) · [Box folder](https://app.box.com/folder/440822123671) (_public sharing pending H8_) · [model/provider proof commit](https://github.com/PhiBao/mailkeep/commit/ef31881).
@@ -132,7 +132,7 @@ Operational scripts: [clock-setup.sh](scripts/clock-setup.sh) for the hourly Fly
 
 The public demo is read-only except for six rate-limited synthetic sample runs. Sample letters create trial rows, use the real pipeline, file under Box `Trials/`, suppress email and expire after 24 hours. The demo clock is fixed at December 9, 2026.
 
-Live proof: sample L02 (`ltr_zAIs3FpqDcCqHAWByfOiu`) joined seeded case `case_zo1RyEj9hAIANY9ypKlTP` with `same_matter=0.99` and `follow_up=0.99`.
+Live proof: two clean sample runs on decision build `378902b` joined seeded case `case_zo1RyEj9hAIANY9ypKlTP` with `same_matter=0.99` and `follow_up` 0.99/0.98. Trial rows were reset afterward; exact IDs, timings and screenshots are in [docs/demo-script.md](docs/demo-script.md).
 
 ## Verification
 
@@ -144,7 +144,7 @@ Live proof: sample L02 (`ltr_zAIs3FpqDcCqHAWByfOiu`) joined seeded case `case_zo
 | Scheduled chase           | Live           | `mailkeep-clock` hourly machine; Sprite `tick_complete` log                                                                               |
 | Egress policy             | Live           | `example.org` REFUSED; gateway and AgentMail CDN allowed                                                                                  |
 | Unit/integration tests    | Passing        | 185 agent tests, shared tests and eval selection/report tests                                                                             |
-| Browser tests             | Passing        | Today, Case, Letter, Mom/Login, Proof, Demo, Shoebox, ten states and 55 anti-slop checks                                                  |
+| Browser tests             | Passing        | Today, Case, Letter, Mom/Login, Proof, Demo, Shoebox, ten states, CAREFUL safety copy and 55 anti-slop checks                             |
 | T15 human inbound email   | Awaiting human | Webhook configured path returns 202; fresh inbound proof still needed                                                                     |
 | T18 live PAID reply       | Awaiting T15   | Unit/effect tests pass                                                                                                                    |
 | T25 exact L01 amount copy | Known gap      | Live API returned amount null; UI fixture verifies intended copy                                                                          |
