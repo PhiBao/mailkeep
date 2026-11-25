@@ -132,7 +132,7 @@ Operational scripts: [clock-setup.sh](scripts/clock-setup.sh) for the hourly Fly
 
 The public demo is read-only except for six rate-limited synthetic sample runs. Sample letters create trial rows, use the real pipeline, file under Box `Trials/`, suppress email and expire after 24 hours. The demo clock is fixed at December 9, 2026.
 
-Live proof: two clean sample runs on decision build `378902b` joined seeded case `case_zo1RyEj9hAIANY9ypKlTP` with `same_matter=0.99` and `follow_up` 0.99/0.98. Trial rows were reset afterward; exact IDs, timings and screenshots are in [docs/demo-script.md](docs/demo-script.md).
+Live proof: two clean canonical runs on product build `d6de088` joined seeded case `case_zo1RyEj9hAIANY9ypKlTP` with `same_matter=0.99` and `follow_up` 0.99/0.98. Run totals were 41.216 s and 37.815 s; exact IDs, timings and checks are in [docs/demo-script.md](docs/demo-script.md). Trial rows and seeded case state were restored afterward.
 
 ## Verification
 

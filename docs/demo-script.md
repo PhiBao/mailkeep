@@ -1,84 +1,79 @@
 # Demo rehearsal
 
-Rehearsed 2026-11-25 against `https://mailkeep-hl3m.sprites.app` on commit `378902b62f4eb8a64d5623ebbd0755fad8419c06`.
+Final canonical rehearsals: 2026-11-25 against `https://mailkeep-hl3m.sprites.app` on product commit `d6de088e53e4b74cf0de735805c0db7caf9a4cd8`.
 
 ## Reliable recording path
 
-The public demo is the primary recording path because it needs no login and suppresses outbound email. Each run used a fresh Playwright context with no cookies at 1440×1000:
+The public demo is the primary recording path because it needs no login and suppresses outbound email. Each run used a fresh Playwright Chromium context at 1440×1000:
 
 1. Open `/demo`; wait for **Riverbend PAST DUE**.
-2. Run Riverbend; wait for **NEEDS YOU**, checks and the linked case.
-3. Open the case file; verify both slips and the second-notice annotation.
-4. Return to `/demo`; run **Urgent benefits notice**; verify **CAREFUL** and the fixed safety copy.
-5. Open `/proof`; verify the deployed SHA, connectors, zero keys and evaluation.
+2. Run Riverbend; wait for **NEEDS YOU**, the linked case, second-notice evidence and Recall.
+3. Open `/demo`; run **Urgent benefits notice**; wait for **CAREFUL** and the fixed safety copy.
+4. Open `/proof`; verify the deployed SHA, boot capture, thresholds, held-out split, amount/due accuracy and costs.
 
-Between runs, all `source=sample, trial=1` rows, their local files and Pinecone vectors were removed on the Sprite. The Riverbend case was restored from the seeded letter's stored route, including title, kind, due date and `second_notice=0`. Seeded letters and evaluation rows were not changed. The same cleanup was run after run 2, leaving the public demo at its seeded baseline.
+Between runs, all `source=sample, trial=1` rows, their local files and Pinecone vectors were removed on the Sprite. Seeded cases were restored from the trial baseline. The final cleanup left the Riverbend case open, due Dec 10 with `second_notice=0`, one seeded letter and no public trial rows. Evaluation rows were never selected by purge.
 
 ## Run 1
 
 | Beat                                        |      Elapsed |
 | ------------------------------------------- | -----------: |
-| `/demo` ready                               |      2.183 s |
-| Riverbend processed and letter rendered     |     17.083 s |
-| Case file ready                             |      0.832 s |
-| Benefits scam processed and letter rendered |     17.395 s |
-| `/proof` ready                              |      1.223 s |
-| **Total**                                   | **38.716 s** |
+| `/demo` ready                               |      2.328 s |
+| Riverbend processed and letter rendered     |     19.336 s |
+| Benefits scam processed and letter rendered |     17.485 s |
+| `/proof` ready                              |      1.220 s |
+| **Total**                                   | **41.216 s** |
 
-- Riverbend trial: `ltr_izYBbRKa4gRPbtZxurfJg`; received **Dec 9, 2026**.
-- Relations: `same matter · 0.99`, `second notice · 0.99`.
-- Case: `case_zo1RyEj9hAIANY9ypKlTP`; open, due Dec 16, second notice received on Dec 9.
-- Parent note: “Hi Ruth, The water bill is unpaid and now includes a late fee. Payment is required to avoid service disconnection. Keep it for now. Sarah will look at it. — Mailkeep”
-- Decision: `jev-1.14.0`, 32 questions, 510 ms, $0.0005.
-- Scam trial: `ltr_xObO6wF2pzSr7mkF0NTT_`; **CAREFUL**; received Dec 9.
-- Scam parent note: “Hi Ruth, the letter from "Maple Senior Health Plan" looks like a scam. Don't pay it. Don't call the number on it. Don't give any card or account numbers. Sarah has been told. — Mailkeep”
-- Scam “What it needs”: “Careful. Don't pay. Don't call the number on it. Sarah has been told.”
-- Scam decision: `jev-1.14.0`, 31 questions, 1116 ms, $0.0005.
-- Browser errors: none.
+- Riverbend trial: `ltr_LTMzYOPSoZfdrDj2eQrzC`; received **Dec 9, 2026**.
+- Relations: `same matter · 0.99`, `second notice · 0.98`.
+- What it needs: “Pay the outstanding water bill balance. · due Dec 16, 2026 · 7 days”.
+- Why: “Second notice for this bill.”
+- Recall: exact account-tail match + Pinecone 0.78, linked; semantic candidates 0.57, 0.50, 0.49, 0.45 and 0.41.
+- Decision: `jev-1.14.0`, 32 questions, 894 ms, estimated letter cost $0.0005.
+- Scam trial: `ltr_Z4KKvson3DGWVi0z3P2q3`; **CAREFUL**; title “Verify Member Card for Benefits”.
+- Scam needs: “Careful. Don't pay. Don't call the number on it. Sarah has been told.”
+- Scam decision: `jev-1.14.0`, 31 questions, 1017 ms, $0.0005.
+- Browser errors: no page errors. One console CSP fallback notice and transient `ERR_NETWORK_CHANGED` messages.
 
 ## Run 2
 
 | Beat                                        |      Elapsed |
 | ------------------------------------------- | -----------: |
-| `/demo` ready                               |      2.145 s |
-| Riverbend processed and letter rendered     |     18.613 s |
-| Case file ready                             |      0.831 s |
-| Benefits scam processed and letter rendered |     19.334 s |
-| `/proof` ready                              |      1.221 s |
-| **Total**                                   | **42.144 s** |
+| `/demo` ready                               |      2.306 s |
+| Riverbend processed and letter rendered     |     15.283 s |
+| Benefits scam processed and letter rendered |     18.260 s |
+| `/proof` ready                              |      1.241 s |
+| **Total**                                   | **37.815 s** |
 
-- Riverbend trial: `ltr_hfnlt2wi5HWKyW5DU_Lvk`; received **Dec 9, 2026**.
+- Riverbend trial: `ltr__sFLu2I99yvqISI4WJ_P0`; received **Dec 9, 2026**.
 - Relations: `same matter · 0.99`, `second notice · 0.98`.
-- Case: `case_zo1RyEj9hAIANY9ypKlTP`; open, due Dec 16, second notice received on Dec 9.
-- Parent note and CAREFUL safety copy matched run 1.
-- Riverbend decision: `jev-1.14.0`, 32 questions, 655 ms, $0.0005.
-- Scam trial: `ltr_rl4ir4R77mxiEhXz8SWLV`; **CAREFUL**; received Dec 9.
-- Scam decision: `jev-1.14.0`, 31 questions, 1093 ms, $0.0005.
-- Browser errors: none.
+- What it needs: “Pay the outstanding water bill balance. · $89.17 · due Dec 16, 2026 · 7 days”.
+- Recall: exact account-tail match + Pinecone 0.78, linked; semantic candidates 0.57, 0.50, 0.49, 0.45 and 0.41.
+- Decision: `jev-1.14.0`, 32 questions, 1078 ms, $0.0005.
+- Scam trial: `ltr_TR-MdxKvT-9FG7PsTMLuw`; **CAREFUL**; same safety copy.
+- Scam decision: `jev-1.14.0`, 31 questions, 1224 ms, $0.0005.
+- Browser errors: no page errors. The only console message was the CSP fallback notice.
+
+## Proof state after runs
+
+- Deployed SHA: `d6de088e53e4b74cf0de735805c0db7caf9a4cd8`.
+- Evaluation shown: `heldout-20261125042539630`, 6 held-out letters.
+- Lane accuracy 83.3%, never unsafe 6/6, false alarms 0, scams caught 1/2.
+- Link precision / recall 100% / 100%, amount exact 0%, due exact 100%, ask rate 33.3%.
+- At the time of the runs `/proof` showed the boot capture and stated that uptime/service state are snapshots, not live polling.
 
 ## Slow steps and controls
 
-| Risk                                 | Observed control                                                                                                                                                                                                       |
-| ------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Cold or slow first provider call     | Run 1's Riverbend beat took 17.083 s. Warm the URL 10 s before recording and keep the processing state on screen; do not cut during it.                                                                                |
-| Variable Jev result near a threshold | Both runs linked at 0.99; follow-up was 0.99 then 0.98, both above 0.80. Show the checks table rather than promising one fixed probability.                                                                            |
-| Public sample quota                  | Five runs per IP per hour. A rehearsal with four requests fits; an extra scam run was rate-limited. Reset trials does not reset the in-memory quota, so deploy/restart or wait for the window before a full rehearsal. |
-| Trial reuse                          | The API intentionally reuses a recent identical trial. Reset sample trials before every run or the second pass will only reopen run 1's rows.                                                                          |
-| Demo date drift                      | The clock now recalculates from fixed `DEMO_TODAY=2026-12-09` on every demo request. Both final runs displayed Dec 9.                                                                                                  |
-| Unsafe CAREFUL copy                  | The page now shows the actual parent-note body and fixed safety copy; it never shows the model's raw “call this number” todo for CAREFUL letters.                                                                      |
-| Everything else                      | Record a fallback screen capture at freeze. No video or audio was generated during rehearsal.                                                                                                                          |
+| Risk                                 | Observed control                                                                                                                                                                                            |
+| ------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Cold or slow first provider call     | Riverbend took 15.283–19.336 s. Warm the URL before recording and keep the four-step processing state on screen; do not cut during it.                                                                      |
+| Variable Jev result near a threshold | Links held at 0.99/0.98 in both runs. Amount extraction was withheld in run 1 and accepted at $89.17 in run 2, so show the checks and “withheld” explanation rather than promising one fixed amount result. |
+| Public sample quota                  | Five runs per IP per hour. Each rehearsal uses two samples. Restarting the service resets the in-memory window; resetting trials does not.                                                                  |
+| Trial reuse                          | The API intentionally reuses a recent identical trial. Purge sample trials before each run or the second pass reopens run 1's rows.                                                                         |
+| Demo baseline mutation               | Trial runs can mutate seeded case state. A transaction-time case baseline is restored when the last sample expires; seeded Box case files are not rewritten by trials.                                      |
+| Unsafe CAREFUL copy                  | The page shows the actual parent-note body and fixed safety copy; it never shows the model's raw “call this number” todo for CAREFUL letters.                                                               |
+| Console noise                        | Both runs had no page errors. The app emits a CSP fallback notice because `script-src` is not explicit; run 1 also saw transient network-change messages.                                                   |
 
-## Fixes made during rehearsal
-
-- `15a6d67` — demo trial timestamps use the household clock; demo case events use the linked letter's date; the letter DTO includes the parent-note body; CAREFUL letters show safety copy in both parent sections.
-- `378902b` — the demo clock recalculates from the fixed demo date so it cannot drift when the real date changes.
-
-## Separate live-loop proof
-
-- Real Gmail → AgentMail intake, second-notice alert, exact `PAID` reply and private Box case-file update were verified on `60365e4`. Exact message IDs, case IDs, Box version and residual notes are in [live-loop-proof.md](live-loop-proof.md).
-- The public demo rehearsals above remain the reliable no-login recording path. They suppress outbound email and do not replace the live-loop evidence.
-
-## Not rehearsed on the public path
+## Not rehearsed
 
 - `/mom` camera upload on a physical phone: the backend upload path is tested, but no phone-camera rehearsal is claimed.
 - Public Box folder: H8 still needs the founder to share folder `440822123671` as “People with the link · Can view.”
