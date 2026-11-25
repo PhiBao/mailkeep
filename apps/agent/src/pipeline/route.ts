@@ -23,6 +23,7 @@ export interface RouteInput {
   letterId: string;
   today: string;
   senderOrg: string | null;
+  accountTail?: string | null;
   title: string;
   qualityFlagged: boolean;
   r2Failed: boolean;
@@ -64,6 +65,7 @@ export interface CaseChange {
   caseId: string | null;
   title: string;
   counterparty: string;
+  accountTail?: string | null;
   kind: Kind;
   status: CaseStatus;
   amountCents: number | null;
@@ -356,6 +358,7 @@ export function route(input: RouteInput): RouteOutput {
     caseId: linked?.caseId ?? null,
     title: input.title,
     counterparty,
+    accountTail: input.accountTail ?? null,
     kind: kind ?? linked?.kind ?? 'other',
     amountCents,
     dueDate,

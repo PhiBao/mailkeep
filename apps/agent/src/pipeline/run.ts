@@ -476,6 +476,7 @@ export async function runLetter(
           letterId: row.id,
           today,
           senderOrg: row.sender_org,
+          accountTail: row.account_tail,
           title: row.title ?? 'Letter',
           qualityFlagged: read.qualityFlagged,
           r2Failed: read.r2Failed,

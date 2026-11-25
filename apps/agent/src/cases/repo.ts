@@ -18,19 +18,39 @@ export function saveCaseChange(
     : undefined;
   const caseId = existing?.id ? String(existing.id) : id('case');
   const now = new Date().toISOString();
+  const amountCents =
+    input.change.action === 'paid'
+      ? null
+      : (input.change.amountCents ??
+        (existing?.amount_cents === null || existing?.amount_cents === undefined
+          ? null
+          : Number(existing.amount_cents)));
+  const dueDate =
+    input.change.dueDate ??
+    (existing?.due_date === null || existing?.due_date === undefined
+      ? null
+      : String(existing.due_date));
+  const accountTail =
+    input.change.accountTail ??
+    (existing?.account_tail === null || existing?.account_tail === undefined
+      ? null
+      : String(existing.account_tail));
+  const secondNotice = Boolean(existing?.second_notice) || input.change.secondNotice;
+  const contradiction = Boolean(existing?.contradiction) || input.change.contradiction;
   if (existing) {
     db.prepare(
-      `UPDATE cases SET title = ?, counterparty = ?, kind = ?, status = ?, amount_cents = ?,
+      `UPDATE cases SET title = ?, counterparty = ?, account_tail = ?, kind = ?, status = ?, amount_cents = ?,
         due_date = ?, second_notice = ?, contradiction = ?, updated_at = ? WHERE id = ? AND household_id = ?`,
     ).run(
       input.change.title,
       input.change.counterparty,
+      accountTail,
       input.change.kind,
       input.change.status,
-      input.change.amountCents,
-      input.change.dueDate,
-      input.change.secondNotice ? 1 : 0,
-      input.change.contradiction ? 1 : 0,
+      amountCents,
+      dueDate,
+      secondNotice ? 1 : 0,
+      contradiction ? 1 : 0,
       now,
       caseId,
       input.householdId,
@@ -38,20 +58,21 @@ export function saveCaseChange(
   } else {
     db.prepare(
       `INSERT INTO cases
-        (id, household_id, title, counterparty, kind, status, amount_cents, due_date,
+        (id, household_id, title, counterparty, account_tail, kind, status, amount_cents, due_date,
          second_notice, contradiction, created_at, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     ).run(
       caseId,
       input.householdId,
       input.change.title,
       input.change.counterparty,
+      accountTail,
       input.change.kind,
       input.change.status,
-      input.change.amountCents,
-      input.change.dueDate,
-      input.change.secondNotice ? 1 : 0,
-      input.change.contradiction ? 1 : 0,
+      amountCents,
+      dueDate,
+      secondNotice ? 1 : 0,
+      contradiction ? 1 : 0,
       now,
       now,
     );
