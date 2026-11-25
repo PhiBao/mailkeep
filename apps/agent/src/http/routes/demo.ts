@@ -545,7 +545,7 @@ export async function purgeExpiredTrials(
       `SELECT l.id, l.household_id, l.case_id, l.local_path, h.pinecone_namespace
         FROM letters l
         JOIN households h ON h.id = l.household_id
-        WHERE l.trial = 1 AND l.created_at <= ?
+        WHERE l.trial = 1 AND l.source = 'sample' AND l.created_at <= ?
         ORDER BY l.created_at, l.id`,
     )
     .all(cutoff) as ExpiredTrialRow[];
@@ -599,7 +599,9 @@ export async function purgeExpiredTrials(
       );
       db.prepare('DELETE FROM kv WHERE k IN (?, ?)').run(`route:${row.id}`, `acted:${row.id}`);
       deleted += db
-        .prepare('DELETE FROM letters WHERE id = ? AND household_id = ? AND trial = 1')
+        .prepare(
+          "DELETE FROM letters WHERE id = ? AND household_id = ? AND trial = 1 AND source = 'sample'",
+        )
         .run(row.id, row.household_id).changes;
       localPaths.push(row.local_path);
       if (row.case_id) {

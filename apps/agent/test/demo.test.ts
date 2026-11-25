@@ -583,6 +583,12 @@ describe('trial purge', () => {
       trial: 1,
       caseId: 'case_fresh',
     });
+    await seedLetter({
+      id: 'ltr_eval_old',
+      source: 'eval',
+      trial: 1,
+      createdAt: '2026-11-20T00:00:00.000Z',
+    });
     const privatePath = await seedLetter({
       id: 'ltr_private_old',
       householdId: 'hh_private',
@@ -649,6 +655,7 @@ describe('trial purge', () => {
     );
 
     expect(db.prepare('SELECT id FROM letters ORDER BY id').all()).toEqual([
+      { id: 'ltr_eval_old' },
       { id: 'ltr_fresh' },
       { id: 'ltr_seed' },
     ]);
