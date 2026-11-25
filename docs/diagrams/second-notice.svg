@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="620" viewBox="0 0 800 620" role="img" aria-labelledby="second-notice-title second-notice-desc">
+  <title id="second-notice-title">How Mailkeep catches a second notice</title>
+  <desc id="second-notice-desc">The December 9 past-due water letter recalls the November 18 bill, passes three calibrated Jev checks, and produces a needs-you family alert plus a new Box case-file version.</desc>
+  <defs>
+    <marker id="notice-arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0 0L8 3L0 6Z" fill="#4a5261"/></marker>
+    <marker id="notice-arrow-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0 0L8 3L0 6Z" fill="#b3401f"/></marker>
+    <style>
+      .notice-title{font:600 24px Literata,Georgia,serif;fill:#1e2430}.notice-sub{font:13px "Atkinson Hyperlegible",Arial,sans-serif;fill:#4a5261}.notice-name{font:600 15px "Atkinson Hyperlegible",Arial,sans-serif;fill:#1e2430}.notice-meta{font:11px "IBM Plex Mono",monospace;fill:#4a5261}.notice-small{font:700 10px "IBM Plex Mono",monospace;fill:#646b78}.notice-check{font:11px "IBM Plex Mono",monospace;fill:#1e2430}.notice-label{font:700 9px "IBM Plex Mono",monospace;letter-spacing:.8px;fill:#646b78}.notice-decision{font:600 13px "Atkinson Hyperlegible",Arial,sans-serif;fill:#1e2430}.notice-foot{font:11px "IBM Plex Mono",monospace;fill:#4a5261}
+    </style>
+  </defs>
+  <rect width="800" height="620" fill="#f6f1e7"/>
+  <text x="32" y="42" class="notice-title">How a second notice is caught</text>
+  <text x="32" y="64" class="notice-sub">The risky gap is between letters, not inside one envelope.</text>
+
+  <path d="M496 143H304" fill="none" stroke="#24507a" stroke-width="1.4" stroke-dasharray="5 4" marker-end="url(#notice-arrow)"/>
+  <rect x="342" y="111" width="132" height="16" rx="2" fill="#f6f1e7"/>
+  <text x="408" y="123" text-anchor="middle" class="notice-label">PINECONE 0.714</text>
+
+  <rect x="64" y="100" width="240" height="86" rx="6" fill="#fffdf8" stroke="#1e2430"/>
+  <text x="184" y="128" text-anchor="middle" class="notice-small">WEEK 1 · NOV 18</text>
+  <text x="184" y="152" text-anchor="middle" class="notice-name">November water bill</text>
+  <text x="184" y="174" text-anchor="middle" class="notice-meta">$84.17 · due Dec 10 · open</text>
+  <rect x="496" y="100" width="240" height="86" rx="6" fill="#fffdf8" stroke="#b3401f" stroke-width="1.6"/>
+  <text x="616" y="128" text-anchor="middle" class="notice-small">WEEK 3 · DEC 9</text>
+  <text x="616" y="152" text-anchor="middle" class="notice-name">PAST DUE notice</text>
+  <text x="616" y="174" text-anchor="middle" class="notice-meta">$89.17 · due Dec 16</text>
+
+  <path d="M616 186V204Q616 212 608 212H424Q416 212 416 220" fill="none" stroke="#4a5261" stroke-width="1.2" marker-end="url(#notice-arrow)"/>
+  <rect x="184" y="220" width="432" height="100" rx="6" fill="#ede5d5" stroke="#d6cbb8"/>
+  <text x="204" y="242" class="notice-small">TYPESAFE JEV · THREE NARROW QUESTIONS</text>
+  <text x="204" y="266" class="notice-check">same_matter</text>
+  <rect x="340" y="256" width="180" height="10" rx="2" fill="#d6cbb8"/><rect x="340" y="256" width="178" height="10" rx="2" fill="#24507a"/>
+  <text x="592" y="266" class="notice-check">0.99 ≥ 0.85</text>
+  <text x="204" y="290" class="notice-check">follow_up</text>
+  <rect x="340" y="280" width="180" height="10" rx="2" fill="#d6cbb8"/><rect x="340" y="280" width="178" height="10" rx="2" fill="#24507a"/>
+  <text x="592" y="290" class="notice-check">0.99 ≥ 0.80</text>
+  <text x="204" y="314" class="notice-check">sender_consistent</text>
+  <rect x="340" y="304" width="180" height="10" rx="2" fill="#d6cbb8"/><rect x="340" y="304" width="178" height="10" rx="2" fill="#3f6b4f"/>
+  <text x="592" y="314" class="notice-check">0.99 ≥ 0.30</text>
+
+  <path d="M400 320V332" fill="none" stroke="#4a5261" stroke-width="1.2" marker-end="url(#notice-arrow)"/>
+  <path d="M400 332L500 366L400 400L300 366Z" fill="#fffdf8" stroke="#1e2430" stroke-width="1.2"/>
+  <text x="400" y="362" text-anchor="middle" class="notice-decision">Same matter</text>
+  <text x="400" y="380" text-anchor="middle" class="notice-decision">accepted?</text>
+
+  <path d="M300 366H220" fill="none" stroke="#4a5261" stroke-width="1.2" marker-end="url(#notice-arrow)"/>
+  <rect x="244" y="340" width="32" height="14" rx="2" fill="#f6f1e7"/>
+  <text x="260" y="351" text-anchor="middle" class="notice-label">NO</text>
+  <rect x="40" y="332" width="180" height="68" rx="34" fill="#fffdf8" stroke="#8a5e0c"/>
+  <text x="130" y="360" text-anchor="middle" class="notice-name">Ask the family</text>
+  <text x="130" y="382" text-anchor="middle" class="notice-meta">which letter matches?</text>
+
+  <path d="M400 400V420" fill="none" stroke="#4a5261" stroke-width="1.2" marker-end="url(#notice-arrow)"/>
+  <rect x="408" y="402" width="34" height="14" rx="2" fill="#f6f1e7"/>
+  <text x="425" y="413" class="notice-label">YES</text>
+  <path d="M400 420L500 454L400 488L300 454Z" fill="#fffdf8" stroke="#1e2430" stroke-width="1.2"/>
+  <text x="400" y="450" text-anchor="middle" class="notice-decision">Follow-up</text>
+  <text x="400" y="468" text-anchor="middle" class="notice-decision">and unpaid?</text>
+
+  <path d="M500 454H568" fill="none" stroke="#4a5261" stroke-width="1.2" marker-end="url(#notice-arrow)"/>
+  <rect x="516" y="428" width="32" height="14" rx="2" fill="#f6f1e7"/>
+  <text x="532" y="439" text-anchor="middle" class="notice-label">NO</text>
+  <rect x="568" y="420" width="184" height="68" rx="34" fill="#fffdf8" stroke="#3f6b4f"/>
+  <text x="660" y="448" text-anchor="middle" class="notice-name">File or heads-up</text>
+  <text x="660" y="470" text-anchor="middle" class="notice-meta">no family alert</text>
+
+  <path d="M400 488V512" fill="none" stroke="#b3401f" stroke-width="1.4" marker-end="url(#notice-arrow-accent)"/>
+  <rect x="408" y="490" width="34" height="14" rx="2" fill="#f6f1e7"/>
+  <text x="425" y="501" class="notice-label">YES</text>
+  <rect x="288" y="512" width="224" height="68" rx="6" fill="#fffdf8" stroke="#b3401f" stroke-width="1.6"/>
+  <text x="400" y="540" text-anchor="middle" class="notice-name">Needs you</text>
+  <text x="400" y="562" text-anchor="middle" class="notice-meta">family alert · second notice</text>
+
+  <path d="M512 546H544" fill="none" stroke="#4a5261" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#notice-arrow)"/>
+  <rect x="514" y="520" width="30" height="14" rx="2" fill="#f6f1e7"/>
+  <text x="529" y="531" text-anchor="middle" class="notice-label">LOG</text>
+  <rect x="544" y="512" width="208" height="68" rx="6" fill="#fffdf8" stroke="#4a5261"/>
+  <text x="648" y="540" text-anchor="middle" class="notice-name">Box case.md</text>
+  <text x="648" y="562" text-anchor="middle" class="notice-meta">new version · both letters</text>
+
+  <line x1="24" y1="600" x2="776" y2="600" stroke="#d6cbb8"/>
+  <text x="32" y="618" class="notice-foot">DASHED = recall / record update</text>
+  <text x="320" y="618" class="notice-foot">DIAMOND = code-owned decision</text>
+  <text x="608" y="618" class="notice-foot">Orange = family action</text>
+</svg>

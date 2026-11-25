@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="520" viewBox="0 0 800 520" role="img" aria-labelledby="letter-trip-title letter-trip-desc">
+  <title id="letter-trip-title">One letter’s trip through Mailkeep</title>
+  <desc id="letter-trip-desc">Mom sends a letter through AgentMail to the Mailkeep Sprite, which calls model and memory connectors through the Fly gateway, files the case in Box, and returns a plain note to Mom.</desc>
+  <defs>
+    <marker id="letter-trip-arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0 0L8 3L0 6Z" fill="#4a5261"/></marker>
+    <marker id="letter-trip-arrow-link" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0 0L8 3L0 6Z" fill="#24507a"/></marker>
+    <style>
+      .trip-title{font:600 24px Literata,Georgia,serif;fill:#1e2430}.trip-sub{font:13px "Atkinson Hyperlegible",Arial,sans-serif;fill:#4a5261}.trip-zone{font:700 10px "IBM Plex Mono",monospace;letter-spacing:1.4px;fill:#646b78}.trip-name{font:600 15px "Atkinson Hyperlegible",Arial,sans-serif;fill:#1e2430}.trip-meta{font:11px "IBM Plex Mono",monospace;fill:#4a5261}.trip-step{font:600 13px "Atkinson Hyperlegible",Arial,sans-serif;fill:#1e2430}.trip-label{font:700 9px "IBM Plex Mono",monospace;letter-spacing:.8px;fill:#646b78}.trip-foot{font:11px "IBM Plex Mono",monospace;fill:#4a5261}
+    </style>
+  </defs>
+  <rect width="800" height="520" fill="#f6f1e7"/>
+  <text x="32" y="42" class="trip-title">One letter’s trip</text>
+  <text x="32" y="64" class="trip-sub">The Sprite does the work. Fly connectors hold the keys.</text>
+
+  <rect x="24" y="88" width="170" height="336" rx="8" fill="#fffdf8" stroke="#d6cbb8"/>
+  <rect x="42" y="98" width="74" height="16" rx="2" fill="#fffdf8"/>
+  <text x="48" y="110" class="trip-zone">FAMILY</text>
+  <rect x="214" y="88" width="358" height="336" rx="8" fill="#ede5d5" stroke="#d6cbb8" stroke-dasharray="6 5"/>
+  <rect x="232" y="98" width="142" height="16" rx="2" fill="#ede5d5"/>
+  <text x="238" y="110" class="trip-zone">FLY SPRITE · MAILKEEP</text>
+  <rect x="592" y="88" width="184" height="336" rx="8" fill="#fffdf8" stroke="#d6cbb8" stroke-dasharray="6 5"/>
+  <rect x="610" y="98" width="146" height="16" rx="2" fill="#fffdf8"/>
+  <text x="616" y="110" class="trip-zone">FLY CONNECTORS</text>
+  <text x="616" y="125" class="trip-label">KEYS LIVE HERE</text>
+
+  <path d="M109 140V80Q109 76 113 76H680Q684 76 684 80V140" fill="none" stroke="#24507a" stroke-width="1.6" marker-end="url(#letter-trip-arrow-link)"/>
+  <rect x="116" y="112" width="46" height="14" rx="2" fill="#f6f1e7"/>
+  <text x="139" y="123" text-anchor="middle" class="trip-label">PHOTO</text>
+  <path d="M614 176H548" fill="none" stroke="#24507a" stroke-width="1.6" marker-end="url(#letter-trip-arrow-link)"/>
+  <rect x="552" y="150" width="62" height="14" rx="2" fill="#ede5d5"/>
+  <text x="583" y="161" text-anchor="middle" class="trip-label">INBOX</text>
+  <path d="M548 286H614" fill="none" stroke="#24507a" stroke-width="1.4" marker-end="url(#letter-trip-arrow-link)"/>
+  <rect x="552" y="260" width="62" height="14" rx="2" fill="#ede5d5"/>
+  <text x="583" y="271" text-anchor="middle" class="trip-label">DECIDE</text>
+  <path d="M548 404H614" fill="none" stroke="#24507a" stroke-width="1.4" stroke-dasharray="5 4" marker-end="url(#letter-trip-arrow-link)"/>
+  <rect x="558" y="378" width="44" height="14" rx="2" fill="#ede5d5"/>
+  <text x="580" y="389" text-anchor="middle" class="trip-label">RECALL</text>
+  <path d="M238 356H174" fill="none" stroke="#24507a" stroke-width="1.6" marker-end="url(#letter-trip-arrow-link)"/>
+  <rect x="174" y="330" width="60" height="14" rx="2" fill="#f6f1e7"/>
+  <text x="204" y="341" text-anchor="middle" class="trip-label">PLAIN NOTE</text>
+
+  <rect x="44" y="140" width="130" height="76" rx="6" fill="#fffdf8" stroke="#1e2430"/>
+  <text x="109" y="172" text-anchor="middle" class="trip-name">Mom</text>
+  <text x="109" y="194" text-anchor="middle" class="trip-meta">photo or forward</text>
+  <rect x="44" y="320" width="130" height="76" rx="6" fill="#fffdf8" stroke="#1e2430"/>
+  <text x="109" y="352" text-anchor="middle" class="trip-name">Mom’s inbox</text>
+  <text x="109" y="374" text-anchor="middle" class="trip-meta">one plain sentence</text>
+
+  <rect x="238" y="140" width="310" height="236" rx="6" fill="#fffdf8" stroke="#b3401f" stroke-width="1.6"/>
+  <text x="258" y="170" class="trip-step">1 · Read and redact</text>
+  <text x="258" y="192" class="trip-meta">Ollama vision + summary</text>
+  <line x1="258" y1="208" x2="528" y2="208" stroke="#d6cbb8"/>
+  <text x="258" y="232" class="trip-step">2 · Recall household history</text>
+  <text x="258" y="254" class="trip-meta">Pinecone vectors + account tail</text>
+  <line x1="258" y1="270" x2="528" y2="270" stroke="#d6cbb8"/>
+  <text x="258" y="294" class="trip-step">3 · Decide with calibrated questions</text>
+  <text x="258" y="316" class="trip-meta">TypeSafe Jev · probabilities</text>
+  <line x1="258" y1="332" x2="528" y2="332" stroke="#d6cbb8"/>
+  <text x="258" y="356" class="trip-step">4 · Route, file and notify</text>
+  <text x="258" y="378" class="trip-meta">SQLite case state · Box · AgentMail</text>
+
+  <rect x="614" y="140" width="140" height="76" rx="6" fill="#ede5d5" stroke="#24507a"/>
+  <text x="684" y="171" text-anchor="middle" class="trip-name">AgentMail</text>
+  <text x="684" y="194" text-anchor="middle" class="trip-meta">inbox + replies</text>
+  <rect x="614" y="252" width="140" height="76" rx="6" fill="#ede5d5" stroke="#24507a"/>
+  <text x="684" y="281" text-anchor="middle" class="trip-name">Model gateway</text>
+  <text x="684" y="304" text-anchor="middle" class="trip-meta">Ollama · TypeSafe</text>
+  <rect x="614" y="366" width="140" height="76" rx="6" fill="#ede5d5" stroke="#24507a"/>
+  <text x="684" y="395" text-anchor="middle" class="trip-name">Memory + files</text>
+  <text x="684" y="418" text-anchor="middle" class="trip-meta">Pinecone · Box</text>
+
+  <line x1="24" y1="448" x2="776" y2="448" stroke="#d6cbb8"/>
+  <text x="32" y="476" class="trip-foot">SOLID = request / action</text>
+  <text x="268" y="476" class="trip-foot">DASHED = recall / file</text>
+  <text x="556" y="476" class="trip-foot">No provider key on the Sprite</text>
+</svg>

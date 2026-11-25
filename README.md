@@ -82,7 +82,9 @@ Mom → AgentMail → Sprite mailkeep service
                     └─ AgentMail: parent note / family Ask
 ```
 
-The backend is required: the Sprites gateway only accepts provider calls from inside a Sprite. SQLite stores household state; Pinecone stores vector memory; Box remains readable without Mailkeep. Hand-authored SVG diagrams are maintained under `docs/diagrams/` during final documentation.
+The backend is required: the Sprites gateway only accepts provider calls from inside a Sprite. SQLite stores household state; Pinecone stores vector memory; Box remains readable without Mailkeep.
+
+![One letter's trip through Mailkeep](docs/diagrams/letter-trip.svg)
 
 ## How it decides
 
@@ -99,6 +101,8 @@ The backend is required: the Sprites gateway only accepts provider calls from in
 | Field confidence     |    ≥ 0.70 | Use the selected amount or due date |
 
 The router is a pure function in [route.ts](apps/agent/src/pipeline/route.ts#L1). Letter text cannot add questions or directly mark a case paid. See [SECURITY.md](SECURITY.md) for prompt-injection and trust-boundary tests.
+
+![How Mailkeep catches a second notice](docs/diagrams/second-notice.svg)
 
 ## Running
 
