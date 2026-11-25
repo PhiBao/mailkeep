@@ -18,6 +18,17 @@ function number(value: number | null): string {
   return value === null ? '—' : value.toFixed(2);
 }
 
+function comparator(key: string): string {
+  return key.startsWith('sender_consistent_') ? '<' : '≥';
+}
+
+function outcome(check: CheckDTO): string {
+  if ((check.key === 'amount_due' || check.key === 'due_date') && check.outcome === 'do not use') {
+    return 'withheld';
+  }
+  return check.outcome;
+}
+
 export function ChecksTable({ checks }: { checks: CheckDTO[] }) {
   return (
     <div className="checks">
@@ -26,7 +37,9 @@ export function ChecksTable({ checks }: { checks: CheckDTO[] }) {
           <tr>
             <th scope="col">Question</th>
             <th scope="col">Answer</th>
-            <th scope="col">p / conf</th>
+            <th scope="col" title="Probability / confidence">
+              p / conf
+            </th>
             <th scope="col">Bar</th>
             <th scope="col">Outcome</th>
           </tr>
@@ -43,9 +56,11 @@ export function ChecksTable({ checks }: { checks: CheckDTO[] }) {
                 {number(check.probability)} / {number(check.confidence)}
               </td>
               <td className="mono">
-                {check.threshold === null ? '—' : `≥ ${number(check.threshold)}`}
+                {check.threshold === null
+                  ? '—'
+                  : `${comparator(check.key)} ${number(check.threshold)}`}
               </td>
-              <td>{check.outcome}</td>
+              <td>{outcome(check)}</td>
             </tr>
           ))}
         </tbody>

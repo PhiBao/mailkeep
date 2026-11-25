@@ -200,6 +200,7 @@ export const letterSchema = z.object({
   error: nullableString,
   imageUrl: z.string(),
   checks: z.array(checkSchema),
+  notes: z.array(z.string()).default([]),
   relations: z.array(relationSchema),
   recall: z.array(recallCandidateSchema),
   outbox: z.array(outboxSchema),

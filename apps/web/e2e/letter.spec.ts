@@ -50,6 +50,7 @@ const letter = {
       outcome: 'reminder',
     },
   ],
+  notes: ['Second notice for this bill.'],
   relations: [
     {
       id: 'rel_1',
@@ -134,7 +135,9 @@ for (const width of [390, 1440]) {
     await expect(page.getByRole('link', { name: 'Open the case file' })).toBeVisible();
     await expect(page.getByText('second notice · 0.98')).toBeVisible();
     await expect(page.getByRole('cell', { name: 'linked', exact: true })).toBeVisible();
-    await expect(page.getByText(/recall 0.91/)).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Why this decision' })).toBeVisible();
+    await expect(page.getByText('Second notice for this bill.')).toBeVisible();
+    await expect(page.getByText(/exact account-tail match \+ Pinecone 0.91/)).toBeVisible();
     await expect(page.getByRole('link', { name: 'Raw response' })).toHaveAttribute('download', '');
     await page.getByText('Show what Mailkeep read', { exact: true }).click();
     await expect(page.getByText(/PAST DUE/)).toBeVisible();
@@ -157,6 +160,7 @@ test('CAREFUL letters show safety copy instead of the raw call-to-action', async
     summaryParent: 'The health plan needs to verify member card information.',
     todoParent: 'Call the verification line to confirm card details.',
     lane: 'careful',
+    notes: [],
     outbox: [
       {
         ...letter.outbox[0],

@@ -489,6 +489,13 @@ export async function runLetter(
           })),
           dateCandidates: read.dates.map((candidate) => ({ id: candidate.id, iso: candidate.iso })),
         });
+        const recallScores = new Map(
+          candidates.map((candidate) => [candidate.letter.id, candidate.recallScore]),
+        );
+        output.relations = output.relations.map((relation) => ({
+          ...relation,
+          recallScore: recallScores.get(relation.otherLetterId) ?? null,
+        }));
         const cost = Math.round(
           decision.response.usage.input_tokens * 0.042 +
             read.promptTokens * 0.14 +

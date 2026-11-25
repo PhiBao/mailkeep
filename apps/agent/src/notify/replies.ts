@@ -259,6 +259,21 @@ function commitRoute(
   forced: NonNullable<RouteInput['forced']>,
 ): AppliedAnswer {
   const output = route(routeInputFor(db, letter, forced));
+  const priorScores = db
+    .prepare(
+      'SELECT other_letter_id, recall_score FROM relations WHERE letter_id = ? AND household_id = ?',
+    )
+    .all(letter.id, letter.household_id) as Array<{
+    other_letter_id: string;
+    recall_score: number | null;
+  }>;
+  const recallScores = new Map(
+    priorScores.map((relation) => [relation.other_letter_id, relation.recall_score]),
+  );
+  output.relations = output.relations.map((relation) => ({
+    ...relation,
+    recallScore: recallScores.get(relation.otherLetterId) ?? null,
+  }));
   let caseId = letter.case_id;
   if (output.caseChange) {
     caseId = saveCaseChange(db, {

@@ -2,7 +2,7 @@ import { mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { getCase, saveCaseChange } from '../src/cases/repo.js';
+import { getCase, saveCaseChange, saveRelations } from '../src/cases/repo.js';
 import { type DB, openDb } from '../src/db/db.js';
 import { migrate } from '../src/db/migrate.js';
 import type { CaseChange } from '../src/pipeline/route.js';
@@ -90,6 +90,25 @@ describe('case history merging', () => {
       second_notice: 1,
       contradiction: 1,
     });
+  });
+
+  it('persists the Pinecone score carried by a route relation', () => {
+    saveRelations(db, {
+      householdId: 'hh_1',
+      letterId: 'ltr_new',
+      relations: [
+        {
+          otherLetterId: 'ltr_old',
+          relation: 'same_matter',
+          probability: 0.91,
+          recallScore: 0.87,
+          status: 'accepted',
+        },
+      ],
+    });
+    expect(
+      db.prepare('SELECT recall_score FROM relations WHERE letter_id = ?').get('ltr_new'),
+    ).toEqual({ recall_score: 0.87 });
   });
 
   it('stores the account tail when a pipeline creates a new case', () => {

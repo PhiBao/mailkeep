@@ -50,6 +50,7 @@ export interface RouteRelation {
   otherLetterId: string;
   relation: Relation;
   probability: number;
+  recallScore?: number | null;
   status: 'accepted' | 'asked' | 'rejected';
 }
 

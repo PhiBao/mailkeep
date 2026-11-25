@@ -275,6 +275,37 @@ function recallCandidates(db: DB, letter: LetterRow, decision: DecisionRow | und
   });
 }
 
+function routeNotes(db: DB, letter: LetterRow): string[] {
+  const stored = db.prepare('SELECT v FROM kv WHERE k = ?').get(`route:${letter.id}`) as
+    | { v: string }
+    | undefined;
+  if (!stored) return [];
+  const output = jsonObject(jsonValue(stored.v));
+  return Array.isArray(output.notes)
+    ? output.notes.filter((note): note is string => typeof note === 'string')
+    : [];
+}
+
+function checkAnswer(decision: DecisionRow | undefined, key: string, answer: string): string {
+  if (!decision || (key !== 'amount_due' && key !== 'due_date')) return answer;
+  const request = jsonObject(jsonValue(decision.request_json));
+  const state = jsonObject(request.state);
+  const candidates = key === 'amount_due' ? state.amount_candidates : state.date_candidates;
+  if (!Array.isArray(candidates)) return answer;
+  const candidate = candidates.map((item) => jsonObject(item)).find((item) => item.id === answer);
+  return typeof candidate?.text === 'string' ? candidate.text : answer;
+}
+
+function indexedCheckLabel(
+  check: { key: string; label: string },
+  recall: Array<{ title: string }>,
+): string {
+  const match = check.key.match(/_(\d+)$/);
+  if (!match) return check.label;
+  const candidate = recall[Number(match[1])];
+  return candidate ? `${candidate.title} · ${check.label}` : check.label;
+}
+
 function decisionDTO(letter: LetterRow, decision: DecisionRow | undefined) {
   if (!decision) return null;
   const request = jsonObject(jsonValue(decision.request_json));
@@ -372,6 +403,7 @@ export function buildLetterDTO(db: DB, row: LetterRow): LetterDTO {
     created_at: string;
   }>;
 
+  const recall = recallCandidates(db, row, decision);
   return letterSchema.parse({
     id: row.id,
     householdId: row.household_id,
@@ -399,14 +431,15 @@ export function buildLetterDTO(db: DB, row: LetterRow): LetterDTO {
     checks: checks.map((check) => ({
       id: check.id,
       key: check.key,
-      label: check.label,
+      label: indexedCheckLabel(check, recall),
       qtype: check.qtype,
-      answer: check.answer,
+      answer: checkAnswer(decision, check.key, check.answer),
       probability: check.probability,
       confidence: check.confidence,
       threshold: check.threshold,
       outcome: check.outcome,
     })),
+    notes: routeNotes(db, row),
     relations: relations.map((relation) => ({
       id: relation.id,
       letterId: relation.letter_id,
@@ -417,7 +450,7 @@ export function buildLetterDTO(db: DB, row: LetterRow): LetterDTO {
       status: relation.status,
       createdAt: relation.created_at,
     })),
-    recall: recallCandidates(db, row, decision),
+    recall,
     outbox: outboxRows(db, row).map((outbox) => ({
       id: outbox.id,
       kind: outbox.kind,

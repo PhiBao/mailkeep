@@ -129,7 +129,9 @@ export function Proof() {
                 <tr key={threshold.key}>
                   <td className="mono">{threshold.key}</td>
                   <td className="mono">
-                    {typeof threshold.bar === 'number' ? `≥ ${threshold.bar}` : threshold.bar}
+                    {typeof threshold.bar === 'number'
+                      ? `${threshold.key === 'senderInconsistent' ? '<' : '≥'} ${threshold.bar}`
+                      : threshold.bar}
                   </td>
                   <td>{threshold.effect}</td>
                 </tr>

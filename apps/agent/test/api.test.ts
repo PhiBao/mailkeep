@@ -805,6 +805,52 @@ describe('Today, case, and letter DTOs', () => {
     expect(text).not.toContain('HOUSEHOLD B SECRET');
   });
 
+  it('exposes route notes and human-readable indexed check answers', async () => {
+    db.prepare("UPDATE decisions SET request_json = ? WHERE id = 'dec_a'").run(
+      JSON.stringify({
+        state: {
+          today: '2026-11-24',
+          past: [{ id: 'ltr_past' }],
+          amount_candidates: [{ id: 'a0', text: '$84.17', context: 'Amount due' }],
+          date_candidates: [{ id: 'd0', text: 'November 20, 2026', context: 'Payment due' }],
+        },
+        questions: {},
+      }),
+    );
+    db.prepare(
+      `INSERT INTO checks
+        (id, letter_id, household_id, key, label, qtype, answer, probability, confidence,
+         threshold, outcome)
+       VALUES ('chk_amount', 'ltr_a', 'hh_a', 'amount_due', 'Amount due', 'choice', 'a0',
+         0.67, 0.59, 0.7, 'do not use')`,
+    ).run();
+    db.prepare(
+      `INSERT INTO checks
+        (id, letter_id, household_id, key, label, qtype, answer, probability, confidence,
+         threshold, outcome)
+       VALUES ('chk_due', 'ltr_a', 'hh_a', 'due_date', 'Due date', 'choice', 'd0',
+         1, 1, 0.7, 'use field')`,
+    ).run();
+    db.prepare(
+      'INSERT INTO kv (k, v) VALUES (?, ?) ON CONFLICT(k) DO UPDATE SET v = excluded.v',
+    ).run('route:ltr_a', JSON.stringify({ notes: ['Second notice for this bill.'] }));
+    const response = await app.request(`${ORIGIN}/api/letters/ltr_a`, {
+      headers: { Cookie: familyCookie },
+    });
+    const dto = letterSchema.parse(await response.json());
+    expect(dto.notes).toEqual(['Second notice for this bill.']);
+    expect(dto.checks).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          key: 'same_matter_0',
+          label: 'Earlier water bill · Same matter',
+        }),
+        expect.objectContaining({ key: 'amount_due', answer: '$84.17' }),
+        expect.objectContaining({ key: 'due_date', answer: 'November 20, 2026' }),
+      ]),
+    );
+  });
+
   it('serves the latest raw decision JSON from an authenticated same-origin route', async () => {
     const response = await app.request(`${ORIGIN}/api/letters/ltr_a/decision`, {
       headers: { Cookie: familyCookie },

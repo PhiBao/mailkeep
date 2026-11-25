@@ -138,7 +138,7 @@ export function saveRelations(
     db.prepare(
       `INSERT INTO relations
         (id, household_id, letter_id, other_letter_id, relation, probability, recall_score, status, created_at)
-       VALUES (?, ?, ?, ?, ?, ?, NULL, ?, ?)`,
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     ).run(
       `rel_${nanoid()}`,
       input.householdId,
@@ -146,6 +146,7 @@ export function saveRelations(
       relation.otherLetterId,
       relation.relation,
       relation.probability,
+      relation.recallScore ?? null,
       relation.status,
       new Date().toISOString(),
     );

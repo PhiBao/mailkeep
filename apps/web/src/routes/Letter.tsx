@@ -48,7 +48,14 @@ function relationText(relation: LetterDTO['relations'][number]): string {
     return `says it was paid · ${relation.probability.toFixed(2)}`;
   if (relation.relation === 'sender_mismatch') return 'sender does not match';
   if (relation.relation === 'contradicts') return 'contradicts a paid mark';
-  return `same matter · ${relation.probability.toFixed(2)}`;
+  if (relation.relation === 'same_matter') {
+    if (relation.status === 'asked')
+      return `possible same matter · ${relation.probability.toFixed(2)} · asked`;
+    if (relation.status === 'rejected')
+      return `same matter rejected · ${relation.probability.toFixed(2)}`;
+    return `linked same matter · ${relation.probability.toFixed(2)}`;
+  }
+  return `${relation.relation.replaceAll('_', ' ')} · ${relation.probability.toFixed(2)}`;
 }
 
 export function Letter({ demo = false }: { demo?: boolean }) {
@@ -98,6 +105,11 @@ export function Letter({ demo = false }: { demo?: boolean }) {
   }
 
   const parentNote = data.outbox.find((row) => row.kind === 'parent_note');
+  const linkedRecall = new Set(
+    data.relations
+      .filter((relation) => relation.status === 'accepted')
+      .map((relation) => relation.otherLetterId),
+  );
   const daysLeft =
     data.dueDate && today
       ? Math.floor(
@@ -198,7 +210,11 @@ export function Letter({ demo = false }: { demo?: boolean }) {
                       ? ` · due ${dateFormat.format(new Date(`${data.dueDate}T00:00:00Z`))}`
                       : ''}
                     {daysLeft !== null
-                      ? ` · ${daysLeft < 0 ? `${Math.abs(daysLeft)} days overdue` : `${daysLeft} days`}`
+                      ? ` · ${
+                          daysLeft < 0
+                            ? `${Math.abs(daysLeft)} ${Math.abs(daysLeft) === 1 ? 'day' : 'days'} overdue`
+                            : `${daysLeft} ${daysLeft === 1 ? 'day' : 'days'}`
+                        }`
                       : ''}
                   </p>
                 ) : (
@@ -206,9 +222,20 @@ export function Letter({ demo = false }: { demo?: boolean }) {
                 )}
               </section>
 
+              {data.notes.length > 0 ? (
+                <section className="letter__section">
+                  <h2>Why this decision</h2>
+                  <ul className="letter__notes">
+                    {data.notes.map((note) => (
+                      <li key={note}>{note}</li>
+                    ))}
+                  </ul>
+                </section>
+              ) : null}
+
               {data.caseId || data.relations.length > 0 ? (
                 <section className="letter__section">
-                  <h2>Linked to</h2>
+                  <h2>Household memory</h2>
                   {data.caseId ? (
                     <Link to={`${demo ? '/demo' : ''}/cases/${data.caseId}`}>
                       Open the case file
@@ -227,10 +254,19 @@ export function Letter({ demo = false }: { demo?: boolean }) {
               <section className="letter__section">
                 <h2>Checks</h2>
                 <ChecksTable checks={data.checks} />
+                {data.checks.some(
+                  (check) =>
+                    (check.key === 'amount_due' || check.key === 'due_date') &&
+                    check.outcome === 'do not use',
+                ) ? (
+                  <p className="meta">
+                    A visible amount or date was left blank because confidence was below the bar.
+                  </p>
+                ) : null}
                 {data.decision ? (
                   <div className="letter__decision meta">
                     <span>{data.decision.modelId}</span> · {data.decision.questionCount} questions ·{' '}
-                    {data.decision.latencyMs} ms · $
+                    decision call {data.decision.latencyMs} ms · estimated letter cost $
                     {(data.decision.costMicrousd / 1_000_000).toFixed(4)}
                     {data.decision.rawResponseUrl ? (
                       <>
@@ -256,15 +292,17 @@ export function Letter({ demo = false }: { demo?: boolean }) {
                             {candidate.title}
                           </Link>
                           <span className="mono">
-                            {' '}
-                            · recall{' '}
-                            {candidate.recallScore === null
-                              ? '—'
-                              : candidate.recallScore.toFixed(2)}{' '}
-                            · account {candidate.tailMatch ? 'match' : 'no match'} · same matter{' '}
+                            {' · '}
+                            {candidate.tailMatch
+                              ? candidate.recallScore === null
+                                ? 'exact account-tail match · no vector score'
+                                : `exact account-tail match + Pinecone ${candidate.recallScore.toFixed(2)}`
+                              : `Pinecone semantic recall ${candidate.recallScore?.toFixed(2) ?? '—'}`}
+                            {' · same matter '}
                             {candidate.sameMatterProbability === null
                               ? '—'
                               : candidate.sameMatterProbability.toFixed(2)}
+                            {linkedRecall.has(candidate.letterId) ? ' · linked' : ''}
                           </span>
                         </li>
                       ))}
