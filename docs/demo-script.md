@@ -77,4 +77,4 @@ Between runs, all `source=sample, trial=1` rows, their local files and Pinecone 
 
 - `/mom` camera upload on a physical phone: the backend upload path is tested, but no phone-camera rehearsal is claimed.
 - Public Box folder: H8 still needs the founder to share folder `440822123671` as “People with the link · Can view.”
-- Founder video, voice, social post and form submission: human-only H9/H10. Nothing was recorded, posted or submitted.
+- X post and form submission: human-only H9/H10. The 79.89-second demo cut is ready for the post; nothing has been posted or submitted.

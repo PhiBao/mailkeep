@@ -1,19 +1,19 @@
 # Social post
 
-Post only after H9 recording. Tag `@flydotio` and include `#Hacksgiving`.
+The 79.89-second demo cut is recorded at 1080p with burned-in subtitles. Attach that file natively to the X post. The founder approves and publishes the post; the agent does not post.
 
-## Primary post — 232 characters
+## Primary post — 275 characters
 
-Mailkeep remembers every letter Mom gets—and catches the second notice. Built on @flydotio Sprites with AgentMail, Ollama, TypeSafe, Pinecone and Box connectors. See the live demo: https://mailkeep-hl3m.sprites.app/demo #Hacksgiving
+Meet Mailkeep: Ruth photographs a bill, and her family gets the part that matters. It links second notices, asks one clear question when a match is uncertain, and files the evidence in Box. Built on @flydotio Sprites. Demo: https://mailkeep-hl3m.sprites.app/demo #Hacksgiving
 
-## Alternate — 222 characters
+## Alternate — 231 characters
 
-A second notice is only dangerous when nobody connects it to the first. Mailkeep does—on @flydotio Sprites, with AgentMail, Ollama, TypeSafe, Pinecone and Box. Live demo: https://mailkeep-hl3m.sprites.app/demo #Hacksgiving
+Meet Mailkeep: a photographed bill becomes a family case. It links second notices, asks when a match is uncertain, and files the evidence in Box. Built on @flydotio Sprites. Demo: https://mailkeep-hl3m.sprites.app/demo #Hacksgiving
 
 ## Posting notes
 
-- Use the 0:45 cut from `submission/VIDEO_SCRIPTS.md`.
-- Paste the final hosted video URL after H9. Do not use a local file path.
-- Keep the live demo URL in the post text even if the platform creates its own link preview.
-- Do not claim a personal family story, user feedback, live PAID reply, or public Box sharing until those proofs exist.
-- Nothing has been posted by the agent.
+- Attach the recorded 79.89-second cut directly to X. Do not use the older 0:45 script.
+- Keep the live demo URL in the post text even if X creates its own link preview.
+- Paste the published post URL into the submission form.
+- Claims are limited to the public demo, the live PAID proof and the held-out results. Do not claim a personal family story, user feedback or public Box sharing.
+- Nothing has been posted or submitted by the agent.

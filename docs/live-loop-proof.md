@@ -46,4 +46,4 @@ The Box gateway permits reading current file metadata and content but denies the
 - One cold-start webhook request returned `502`; `/healthz` returned `200`, and the immediate retry returned `202` and processed normally.
 - The pre-T48 failed clarification outbox row `out_vok-OqDrAP3d6ZO6eYBlg` remains as historical evidence. It did not block the successful fresh `NO` reply.
 - Public Box sharing remains blocked until the founder shares the demo folder. This proof used the household's private Box folder.
-- No video, voiceover, social post, form submission or email outside the three permitted addresses was created.
+- No social post, form submission or email outside the three permitted addresses was created. The 79.89-second demo video and voiceover were produced separately after this proof.

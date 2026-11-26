@@ -52,9 +52,9 @@ test.skip('Box shared folder opens publicly', async () => {
 });
 
 test.skip('demo video opens publicly', async () => {
-  // H9: founder must record, host and supply the video URL.
+  // H9: the cut is ready; founder must upload it with the launch post and supply the URL.
 });
 
 test.skip('social post opens publicly and tags @flydotio', async () => {
-  // H9: founder must post and supply the public URL.
+  // H9: founder must publish the post with the video and supply the public URL.
 });

@@ -6,7 +6,7 @@ A personal mail agent on a Fly.io Sprite for the adult child of an older parent.
 
 **[Open the live demo](https://mailkeep-hl3m.sprites.app/demo)** · **[See how it runs](https://mailkeep-hl3m.sprites.app/proof)** · **[Code](https://github.com/PhiBao/mailkeep)**
 
-**Demo video:** _pending founder recording (H9); no video has been generated._
+**Demo video:** 79.89-second walkthrough recorded at 1080p for the X launch post, not hosted in this repo.
 
 ## Try it in 60 seconds
 
@@ -149,7 +149,7 @@ Live proof: two clean canonical runs on product build `d6de088` joined seeded ca
 | T18 live PAID reply       | Live           | Exact PAID on the Cedar alert thread marked the case paid, letter handled and versioned Box `case.md`                                     |
 | T25 exact L01 amount copy | Known gap      | Live API returned amount null; UI fixture verifies intended copy                                                                          |
 | H8 Box public sharing     | Awaiting human | Folder exists; shared view link not yet supplied                                                                                          |
-| Video/social/form         | Human tasks    | Scripts/package are prepared; nothing posted or submitted                                                                                 |
+| Launch media              | Video ready    | 79.89 s, 1080p demo cut ready for the X post; nothing posted or submitted                                                                 |
 
 ## Evaluation
 
